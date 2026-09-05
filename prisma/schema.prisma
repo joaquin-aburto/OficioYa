@@ -1,0 +1,320 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+// ENUMS
+
+
+enum Urgencia {
+  Normal
+  Urgente
+}
+
+enum EstadoSolicitud {
+  Pendiente
+  Aceptada
+  Rechazada
+  Cotizada
+  EnCurso
+  Terminada
+  Cancelada
+  Calificada
+}
+
+enum EstadoCotizacion {
+  Enviada
+  Aceptada
+  Rechazada
+}
+
+enum DiaSemana {
+  Lunes
+  Martes
+  Miercoles
+  Jueves
+  Viernes
+  Sabado
+  Domingo
+}
+
+enum MetodoPago {
+  Tarjeta
+  Efectivo
+  Transferencia
+}
+
+enum EstadoPago {
+  Pendiente
+  Completado
+  Fallido
+}
+
+enum DestinatarioTipo {
+  Usuario
+  Trabajador
+}
+
+enum TipoNotificacion {
+  NuevaSolicitud
+  Cotizacion
+  Pago
+  Calificacion
+  General
+}
+
+
+// Entidades
+
+
+model Usuario {
+  id             Int      @id @default(autoincrement())
+  nombre         String
+  correo         String   @unique
+  telefono       String?
+  contrasenaHash String
+  fotoPerfil     String?
+  fechaRegistro  DateTime @default(now())
+  activo         Boolean  @default(true)
+
+  direcciones    Direccion[]
+  solicitudes    Solicitud[]    @relation("SolicitudCliente")
+  calificaciones Calificacion[] @relation("CalificacionCliente")
+  pagos          Pago[]         @relation("PagoCliente")
+
+  @@map("usuarios")
+}
+
+
+model Trabajador {
+  id              Int      @id @default(autoincrement())
+  nombre          String
+  correo          String   @unique
+  telefono        String?
+  contrasenaHash  String
+  fotoPerfil      String?
+  descripcion     String?
+  anosExperiencia Int?
+  verificado      Boolean  @default(false)
+  fechaRegistro   DateTime @default(now())
+  activo          Boolean  @default(true)
+
+  especialidades TrabajadorEspecialidad[]
+  servicios      Servicio[]
+  disponibilidad Disponibilidad[]
+  fotosTrabajos  FotoTrabajo[]
+  solicitudes    Solicitud[]    @relation("SolicitudTrabajador")
+  cotizaciones   Cotizacion[]
+  calificaciones Calificacion[] @relation("CalificacionTrabajador")
+  pagos          Pago[]         @relation("PagoTrabajador")
+
+  @@map("trabajadores")
+}
+
+
+
+model Especialidad {
+  id          Int     @id @default(autoincrement())
+  nombre      String
+  descripcion String?
+  icono       String?
+
+  trabajadores TrabajadorEspecialidad[]
+  servicios    Servicio[]
+  solicitudes  Solicitud[]
+
+  @@map("especialidades")
+}
+
+model TrabajadorEspecialidad {
+  trabajadorId   Int
+  especialidadId Int
+
+  trabajador   Trabajador   @relation(fields: [trabajadorId], references: [id])
+  especialidad Especialidad @relation(fields: [especialidadId], references: [id])
+
+  @@id([trabajadorId, especialidadId])
+  @@map("trabajadores_especialidades")
+}
+
+
+
+model Servicio {
+  id             Int     @id @default(autoincrement())
+  trabajadorId   Int
+  especialidadId Int
+  nombre         String
+  descripcion    String?
+  precioBase     Decimal @db.Decimal(10, 2)
+  activo         Boolean @default(true)
+
+  trabajador   Trabajador   @relation(fields: [trabajadorId], references: [id])
+  especialidad Especialidad @relation(fields: [especialidadId], references: [id])
+
+  @@map("servicios")
+}
+
+
+
+model Solicitud {
+  id                   Int             @id @default(autoincrement())
+  clienteId            Int
+  trabajadorAsignadoId Int?
+  direccionId          Int
+  especialidadId       Int
+  descripcion          String
+  urgencia             Urgencia        @default(Normal)
+  fechaDeseada         DateTime?
+  estado               EstadoSolicitud @default(Pendiente)
+  fechaCreacion        DateTime        @default(now())
+  fechaActualizacion   DateTime        @updatedAt
+
+  cliente            Usuario      @relation("SolicitudCliente", fields: [clienteId], references: [id])
+  trabajadorAsignado Trabajador?  @relation("SolicitudTrabajador", fields: [trabajadorAsignadoId], references: [id])
+  direccion          Direccion    @relation(fields: [direccionId], references: [id])
+  especialidad       Especialidad @relation(fields: [especialidadId], references: [id])
+
+  cotizaciones  Cotizacion[]
+  fotosTrabajos FotoTrabajo[]
+  calificacion  Calificacion?
+  pago          Pago?
+
+  @@map("solicitudes")
+}
+
+
+
+model Cotizacion {
+  id           Int              @id @default(autoincrement())
+  solicitudId  Int
+  trabajadorId Int
+  monto        Decimal          @db.Decimal(10, 2)
+  comentario   String?
+  estado       EstadoCotizacion @default(Enviada)
+  fechaEnvio   DateTime         @default(now())
+
+  solicitud  Solicitud  @relation(fields: [solicitudId], references: [id])
+  trabajador Trabajador @relation(fields: [trabajadorId], references: [id])
+
+  @@map("cotizaciones")
+}
+
+
+
+model Disponibilidad {
+  id           Int       @id @default(autoincrement())
+  trabajadorId Int
+  diaSemana    DiaSemana
+  horaInicio   String // formato "HH:MM"
+  horaFin      String // formato "HH:MM"
+
+  trabajador Trabajador @relation(fields: [trabajadorId], references: [id])
+
+  @@map("disponibilidad")
+}
+
+
+
+model Direccion {
+  id          Int      @id @default(autoincrement())
+  usuarioId   Int
+  alias       String?
+  calle       String
+  colonia     String?
+  ciudad      String?
+  referencias String?
+  latitud     Decimal? @db.Decimal(9, 6)
+  longitud    Decimal? @db.Decimal(9, 6)
+
+  usuario     Usuario     @relation(fields: [usuarioId], references: [id])
+  solicitudes Solicitud[]
+
+  @@map("direcciones")
+}
+
+
+
+model Calificacion {
+  id           Int      @id @default(autoincrement())
+  solicitudId  Int      @unique
+  clienteId    Int
+  trabajadorId Int
+  puntuacion   Int
+  comentario   String?
+  fecha        DateTime @default(now())
+
+  solicitud  Solicitud  @relation(fields: [solicitudId], references: [id])
+  cliente    Usuario    @relation("CalificacionCliente", fields: [clienteId], references: [id])
+  trabajador Trabajador @relation("CalificacionTrabajador", fields: [trabajadorId], references: [id])
+
+  @@map("calificaciones")
+}
+
+
+
+model FotoTrabajo {
+  id           Int      @id @default(autoincrement())
+  trabajadorId Int
+  solicitudId  Int?
+  urlImagen    String
+  descripcion  String?
+  fechaSubida  DateTime @default(now())
+
+  trabajador Trabajador @relation(fields: [trabajadorId], references: [id])
+  solicitud  Solicitud? @relation(fields: [solicitudId], references: [id])
+
+  @@map("fotos_trabajos")
+}
+
+
+
+model Pago {
+  id           Int        @id @default(autoincrement())
+  solicitudId  Int        @unique
+  clienteId    Int
+  trabajadorId Int
+  montoTotal   Decimal    @db.Decimal(10, 2)
+  metodoPago   MetodoPago
+  estado       EstadoPago @default(Pendiente)
+  fechaPago    DateTime   @default(now())
+
+  solicitud  Solicitud  @relation(fields: [solicitudId], references: [id])
+  cliente    Usuario    @relation("PagoCliente", fields: [clienteId], references: [id])
+  trabajador Trabajador @relation("PagoTrabajador", fields: [trabajadorId], references: [id])
+  comision   Comision?
+
+  @@map("pagos")
+}
+
+
+
+model Comision {
+  id                 Int      @id @default(autoincrement())
+  pagoId             Int      @unique
+  porcentajeAplicado Decimal  @db.Decimal(5, 2)
+  montoComision      Decimal  @db.Decimal(10, 2)
+  fecha              DateTime @default(now())
+
+  pago Pago @relation(fields: [pagoId], references: [id])
+
+  @@map("comisiones")
+}
+
+
+
+model Notificacion {
+  id               Int              @id @default(autoincrement())
+  destinatarioTipo DestinatarioTipo
+  destinatarioId   Int
+  tipo             TipoNotificacion
+  mensaje          String
+  leido            Boolean          @default(false)
+  fechaCreacion    DateTime         @default(now())
+
+  @@map("notificaciones")
+}

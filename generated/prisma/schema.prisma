@@ -7,9 +7,7 @@ datasource db {
   provider = "postgresql"
 }
 
-
 // ENUMS
-
 
 enum Urgencia {
   Normal
@@ -68,9 +66,7 @@ enum TipoNotificacion {
   General
 }
 
-
 // Entidades
-
 
 model Usuario {
   id             Int      @id @default(autoincrement())
@@ -90,7 +86,6 @@ model Usuario {
   @@map("usuarios")
 }
 
-
 model Trabajador {
   id              Int      @id @default(autoincrement())
   nombre          String
@@ -108,15 +103,13 @@ model Trabajador {
   servicios      Servicio[]
   disponibilidad Disponibilidad[]
   fotosTrabajos  FotoTrabajo[]
-  solicitudes    Solicitud[]    @relation("SolicitudTrabajador")
+  solicitudes    Solicitud[]              @relation("SolicitudTrabajador")
   cotizaciones   Cotizacion[]
-  calificaciones Calificacion[] @relation("CalificacionTrabajador")
-  pagos          Pago[]         @relation("PagoTrabajador")
+  calificaciones Calificacion[]           @relation("CalificacionTrabajador")
+  pagos          Pago[]                   @relation("PagoTrabajador")
 
   @@map("trabajadores")
 }
-
-
 
 model Especialidad {
   id          Int     @id @default(autoincrement())
@@ -142,8 +135,6 @@ model TrabajadorEspecialidad {
   @@map("trabajadores_especialidades")
 }
 
-
-
 model Servicio {
   id             Int     @id @default(autoincrement())
   trabajadorId   Int
@@ -158,8 +149,6 @@ model Servicio {
 
   @@map("servicios")
 }
-
-
 
 model Solicitud {
   id                   Int             @id @default(autoincrement())
@@ -187,8 +176,6 @@ model Solicitud {
   @@map("solicitudes")
 }
 
-
-
 model Cotizacion {
   id           Int              @id @default(autoincrement())
   solicitudId  Int
@@ -204,8 +191,6 @@ model Cotizacion {
   @@map("cotizaciones")
 }
 
-
-
 model Disponibilidad {
   id           Int       @id @default(autoincrement())
   trabajadorId Int
@@ -217,8 +202,6 @@ model Disponibilidad {
 
   @@map("disponibilidad")
 }
-
-
 
 model Direccion {
   id          Int      @id @default(autoincrement())
@@ -237,8 +220,6 @@ model Direccion {
   @@map("direcciones")
 }
 
-
-
 model Calificacion {
   id           Int      @id @default(autoincrement())
   solicitudId  Int      @unique
@@ -255,8 +236,6 @@ model Calificacion {
   @@map("calificaciones")
 }
 
-
-
 model FotoTrabajo {
   id           Int      @id @default(autoincrement())
   trabajadorId Int
@@ -270,8 +249,6 @@ model FotoTrabajo {
 
   @@map("fotos_trabajos")
 }
-
-
 
 model Pago {
   id           Int        @id @default(autoincrement())
@@ -291,8 +268,6 @@ model Pago {
   @@map("pagos")
 }
 
-
-
 model Comision {
   id                 Int      @id @default(autoincrement())
   pagoId             Int      @unique
@@ -304,8 +279,6 @@ model Comision {
 
   @@map("comisiones")
 }
-
-
 
 model Notificacion {
   id               Int              @id @default(autoincrement())

@@ -17,7 +17,13 @@
     "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
+<<<<<<< HEAD
     "next": "^16.3.5",
+=======
+    "framer-motion": "^13.2.0",
+    "lucide-react": "^1.45.0",
+    "next": "^16.3.4",
+>>>>>>> 15e1298205930a5638021ab5e7c30ee02810a7ea
     "pg": "^8.23.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

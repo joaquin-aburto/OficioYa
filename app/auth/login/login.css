@@ -223,6 +223,7 @@
   font-weight: 800;
 }
 
+
 @media (max-width: 800px) {
   .login-page {
     display: block;
@@ -243,6 +244,7 @@
   }
 }
 
+<<<<<<< HEAD
 .brand-logo {
   width: 48px;
   height: 48px;
@@ -250,6 +252,8 @@
   border-radius: 12px;
 }
 
+=======
+>>>>>>> 15e1298205930a5638021ab5e7c30ee02810a7ea
 @media (prefers-reduced-motion: reduce) {
   .login-form input,
   .login-form button {

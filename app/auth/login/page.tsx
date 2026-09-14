@@ -25,10 +25,7 @@ export default function LoginPage() {
       })
       const data = await response.json()
 
-      if (response.ok) {
-        router.push('../../preubaB')
-        return
-      }
+    
 
       setMensaje(data.error || data.message || 'No se pudo iniciar sesión.')
     } catch {
@@ -42,7 +39,15 @@ export default function LoginPage() {
     <main className="login-page">
       <section className="login-panel" aria-labelledby="login-title">
         <Link className="login-brand" href="/" aria-label="Volver a OficioYa">
+<<<<<<< HEAD
           <span className="brand-mark">O</span>
+=======
+          <img
+            src="https://jqhlnwusmwtqxxvtitht.supabase.co/storage/v1/object/public/ImagesOficioYa/OficioYa/Logo/LogoOficioYa-Log.png"
+            alt="OficioYa"
+            className="brand-logo"
+          />
+>>>>>>> 15e1298205930a5638021ab5e7c30ee02810a7ea
           <span>OficioYa</span>
         </Link>
 
@@ -67,7 +72,11 @@ export default function LoginPage() {
 
           <div className="password-row">
             <label htmlFor="contrasena">Contraseña</label>
+<<<<<<< HEAD
             <Link href="/recuperar-contrasena">¿La olvidaste?</Link>
+=======
+            <Link href="/auth/login/recoverPassword">¿La olvidaste?</Link>
+>>>>>>> 15e1298205930a5638021ab5e7c30ee02810a7ea
           </div>
           <input
             id="contrasena"
@@ -88,7 +97,11 @@ export default function LoginPage() {
         {mensaje && <p className="login-message" role="status">{mensaje}</p>}
 
         <p className="signup-text">
+<<<<<<< HEAD
           ¿Todavía no tienes cuenta? <Link href="/registro">Crea una gratis</Link>
+=======
+          ¿Todavía no tienes cuenta? <Link href="/auth/register">Crea una gratis</Link>
+>>>>>>> 15e1298205930a5638021ab5e7c30ee02810a7ea
         </p>
       </section>
 

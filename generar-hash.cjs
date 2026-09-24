@@ -1,0 +1,1 @@
+ console.log(require('bcryptjs').hashSync('Panfilo1234', 10))

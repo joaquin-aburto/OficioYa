@@ -1,0 +1,1 @@
+export const COMISION_PORCENTAJE = 10

@@ -5,6 +5,20 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import './login.css'
 
+type Tipo = 'cliente' | 'trabajador' | 'admin'
+
+// Mismas llaves que ya usan los tres dashboards
+const STORAGE_KEY: Record<Tipo, string> = {
+  cliente: 'oficioya_usuario',
+  trabajador: 'oficioya_trabajador',
+  admin: 'oficioya_admin',
+}
+const DESTINO: Record<Tipo, string> = {
+  cliente: '/cliente/dashboard',
+  trabajador: '/trabajador/dashboard',
+  admin: '/admin/dashboard',
+}
+
 export default function LoginPage() {
   const router = useRouter()
   const [correo, setCorreo] = useState('')
@@ -26,7 +40,14 @@ export default function LoginPage() {
       const data = await response.json()
 
       if (response.ok) {
-        router.push('../../pruebaB')
+        const tipo = data.tipo as Tipo
+        // Por si había una sesión de otro tipo de cuenta abierta en este navegador
+        Object.values(STORAGE_KEY).forEach((k) => localStorage.removeItem(k))
+        localStorage.setItem(
+          STORAGE_KEY[tipo],
+          JSON.stringify(tipo === 'admin' ? { correo: data.user.correo } : { id: data.user.id, nombre: data.user.nombre })
+        )
+        router.push(DESTINO[tipo])
         return
       }
 

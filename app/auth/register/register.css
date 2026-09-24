@@ -1,0 +1,146 @@
+/* Extras del registro. La base (.login-page, .login-panel, .login-form, etc.)
+   viene de ../login/login.css. Cambia estas variables para igualar tu marca. */
+
+.register-page {
+  --reg-ink: #10243e;
+  --reg-line: #cfd8e3;
+  --reg-soft: #f2f6fa;
+  --reg-muted: #5b6a7b;
+  --reg-focus: #1f5fa8;
+  --reg-error: #c23636;
+}
+
+/* Selector: cliente / profesional */
+.register-page .role-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 20px 0 4px;
+}
+.register-page .role-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 2px solid var(--reg-line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--reg-ink);
+  cursor: pointer;
+  line-height: 1.3;
+}
+.register-page .role-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.register-page .role-option:hover {
+  border-color: var(--reg-ink);
+}
+.register-page .role-option.on {
+  border-color: var(--reg-ink);
+  background: var(--reg-soft);
+  box-shadow: inset 0 0 0 1px var(--reg-ink);
+}
+.register-page .role-option:focus-within {
+  outline: 3px solid var(--reg-focus);
+  outline-offset: 2px;
+}
+.register-page .role-emoji {
+  font-size: 24px;
+  line-height: 1.2;
+}
+.register-page .role-option strong {
+  font-size: 15px;
+}
+.register-page .role-detail {
+  color: var(--reg-muted);
+  font-size: 13px;
+}
+
+/* Oficios (solo profesionales). Se usan <label> + checkbox oculto para no heredar
+   los estilos de botón/input de .login-form */
+.register-page .oficio-fieldset {
+  margin: 14px 0 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.register-page .oficio-fieldset legend {
+  padding: 0;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.register-page .oficio-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.register-page .login-form .oficio-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  margin: 0;
+  padding: 8px 14px;
+  border: 1px solid var(--reg-line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--reg-ink);
+  font-weight: 500;
+  cursor: pointer;
+}
+.register-page .login-form .oficio-chip input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+}
+.register-page .login-form .oficio-chip:hover {
+  border-color: var(--reg-ink);
+}
+.register-page .login-form .oficio-chip.on {
+  border-color: var(--reg-ink);
+  background: var(--reg-ink);
+  color: #fff;
+}
+.register-page .login-form .oficio-chip:focus-within {
+  outline: 3px solid var(--reg-focus);
+  outline-offset: 2px;
+}
+
+/* Textos de apoyo */
+.register-page .reg-hint {
+  margin: 0;
+  color: var(--reg-muted);
+  font-size: 14px;
+}
+.register-page .reg-hint-error {
+  color: var(--reg-error);
+}
+.register-page .reg-verif {
+  margin-top: 14px;
+}
+.register-page .login-form .reg-link {
+  all: unset;
+  color: var(--reg-focus);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* El formulario del registro es más largo: deja que el panel haga scroll en pantallas bajas */
+.register-page .login-panel {
+  overflow-y: auto;
+}
+
+@media (max-width: 480px) {
+  .register-page .role-picker {
+    grid-template-columns: 1fr;
+  }
+}

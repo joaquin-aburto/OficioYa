@@ -26,24 +26,25 @@ export async function POST(req: Request) {
 
     /* -------------------------------- Admin -------------------------------- */
     const correoAdmin = process.env.ADMIN_CORREO?.trim().toLowerCase()
-    console.log('[debug admin] ADMIN_CORREO leído:', JSON.stringify(correoAdmin))
-    console.log('[debug admin] correo escrito en el form:', JSON.stringify(correo))
     if (correoAdmin && correo === correoAdmin) {
       const hashAdmin = process.env.ADMIN_CONTRASENA_HASH
       const contrasenaPlanaAdmin = process.env.ADMIN_CONTRASENA
-
-      console.log('[debug admin] hashAdmin definido:', Boolean(hashAdmin))
-      console.log('[debug admin] hashAdmin (primeros 10 chars):', hashAdmin?.slice(0, 10))
-      console.log('[debug admin] hashAdmin longitud:', hashAdmin?.length, '(debe ser 60)')
-      console.log('[debug admin] contrasena escrita en el form:', JSON.stringify(contrasena))
 
       if (!hashAdmin && !contrasenaPlanaAdmin) {
         console.error('Faltan variables de entorno ADMIN_CONTRASENA_HASH / ADMIN_CONTRASENA')
         return NextResponse.json({ error: 'El acceso de administrador no está configurado.' }, { status: 500 })
       }
+      // Un hash de bcrypt válido siempre mide 60 caracteres y empieza con $2a$, $2b$ o $2y$.
+      // Si no cumple esto, seguro se corrompió al copiarlo (el $ se interpretó en una terminal).
+      if (hashAdmin && !/^\$2[aby]\$\d{2}\$.{53}$/.test(hashAdmin)) {
+        console.error(
+          `ADMIN_CONTRASENA_HASH no tiene formato de bcrypt válido (longitud ${hashAdmin.length}, debe ser 60). ` +
+            'Vuelve a generarlo y pégalo directo en el .env, sin pasarlo por una terminal.'
+        )
+        return NextResponse.json({ error: 'El acceso de administrador no está configurado correctamente.' }, { status: 500 })
+      }
 
       const ok = hashAdmin ? await bcrypt.compare(contrasena, hashAdmin) : contrasena === contrasenaPlanaAdmin
-      console.log('[debug admin] resultado de bcrypt.compare:', ok)
       if (!ok) return NextResponse.json({ error: MENSAJE_GENERICO }, { status: 401 })
 
       return NextResponse.json({

@@ -1,26 +1,24 @@
 import { NextResponse } from 'next/server'
 import prisma from '../../../lib/prisma'
+import { subirFotoPerfil } from '../../../lib/fotoPerfil'
 import bcrypt from 'bcryptjs'
 
-// POST /api/auth/register
-// Body: { tipo: 'cliente' | 'trabajador', nombre, correo, telefono?, contrasena,
-//         // solo trabajador:
-//         especialidadIds: number[], anosExperiencia?, descripcion? }
 
 const CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const fail = (error: string, status = 400) => NextResponse.json({ error }, { status })
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json()
+    const form = await req.formData()
+    const campo = (nombre: string) => String(form.get(nombre) ?? '').trim()
 
-    const tipo = body.tipo === 'trabajador' ? 'trabajador' : body.tipo === 'cliente' ? 'cliente' : null
+    const tipo = campo('tipo') === 'trabajador' ? 'trabajador' : campo('tipo') === 'cliente' ? 'cliente' : null
     if (!tipo) return fail('Elige si te registras como cliente o como profesional.')
 
-    const nombre = String(body.nombre ?? '').trim()
-    const correo = String(body.correo ?? '').trim().toLowerCase()
-    const contrasena = String(body.contrasena ?? '')
-    const telefonoDigitos = String(body.telefono ?? '').replace(/\D/g, '')
+    const nombre = campo('nombre')
+    const correo = campo('correo').toLowerCase()
+    const contrasena = String(form.get('contrasena') ?? '')
+    const telefonoDigitos = campo('telefono').replace(/\D/g, '')
 
     if (nombre.length < 2) return fail('Escribe tu nombre.')
     if (!CORREO.test(correo)) return fail('Escribe un correo válido.')
@@ -30,6 +28,16 @@ export async function POST(req: Request) {
     }
     const telefono = telefonoDigitos || null
 
+    // El archivo es opcional: si no viene, form.get devuelve null y
+    // subirFotoPerfil usa la foto por defecto de ese tipo de cuenta.
+    const archivo = form.get('archivo')
+    let fotoPerfil: string
+    try {
+      fotoPerfil = await subirFotoPerfil(tipo, archivo instanceof File ? archivo : null)
+    } catch (e) {
+      return fail(e instanceof Error ? e.message : 'No pudimos subir tu foto.')
+    }
+
     const contrasenaHash = await bcrypt.hash(contrasena, 10)
 
     /* ------------------------------ Cliente ------------------------------ */
@@ -38,7 +46,7 @@ export async function POST(req: Request) {
       if (existe) return fail('Este correo ya está registrado como cliente.', 409)
 
       const usuario = await prisma.usuario.create({
-        data: { nombre, correo, telefono, contrasenaHash },
+        data: { nombre, correo, telefono, contrasenaHash, fotoPerfil },
         select: { id: true, nombre: true, correo: true },
       })
       return NextResponse.json(
@@ -48,11 +56,17 @@ export async function POST(req: Request) {
     }
 
     /* ----------------------------- Trabajador ----------------------------- */
+    let especialidadIdsCrudo: unknown[] = []
+    try {
+      especialidadIdsCrudo = JSON.parse(campo('especialidadIds') || '[]')
+    } catch {
+      return fail('Elige al menos un oficio para poder recibir solicitudes.')
+    }
     const ids: number[] = Array.from(
       new Set(
-        (Array.isArray(body.especialidadIds) ? body.especialidadIds : [])
-          .map((n: unknown) => Number(n))
-          .filter((n: number) => Number.isInteger(n) && n > 0)
+        (Array.isArray(especialidadIdsCrudo) ? especialidadIdsCrudo : [])
+          .map((n) => Number(n))
+          .filter((n) => Number.isInteger(n) && n > 0)
       )
     )
     if (ids.length === 0) return fail('Elige al menos un oficio para poder recibir solicitudes.')
@@ -61,12 +75,13 @@ export async function POST(req: Request) {
     if (validas !== ids.length) return fail('Alguno de los oficios elegidos no es válido.')
 
     let anosExperiencia: number | null = null
-    if (body.anosExperiencia !== undefined && body.anosExperiencia !== null && body.anosExperiencia !== '') {
-      const n = Number(body.anosExperiencia)
+    const anosCrudo = campo('anosExperiencia')
+    if (anosCrudo !== '') {
+      const n = Number(anosCrudo)
       if (!Number.isInteger(n) || n < 0 || n > 60) return fail('Los años de experiencia deben ser un número entre 0 y 60.')
       anosExperiencia = n
     }
-    const descripcion = String(body.descripcion ?? '').trim().slice(0, 500) || null
+    const descripcion = campo('descripcion').slice(0, 500) || null
 
     const existe = await prisma.trabajador.findUnique({ where: { correo } })
     if (existe) return fail('Este correo ya está registrado como profesional.', 409)
@@ -77,6 +92,7 @@ export async function POST(req: Request) {
         correo,
         telefono,
         contrasenaHash,
+        fotoPerfil,
         anosExperiencia,
         descripcion,
         // verificado queda en false hasta que lo revises

@@ -1,6 +1,3 @@
-/* Extras del panel de administrador.
-   Los estilos base (.dash, .side, .stats, .btn, .modal…) vienen de
-   ../../cliente/dashboard/dashboard.css */
 
 .dash .admin-icon {
   display: grid;

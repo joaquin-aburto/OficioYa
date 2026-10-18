@@ -1,9 +1,10 @@
 'use client'
 
-import { FormEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { ChangeEvent, FormEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import './dashboard.css'
+import { subirFotosProblema, validarFoto, MAX_FOTOS } from '../../lib/fotoProblema'
 
 /* ------------------------------------------------------------------ */
 /* Tipos                                                               */
@@ -808,7 +809,7 @@ export default function ClienteDashboardPage() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Modal: nueva solicitud                                              */
+/* Modal: nueva solicitud (con fotos del problema)                     */
 /* ------------------------------------------------------------------ */
 
 function NuevaSolicitudModal({
@@ -836,24 +837,71 @@ function NuevaSolicitudModal({
   const [ciudad, setCiudad] = useState('')
   const [aviso, setAviso] = useState('')
 
+  // Fotos del problema (opcional, hasta MAX_FOTOS)
+  const [fotos, setFotos] = useState<File[]>([])
+  const [fotoPreviews, setFotoPreviews] = useState<string[]>([])
+  const [subiendoFotos, setSubiendoFotos] = useState(false)
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  function enviar(e: FormEvent) {
+  // Libera las vistas previas al cerrar el modal
+  useEffect(() => {
+    return () => fotoPreviews.forEach((url) => URL.revokeObjectURL(url))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  function agregarFotos(event: ChangeEvent<HTMLInputElement>) {
+    const nuevas = Array.from(event.target.files ?? [])
+    event.target.value = '' // permite volver a elegir el mismo archivo
+    if (fotos.length + nuevas.length > MAX_FOTOS) return setAviso(`Puedes subir máximo ${MAX_FOTOS} fotos.`)
+    for (const archivo of nuevas) {
+      const err = validarFoto(archivo)
+      if (err) return setAviso(err)
+    }
+    setAviso('')
+    setFotos((f) => [...f, ...nuevas])
+    setFotoPreviews((p) => [...p, ...nuevas.map((a) => URL.createObjectURL(a))])
+  }
+
+  function quitarFoto(i: number) {
+    setFotoPreviews((p) => {
+      URL.revokeObjectURL(p[i])
+      return p.filter((_, idx) => idx !== i)
+    })
+    setFotos((f) => f.filter((_, idx) => idx !== i))
+  }
+
+  async function enviar(e: FormEvent) {
     e.preventDefault()
     if (!especialidadId) return setAviso('Elige qué tipo de profesional necesitas.')
     if (descripcion.trim().length < 10) return setAviso('Cuéntanos un poco más del problema (mínimo 10 caracteres).')
     if (direccionId === 'nueva' && !calle.trim()) return setAviso('Agrega la dirección donde se necesita el servicio.')
     setAviso('')
 
+    // Primero se suben las fotos a Supabase; al backend solo van las URLs
+    let urlsFotos: string[] = []
+    if (fotos.length > 0) {
+      setSubiendoFotos(true)
+      try {
+        urlsFotos = await subirFotosProblema(fotos)
+      } catch (err) {
+        setAviso(err instanceof Error ? err.message : 'No pudimos subir las fotos.')
+        setSubiendoFotos(false)
+        return
+      }
+      setSubiendoFotos(false)
+    }
+
     onSubmit({
       especialidadId,
       descripcion,
       urgencia,
       fechaDeseada: fechaDeseada || null,
+      fotos: urlsFotos,
       ...(direccionId === 'nueva'
         ? { direccionNueva: { alias: 'Casa', calle, colonia, ciudad } }
         : { direccionId: Number(direccionId) }),
@@ -894,6 +942,36 @@ function NuevaSolicitudModal({
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
             placeholder="Desde cuándo pasa, dónde está el problema, si ya intentaste algo…"
+          />
+        </div>
+
+        {/* Fotos del problema */}
+        <div className="field">
+          <label htmlFor="m-fotos">Fotos del problema (opcional, hasta {MAX_FOTOS})</label>
+          <div className="foto-grid">
+            {fotoPreviews.map((url, i) => (
+              <div key={url} className="foto-thumb">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={url} alt={`Foto ${i + 1} del problema`} />
+                <button type="button" className="foto-quitar" onClick={() => quitarFoto(i)} aria-label="Quitar foto">
+                  <Icon name="close" size={14} />
+                </button>
+              </div>
+            ))}
+            {fotos.length < MAX_FOTOS && (
+              <label htmlFor="m-fotos" className="foto-agregar">
+                <Icon name="plus" size={20} />
+                <span>Agregar</span>
+              </label>
+            )}
+          </div>
+          <input
+            id="m-fotos"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            multiple
+            onChange={agregarFotos}
+            className="avatar-upload-input"
           />
         </div>
 
@@ -938,8 +1016,8 @@ function NuevaSolicitudModal({
 
         <div className="modal-actions">
           <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
-          <button type="submit" className="btn btn-primary" disabled={ocupado}>
-            {ocupado ? 'Enviando…' : 'Enviar solicitud'}
+          <button type="submit" className="btn btn-primary" disabled={ocupado || subiendoFotos}>
+            {subiendoFotos ? 'Subiendo fotos…' : ocupado ? 'Enviando…' : 'Enviar solicitud'}
           </button>
         </div>
       </form>

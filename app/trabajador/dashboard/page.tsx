@@ -26,6 +26,7 @@ type Lead = {
   direccion: { colonia: string | null; ciudad: string | null }
   clienteNombre: string
   totalCotizaciones: number
+  fotos: string[]
 }
 type MiCotizacion = {
   id: number
@@ -33,7 +34,7 @@ type MiCotizacion = {
   comentario: string | null
   estado: 'Enviada' | 'Aceptada' | 'Rechazada'
   fechaEnvio: string
-  solicitud: { id: number; descripcion: string; urgencia: Urgencia; estado: string; especialidad: { nombre: string } }
+  solicitud: { id: number; descripcion: string; urgencia: Urgencia; estado: string; especialidad: { nombre: string }; fotos: string[] }
 }
 type Trabajo = {
   id: number
@@ -46,6 +47,7 @@ type Trabajo = {
   direccion: { alias: string | null; calle: string; colonia: string | null; ciudad: string | null; referencias: string | null }
   monto: number | null
   pago: { id: number; estado: string; metodoPago: Metodo } | null
+  fotos: string[]
 }
 type Pago = {
   id: number
@@ -214,6 +216,55 @@ function Estrellas({ valor, total }: { valor: number | null; total: number }) {
       <strong>{valor.toFixed(1)}</strong>
       <span className="rating-count">({total})</span>
     </span>
+  )
+}
+
+// Miniaturas de las fotos que subió el cliente; al tocar una se ve grande
+function FotosProblema({ fotos }: { fotos?: string[] }) {
+  const [abierta, setAbierta] = useState<number | null>(null)
+  const lista = fotos ?? []
+
+  useEffect(() => {
+    if (abierta === null) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setAbierta(null)
+      if (e.key === 'ArrowRight') setAbierta((i) => (i === null ? i : (i + 1) % lista.length))
+      if (e.key === 'ArrowLeft') setAbierta((i) => (i === null ? i : (i - 1 + lista.length) % lista.length))
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [abierta, lista.length])
+
+  if (lista.length === 0) return null
+
+  return (
+    <>
+      <div className="fotos-problema" aria-label={`Fotos del problema (${lista.length})`}>
+        {lista.map((url, i) => (
+          <button type="button" key={url} className="foto-mini" onClick={() => setAbierta(i)} aria-label={`Ver foto ${i + 1} de ${lista.length}`}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={url} alt="" loading="lazy" />
+          </button>
+        ))}
+      </div>
+
+      {abierta !== null && (
+        <div className="overlay visor" role="dialog" aria-modal="true" aria-label="Foto del problema" onMouseDown={(e) => e.target === e.currentTarget && setAbierta(null)}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="visor-img" src={lista[abierta]} alt={`Foto ${abierta + 1} de ${lista.length}`} />
+          <button type="button" className="visor-cerrar" onClick={() => setAbierta(null)} aria-label="Cerrar">
+            <Icon name="close" />
+          </button>
+          {lista.length > 1 && (
+            <>
+              <button type="button" className="visor-nav visor-prev" onClick={() => setAbierta((abierta - 1 + lista.length) % lista.length)} aria-label="Foto anterior">‹</button>
+              <button type="button" className="visor-nav visor-next" onClick={() => setAbierta((abierta + 1) % lista.length)} aria-label="Foto siguiente">›</button>
+              <span className="visor-cuenta">{abierta + 1} / {lista.length}</span>
+            </>
+          )}
+        </div>
+      )}
+    </>
   )
 }
 
@@ -519,6 +570,7 @@ export default function TrabajadorDashboardPage() {
                       </div>
 
                       <p className="sol-desc">{l.descripcion}</p>
+                      <FotosProblema fotos={l.fotos} />
 
                       <p className="muted small sol-dir">
                         <Icon name="pin" size={14} />
@@ -565,6 +617,7 @@ export default function TrabajadorDashboardPage() {
                         </div>
 
                         <p className="sol-desc">{t.descripcion}</p>
+                        <FotosProblema fotos={t.fotos} />
 
                         <p className="sol-estado">
                           <strong>{ESTADO_TRABAJO[t.estado]}</strong>
@@ -628,6 +681,7 @@ export default function TrabajadorDashboardPage() {
                           #{c.solicitud.id} · enviada {hace(c.fechaEnvio)}
                         </span>
                         <span className="fila-desc">{c.solicitud.descripcion}</span>
+                        <FotosProblema fotos={c.solicitud.fotos} />
                       </div>
                       <div className="fila-side">
                         <strong>{dinero(c.monto)}</strong>
@@ -959,6 +1013,7 @@ function CotizarModal({
           {lead.urgencia === 'Urgente' && <span className="tag tag-urgente"> Urgente</span>}
         </strong>
         <p>{lead.descripcion}</p>
+        <FotosProblema fotos={lead.fotos} />
       </div>
 
       <div className="field">

@@ -35,6 +35,13 @@ export async function POST(req: Request) {
               calle: nueva.calle.trim(),
               colonia: nueva.colonia?.trim() || null,
               ciudad: nueva.ciudad?.trim() || null,
+              fotos: Array.isArray(body.fotos)
+              ? body.fotos
+                  .filter((u: unknown): u is string =>
+                    typeof u === 'string' &&
+                    u.startsWith('https://jqhlnwusmwtqxxvtitht.supabase.co/storage/v1/object/public/ImagesOficioYa/OficioYa/Problemas/'))
+                  .slice(0, 5)
+              : [],
             },
           })
           direccionId = creada.id

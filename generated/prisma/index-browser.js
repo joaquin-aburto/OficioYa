@@ -178,7 +178,8 @@ exports.Prisma.SolicitudScalarFieldEnum = {
   fechaDeseada: 'fechaDeseada',
   estado: 'estado',
   fechaCreacion: 'fechaCreacion',
-  fechaActualizacion: 'fechaActualizacion'
+  fechaActualizacion: 'fechaActualizacion',
+  fotos: 'fotos'
 };
 
 exports.Prisma.CotizacionScalarFieldEnum = {

@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import '../login/login.css' // mismos estilos base que el login
@@ -34,6 +34,10 @@ function emojiDe(o: Oficio) {
   return EMOJI_OFICIO.find(([k]) => n.includes(k))?.[1] ?? '🛠️'
 }
 
+// Debe coincidir con los límites que valida app/lib/fotoPerfil.ts en el servidor
+const TIPOS_FOTO_PERMITIDOS = ['image/jpeg', 'image/png', 'image/webp']
+const TAMANO_MAXIMO_FOTO = 5 * 1024 * 1024 // 5 MB
+
 export default function RegisterPage() {
   const router = useRouter()
 
@@ -42,6 +46,11 @@ export default function RegisterPage() {
   const [correo, setCorreo] = useState('')
   const [telefono, setTelefono] = useState('')
   const [contrasena, setContrasena] = useState('')
+
+  // Foto de perfil (opcional para ambos tipos de cuenta)
+  const [foto, setFoto] = useState<File | null>(null)
+  const [fotoPreview, setFotoPreview] = useState<string | null>(null)
+  const inputFotoRef = useRef<HTMLInputElement>(null)
 
   // Solo profesionales
   const [oficios, setOficios] = useState<Oficio[] | null>(null)
@@ -67,8 +76,42 @@ export default function RegisterPage() {
     }
   }, [tipo, oficios, intento])
 
+  // Libera la URL de vista previa cuando cambia la foto o se cierra la página,
+  // para no dejar memoria del navegador ocupada de más
+  useEffect(() => {
+    return () => {
+      if (fotoPreview) URL.revokeObjectURL(fotoPreview)
+    }
+  }, [fotoPreview])
+
   function alternarOficio(id: number) {
     setSeleccion((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]))
+  }
+
+  function elegirFoto(event: ChangeEvent<HTMLInputElement>) {
+    const archivo = event.target.files?.[0]
+    event.target.value = '' // permite volver a elegir el mismo archivo si lo quita y lo repone
+
+    if (!archivo) return
+    if (!TIPOS_FOTO_PERMITIDOS.includes(archivo.type)) {
+      setMensaje('La foto debe ser JPG, PNG o WEBP.')
+      return
+    }
+    if (archivo.size > TAMANO_MAXIMO_FOTO) {
+      setMensaje('La foto no puede pesar más de 5 MB.')
+      return
+    }
+
+    setMensaje('')
+    if (fotoPreview) URL.revokeObjectURL(fotoPreview)
+    setFoto(archivo)
+    setFotoPreview(URL.createObjectURL(archivo))
+  }
+
+  function quitarFoto() {
+    if (fotoPreview) URL.revokeObjectURL(fotoPreview)
+    setFoto(null)
+    setFotoPreview(null)
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -82,19 +125,22 @@ export default function RegisterPage() {
 
     setCargando(true)
     try {
+      const datos = new FormData()
+      datos.set('tipo', tipo)
+      datos.set('nombre', nombre)
+      datos.set('correo', correo)
+      datos.set('telefono', telefono)
+      datos.set('contrasena', contrasena)
+      if (foto) datos.set('archivo', foto) // si no se eligió foto, el servidor usa la de por defecto
+      if (tipo === 'trabajador') {
+        datos.set('especialidadIds', JSON.stringify(seleccion))
+        datos.set('anosExperiencia', anos)
+        datos.set('descripcion', descripcion)
+      }
+
       const response = await fetch('/api/auth/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tipo,
-          nombre,
-          correo,
-          telefono,
-          contrasena,
-          ...(tipo === 'trabajador'
-            ? { especialidadIds: seleccion, anosExperiencia: anos, descripcion }
-            : {}),
-        }),
+        body: datos, // sin header Content-Type: el navegador arma el multipart solo
       })
       const data = await response.json()
 
@@ -155,6 +201,51 @@ export default function RegisterPage() {
               <span className="role-detail">{o.detalle}</span>
             </label>
           ))}
+        </div>
+
+        {/* Foto de perfil: opcional para cliente y trabajador. Si no eligen
+            ninguna, el servidor asigna una foto por defecto. */}
+        <div className="foto-picker">
+          <button
+            type="button"
+            className="foto-circulo"
+            onClick={() => inputFotoRef.current?.click()}
+            aria-label={fotoPreview ? 'Cambiar foto de perfil' : 'Agregar foto de perfil'}
+          >
+            {fotoPreview ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={fotoPreview} alt="" className="foto-preview" />
+            ) : (
+              <span className="foto-placeholder" aria-hidden="true">📷</span>
+            )}
+          </button>
+          <input
+            ref={inputFotoRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={elegirFoto}
+            className="sr-only-input"
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+          <div className="foto-texto">
+            <p className="foto-titulo">Foto de perfil (opcional)</p>
+            <p className="foto-ayuda">
+              {fotoPreview
+                ? 'Así te van a ver.'
+                : 'Si no subes una, te asignamos una por defecto. Puedes cambiarla luego.'}
+            </p>
+            <div className="foto-botones">
+              <button type="button" className="reg-link" onClick={() => inputFotoRef.current?.click()}>
+                {fotoPreview ? 'Cambiar foto' : 'Elegir foto'}
+              </button>
+              {fotoPreview && (
+                <button type="button" className="reg-link reg-link-quitar" onClick={quitarFoto}>
+                  Quitar
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
         <form className="login-form" onSubmit={handleSubmit}>

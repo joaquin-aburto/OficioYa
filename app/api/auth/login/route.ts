@@ -2,15 +2,7 @@ import { NextResponse } from 'next/server'
 import prisma from '../../../lib/prisma'
 import bcrypt from 'bcryptjs'
 
-// POST /api/auth/login
-// Un solo formulario de correo + contraseña para los tres tipos de cuenta.
-// Prueba en este orden: administrador (variables de entorno) → cliente →
-// trabajador, y responde cuál tipo de cuenta encontró en "tipo".
-//
-// Nota: como Usuario y Trabajador son tablas separadas, en teoría el mismo
-// correo podría existir en ambas con contraseñas distintas. Por eso no basta
-// con buscar el correo: se prueba la contraseña contra cada tabla hasta que
-// una haga match.
+
 
 const MENSAJE_GENERICO = 'Correo o contraseña incorrectos.'
 

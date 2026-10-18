@@ -8518,6 +8518,7 @@ export namespace Prisma {
     estado: number
     fechaCreacion: number
     fechaActualizacion: number
+    fotos: number
     _all: number
   }
 
@@ -8578,6 +8579,7 @@ export namespace Prisma {
     estado?: true
     fechaCreacion?: true
     fechaActualizacion?: true
+    fotos?: true
     _all?: true
   }
 
@@ -8679,6 +8681,7 @@ export namespace Prisma {
     estado: $Enums.EstadoSolicitud
     fechaCreacion: Date
     fechaActualizacion: Date
+    fotos: string[]
     _count: SolicitudCountAggregateOutputType | null
     _avg: SolicitudAvgAggregateOutputType | null
     _sum: SolicitudSumAggregateOutputType | null
@@ -8712,6 +8715,7 @@ export namespace Prisma {
     estado?: boolean
     fechaCreacion?: boolean
     fechaActualizacion?: boolean
+    fotos?: boolean
     cliente?: boolean | UsuarioDefaultArgs<ExtArgs>
     trabajadorAsignado?: boolean | Solicitud$trabajadorAsignadoArgs<ExtArgs>
     direccion?: boolean | DireccionDefaultArgs<ExtArgs>
@@ -8735,6 +8739,7 @@ export namespace Prisma {
     estado?: boolean
     fechaCreacion?: boolean
     fechaActualizacion?: boolean
+    fotos?: boolean
     cliente?: boolean | UsuarioDefaultArgs<ExtArgs>
     trabajadorAsignado?: boolean | Solicitud$trabajadorAsignadoArgs<ExtArgs>
     direccion?: boolean | DireccionDefaultArgs<ExtArgs>
@@ -8753,6 +8758,7 @@ export namespace Prisma {
     estado?: boolean
     fechaCreacion?: boolean
     fechaActualizacion?: boolean
+    fotos?: boolean
     cliente?: boolean | UsuarioDefaultArgs<ExtArgs>
     trabajadorAsignado?: boolean | Solicitud$trabajadorAsignadoArgs<ExtArgs>
     direccion?: boolean | DireccionDefaultArgs<ExtArgs>
@@ -8771,9 +8777,10 @@ export namespace Prisma {
     estado?: boolean
     fechaCreacion?: boolean
     fechaActualizacion?: boolean
+    fotos?: boolean
   }
 
-  export type SolicitudOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clienteId" | "trabajadorAsignadoId" | "direccionId" | "especialidadId" | "descripcion" | "urgencia" | "fechaDeseada" | "estado" | "fechaCreacion" | "fechaActualizacion", ExtArgs["result"]["solicitud"]>
+  export type SolicitudOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clienteId" | "trabajadorAsignadoId" | "direccionId" | "especialidadId" | "descripcion" | "urgencia" | "fechaDeseada" | "estado" | "fechaCreacion" | "fechaActualizacion" | "fotos", ExtArgs["result"]["solicitud"]>
   export type SolicitudInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     cliente?: boolean | UsuarioDefaultArgs<ExtArgs>
     trabajadorAsignado?: boolean | Solicitud$trabajadorAsignadoArgs<ExtArgs>
@@ -8822,6 +8829,7 @@ export namespace Prisma {
       estado: $Enums.EstadoSolicitud
       fechaCreacion: Date
       fechaActualizacion: Date
+      fotos: string[]
     }, ExtArgs["result"]["solicitud"]>
     composites: {}
   }
@@ -9264,6 +9272,7 @@ export namespace Prisma {
     readonly estado: FieldRef<"Solicitud", 'EstadoSolicitud'>
     readonly fechaCreacion: FieldRef<"Solicitud", 'DateTime'>
     readonly fechaActualizacion: FieldRef<"Solicitud", 'DateTime'>
+    readonly fotos: FieldRef<"Solicitud", 'String[]'>
   }
     
 
@@ -18974,7 +18983,8 @@ export namespace Prisma {
     fechaDeseada: 'fechaDeseada',
     estado: 'estado',
     fechaCreacion: 'fechaCreacion',
-    fechaActualizacion: 'fechaActualizacion'
+    fechaActualizacion: 'fechaActualizacion',
+    fotos: 'fotos'
   };
 
   export type SolicitudScalarFieldEnum = (typeof SolicitudScalarFieldEnum)[keyof typeof SolicitudScalarFieldEnum]
@@ -19681,6 +19691,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFilter<"Solicitud"> | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFilter<"Solicitud"> | Date | string
     fechaActualizacion?: DateTimeFilter<"Solicitud"> | Date | string
+    fotos?: StringNullableListFilter<"Solicitud">
     cliente?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
     trabajadorAsignado?: XOR<TrabajadorNullableScalarRelationFilter, TrabajadorWhereInput> | null
     direccion?: XOR<DireccionScalarRelationFilter, DireccionWhereInput>
@@ -19703,6 +19714,7 @@ export namespace Prisma {
     estado?: SortOrder
     fechaCreacion?: SortOrder
     fechaActualizacion?: SortOrder
+    fotos?: SortOrder
     cliente?: UsuarioOrderByWithRelationInput
     trabajadorAsignado?: TrabajadorOrderByWithRelationInput
     direccion?: DireccionOrderByWithRelationInput
@@ -19728,6 +19740,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFilter<"Solicitud"> | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFilter<"Solicitud"> | Date | string
     fechaActualizacion?: DateTimeFilter<"Solicitud"> | Date | string
+    fotos?: StringNullableListFilter<"Solicitud">
     cliente?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
     trabajadorAsignado?: XOR<TrabajadorNullableScalarRelationFilter, TrabajadorWhereInput> | null
     direccion?: XOR<DireccionScalarRelationFilter, DireccionWhereInput>
@@ -19750,6 +19763,7 @@ export namespace Prisma {
     estado?: SortOrder
     fechaCreacion?: SortOrder
     fechaActualizacion?: SortOrder
+    fotos?: SortOrder
     _count?: SolicitudCountOrderByAggregateInput
     _avg?: SolicitudAvgOrderByAggregateInput
     _max?: SolicitudMaxOrderByAggregateInput
@@ -19772,6 +19786,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudWithAggregatesFilter<"Solicitud"> | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeWithAggregatesFilter<"Solicitud"> | Date | string
     fechaActualizacion?: DateTimeWithAggregatesFilter<"Solicitud"> | Date | string
+    fotos?: StringNullableListFilter<"Solicitud">
   }
 
   export type CotizacionWhereInput = {
@@ -20702,6 +20717,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     cliente: UsuarioCreateNestedOneWithoutSolicitudesInput
     trabajadorAsignado?: TrabajadorCreateNestedOneWithoutSolicitudesInput
     direccion: DireccionCreateNestedOneWithoutSolicitudesInput
@@ -20724,6 +20740,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutSolicitudInput
     fotosTrabajos?: FotoTrabajoUncheckedCreateNestedManyWithoutSolicitudInput
     calificacion?: CalificacionUncheckedCreateNestedOneWithoutSolicitudInput
@@ -20737,6 +20754,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     cliente?: UsuarioUpdateOneRequiredWithoutSolicitudesNestedInput
     trabajadorAsignado?: TrabajadorUpdateOneWithoutSolicitudesNestedInput
     direccion?: DireccionUpdateOneRequiredWithoutSolicitudesNestedInput
@@ -20759,6 +20777,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     cotizaciones?: CotizacionUncheckedUpdateManyWithoutSolicitudNestedInput
     fotosTrabajos?: FotoTrabajoUncheckedUpdateManyWithoutSolicitudNestedInput
     calificacion?: CalificacionUncheckedUpdateOneWithoutSolicitudNestedInput
@@ -20777,6 +20796,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
   }
 
   export type SolicitudUpdateManyMutationInput = {
@@ -20786,6 +20806,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
   }
 
   export type SolicitudUncheckedUpdateManyInput = {
@@ -20800,6 +20821,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
   }
 
   export type CotizacionCreateInput = {
@@ -21830,6 +21852,14 @@ export namespace Prisma {
     not?: NestedEnumEstadoSolicitudFilter<$PrismaModel> | $Enums.EstadoSolicitud
   }
 
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
   export type UsuarioScalarRelationFilter = {
     is?: UsuarioWhereInput
     isNot?: UsuarioWhereInput
@@ -21867,6 +21897,7 @@ export namespace Prisma {
     estado?: SortOrder
     fechaCreacion?: SortOrder
     fechaActualizacion?: SortOrder
+    fotos?: SortOrder
   }
 
   export type SolicitudAvgOrderByAggregateInput = {
@@ -23162,6 +23193,10 @@ export namespace Prisma {
     update?: XOR<XOR<EspecialidadUpdateToOneWithWhereWithoutServiciosInput, EspecialidadUpdateWithoutServiciosInput>, EspecialidadUncheckedUpdateWithoutServiciosInput>
   }
 
+  export type SolicitudCreatefotosInput = {
+    set: string[]
+  }
+
   export type UsuarioCreateNestedOneWithoutSolicitudesInput = {
     create?: XOR<UsuarioCreateWithoutSolicitudesInput, UsuarioUncheckedCreateWithoutSolicitudesInput>
     connectOrCreate?: UsuarioCreateOrConnectWithoutSolicitudesInput
@@ -23248,6 +23283,11 @@ export namespace Prisma {
 
   export type EnumEstadoSolicitudFieldUpdateOperationsInput = {
     set?: $Enums.EstadoSolicitud
+  }
+
+  export type SolicitudUpdatefotosInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type UsuarioUpdateOneRequiredWithoutSolicitudesNestedInput = {
@@ -24101,6 +24141,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     trabajadorAsignado?: TrabajadorCreateNestedOneWithoutSolicitudesInput
     direccion: DireccionCreateNestedOneWithoutSolicitudesInput
     especialidad: EspecialidadCreateNestedOneWithoutSolicitudesInput
@@ -24121,6 +24162,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutSolicitudInput
     fotosTrabajos?: FotoTrabajoUncheckedCreateNestedManyWithoutSolicitudInput
     calificacion?: CalificacionUncheckedCreateNestedOneWithoutSolicitudInput
@@ -24257,6 +24299,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFilter<"Solicitud"> | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFilter<"Solicitud"> | Date | string
     fechaActualizacion?: DateTimeFilter<"Solicitud"> | Date | string
+    fotos?: StringNullableListFilter<"Solicitud">
   }
 
   export type CalificacionUpsertWithWhereUniqueWithoutClienteInput = {
@@ -24418,6 +24461,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     cliente: UsuarioCreateNestedOneWithoutSolicitudesInput
     direccion: DireccionCreateNestedOneWithoutSolicitudesInput
     especialidad: EspecialidadCreateNestedOneWithoutSolicitudesInput
@@ -24438,6 +24482,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutSolicitudInput
     fotosTrabajos?: FotoTrabajoUncheckedCreateNestedManyWithoutSolicitudInput
     calificacion?: CalificacionUncheckedCreateNestedOneWithoutSolicitudInput
@@ -24776,6 +24821,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     cliente: UsuarioCreateNestedOneWithoutSolicitudesInput
     trabajadorAsignado?: TrabajadorCreateNestedOneWithoutSolicitudesInput
     direccion: DireccionCreateNestedOneWithoutSolicitudesInput
@@ -24796,6 +24842,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutSolicitudInput
     fotosTrabajos?: FotoTrabajoUncheckedCreateNestedManyWithoutSolicitudInput
     calificacion?: CalificacionUncheckedCreateNestedOneWithoutSolicitudInput
@@ -25635,6 +25682,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     cliente: UsuarioCreateNestedOneWithoutSolicitudesInput
     trabajadorAsignado?: TrabajadorCreateNestedOneWithoutSolicitudesInput
     direccion: DireccionCreateNestedOneWithoutSolicitudesInput
@@ -25656,6 +25704,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     fotosTrabajos?: FotoTrabajoUncheckedCreateNestedManyWithoutSolicitudInput
     calificacion?: CalificacionUncheckedCreateNestedOneWithoutSolicitudInput
     pago?: PagoUncheckedCreateNestedOneWithoutSolicitudInput
@@ -25730,6 +25779,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     cliente?: UsuarioUpdateOneRequiredWithoutSolicitudesNestedInput
     trabajadorAsignado?: TrabajadorUpdateOneWithoutSolicitudesNestedInput
     direccion?: DireccionUpdateOneRequiredWithoutSolicitudesNestedInput
@@ -25751,6 +25801,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     fotosTrabajos?: FotoTrabajoUncheckedUpdateManyWithoutSolicitudNestedInput
     calificacion?: CalificacionUncheckedUpdateOneWithoutSolicitudNestedInput
     pago?: PagoUncheckedUpdateOneWithoutSolicitudNestedInput
@@ -25945,6 +25996,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     cliente: UsuarioCreateNestedOneWithoutSolicitudesInput
     trabajadorAsignado?: TrabajadorCreateNestedOneWithoutSolicitudesInput
     especialidad: EspecialidadCreateNestedOneWithoutSolicitudesInput
@@ -25965,6 +26017,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutSolicitudInput
     fotosTrabajos?: FotoTrabajoUncheckedCreateNestedManyWithoutSolicitudInput
     calificacion?: CalificacionUncheckedCreateNestedOneWithoutSolicitudInput
@@ -26042,6 +26095,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     cliente: UsuarioCreateNestedOneWithoutSolicitudesInput
     trabajadorAsignado?: TrabajadorCreateNestedOneWithoutSolicitudesInput
     direccion: DireccionCreateNestedOneWithoutSolicitudesInput
@@ -26063,6 +26117,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutSolicitudInput
     fotosTrabajos?: FotoTrabajoUncheckedCreateNestedManyWithoutSolicitudInput
     pago?: PagoUncheckedCreateNestedOneWithoutSolicitudInput
@@ -26169,6 +26224,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     cliente?: UsuarioUpdateOneRequiredWithoutSolicitudesNestedInput
     trabajadorAsignado?: TrabajadorUpdateOneWithoutSolicitudesNestedInput
     direccion?: DireccionUpdateOneRequiredWithoutSolicitudesNestedInput
@@ -26190,6 +26246,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     cotizaciones?: CotizacionUncheckedUpdateManyWithoutSolicitudNestedInput
     fotosTrabajos?: FotoTrabajoUncheckedUpdateManyWithoutSolicitudNestedInput
     pago?: PagoUncheckedUpdateOneWithoutSolicitudNestedInput
@@ -26338,6 +26395,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     cliente: UsuarioCreateNestedOneWithoutSolicitudesInput
     trabajadorAsignado?: TrabajadorCreateNestedOneWithoutSolicitudesInput
     direccion: DireccionCreateNestedOneWithoutSolicitudesInput
@@ -26359,6 +26417,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutSolicitudInput
     calificacion?: CalificacionUncheckedCreateNestedOneWithoutSolicitudInput
     pago?: PagoUncheckedCreateNestedOneWithoutSolicitudInput
@@ -26439,6 +26498,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     cliente?: UsuarioUpdateOneRequiredWithoutSolicitudesNestedInput
     trabajadorAsignado?: TrabajadorUpdateOneWithoutSolicitudesNestedInput
     direccion?: DireccionUpdateOneRequiredWithoutSolicitudesNestedInput
@@ -26460,6 +26520,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     cotizaciones?: CotizacionUncheckedUpdateManyWithoutSolicitudNestedInput
     calificacion?: CalificacionUncheckedUpdateOneWithoutSolicitudNestedInput
     pago?: PagoUncheckedUpdateOneWithoutSolicitudNestedInput
@@ -26472,6 +26533,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     cliente: UsuarioCreateNestedOneWithoutSolicitudesInput
     trabajadorAsignado?: TrabajadorCreateNestedOneWithoutSolicitudesInput
     direccion: DireccionCreateNestedOneWithoutSolicitudesInput
@@ -26493,6 +26555,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
     cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutSolicitudInput
     fotosTrabajos?: FotoTrabajoUncheckedCreateNestedManyWithoutSolicitudInput
     calificacion?: CalificacionUncheckedCreateNestedOneWithoutSolicitudInput
@@ -26617,6 +26680,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     cliente?: UsuarioUpdateOneRequiredWithoutSolicitudesNestedInput
     trabajadorAsignado?: TrabajadorUpdateOneWithoutSolicitudesNestedInput
     direccion?: DireccionUpdateOneRequiredWithoutSolicitudesNestedInput
@@ -26638,6 +26702,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     cotizaciones?: CotizacionUncheckedUpdateManyWithoutSolicitudNestedInput
     fotosTrabajos?: FotoTrabajoUncheckedUpdateManyWithoutSolicitudNestedInput
     calificacion?: CalificacionUncheckedUpdateOneWithoutSolicitudNestedInput
@@ -26837,6 +26902,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
   }
 
   export type CalificacionCreateManyClienteInput = {
@@ -26899,6 +26965,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     trabajadorAsignado?: TrabajadorUpdateOneWithoutSolicitudesNestedInput
     direccion?: DireccionUpdateOneRequiredWithoutSolicitudesNestedInput
     especialidad?: EspecialidadUpdateOneRequiredWithoutSolicitudesNestedInput
@@ -26919,6 +26986,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     cotizaciones?: CotizacionUncheckedUpdateManyWithoutSolicitudNestedInput
     fotosTrabajos?: FotoTrabajoUncheckedUpdateManyWithoutSolicitudNestedInput
     calificacion?: CalificacionUncheckedUpdateOneWithoutSolicitudNestedInput
@@ -26936,6 +27004,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
   }
 
   export type CalificacionUpdateWithoutClienteInput = {
@@ -27034,6 +27103,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
   }
 
   export type CotizacionCreateManyTrabajadorInput = {
@@ -27152,6 +27222,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     cliente?: UsuarioUpdateOneRequiredWithoutSolicitudesNestedInput
     direccion?: DireccionUpdateOneRequiredWithoutSolicitudesNestedInput
     especialidad?: EspecialidadUpdateOneRequiredWithoutSolicitudesNestedInput
@@ -27172,6 +27243,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     cotizaciones?: CotizacionUncheckedUpdateManyWithoutSolicitudNestedInput
     fotosTrabajos?: FotoTrabajoUncheckedUpdateManyWithoutSolicitudNestedInput
     calificacion?: CalificacionUncheckedUpdateOneWithoutSolicitudNestedInput
@@ -27189,6 +27261,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
   }
 
   export type CotizacionUpdateWithoutTrabajadorInput = {
@@ -27298,6 +27371,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
   }
 
   export type TrabajadorEspecialidadUpdateWithoutEspecialidadInput = {
@@ -27345,6 +27419,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     cliente?: UsuarioUpdateOneRequiredWithoutSolicitudesNestedInput
     trabajadorAsignado?: TrabajadorUpdateOneWithoutSolicitudesNestedInput
     direccion?: DireccionUpdateOneRequiredWithoutSolicitudesNestedInput
@@ -27365,6 +27440,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     cotizaciones?: CotizacionUncheckedUpdateManyWithoutSolicitudNestedInput
     fotosTrabajos?: FotoTrabajoUncheckedUpdateManyWithoutSolicitudNestedInput
     calificacion?: CalificacionUncheckedUpdateOneWithoutSolicitudNestedInput
@@ -27382,6 +27458,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
   }
 
   export type CotizacionCreateManySolicitudInput = {
@@ -27461,6 +27538,7 @@ export namespace Prisma {
     estado?: $Enums.EstadoSolicitud
     fechaCreacion?: Date | string
     fechaActualizacion?: Date | string
+    fotos?: SolicitudCreatefotosInput | string[]
   }
 
   export type SolicitudUpdateWithoutDireccionInput = {
@@ -27470,6 +27548,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     cliente?: UsuarioUpdateOneRequiredWithoutSolicitudesNestedInput
     trabajadorAsignado?: TrabajadorUpdateOneWithoutSolicitudesNestedInput
     especialidad?: EspecialidadUpdateOneRequiredWithoutSolicitudesNestedInput
@@ -27490,6 +27569,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
     cotizaciones?: CotizacionUncheckedUpdateManyWithoutSolicitudNestedInput
     fotosTrabajos?: FotoTrabajoUncheckedUpdateManyWithoutSolicitudNestedInput
     calificacion?: CalificacionUncheckedUpdateOneWithoutSolicitudNestedInput
@@ -27507,6 +27587,7 @@ export namespace Prisma {
     estado?: EnumEstadoSolicitudFieldUpdateOperationsInput | $Enums.EstadoSolicitud
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fechaActualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fotos?: SolicitudUpdatefotosInput | string[]
   }
 
 

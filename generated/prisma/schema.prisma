@@ -163,6 +163,7 @@ model Solicitud {
   estado               EstadoSolicitud @default(Pendiente)
   fechaCreacion        DateTime        @default(now())
   fechaActualizacion   DateTime        @updatedAt
+  fotos                String[]        @default([])
 
   cliente            Usuario      @relation("SolicitudCliente", fields: [clienteId], references: [id])
   trabajadorAsignado Trabajador?  @relation("SolicitudTrabajador", fields: [trabajadorAsignadoId], references: [id])

@@ -79,6 +79,7 @@ export async function GET(req: Request) {
               descripcion: true,
               urgencia: true,
               estado: true,
+              fotos: true,
               especialidad: { select: { nombre: true } },
             },
           },
@@ -186,6 +187,7 @@ export async function GET(req: Request) {
         direccion: s.direccion,
         clienteNombre: s.cliente.nombre.split(' ')[0],
         totalCotizaciones: s._count.cotizaciones,
+        fotos: s.fotos,
       })),
       cotizaciones: cotizaciones.map((c) => ({
         id: c.id,
@@ -206,6 +208,7 @@ export async function GET(req: Request) {
         direccion: s.direccion,
         monto: s.cotizaciones[0] ? num(s.cotizaciones[0].monto) : null,
         pago: s.pago,
+        fotos: s.fotos,
       })),
       pagos: pagos.map((p) => {
         const comision = num(p.comision?.montoComision)

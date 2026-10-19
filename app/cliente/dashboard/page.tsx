@@ -263,6 +263,7 @@ export default function ClienteDashboardPage() {
   const [problema, setProblema] = useState('')
   const [borrador, setBorrador] = useState<BorradorSolicitud | null>(null)
   const [calificando, setCalificando] = useState<Solicitud | null>(null)
+  const [pagando, setPagando] = useState<Solicitud | null>(null)
   const [toast, setToast] = useState('')
   const [ocupado, setOcupado] = useState(false)
 
@@ -661,6 +662,16 @@ export default function ClienteDashboardPage() {
                             Cancelar solicitud
                           </button>
                         )}
+                        {s.estado === 'EnCurso' && (
+                          <div className="confirmar-box">
+                            <p>
+                              <strong>¿Ya terminó el trabajo?</strong> Confírmalo para pagar y cerrar la solicitud.
+                            </p>
+                            <button className="btn btn-accent btn-sm" onClick={() => setPagando(s)}>
+                              Confirmar que se cumplió
+                            </button>
+                          </div>
+                        )}
                         {s.estado === 'Terminada' && !s.yaCalificada && (
                           <button className="btn btn-accent btn-sm" onClick={() => setCalificando(s)}>Calificar servicio</button>
                         )}
@@ -795,6 +806,22 @@ export default function ClienteDashboardPage() {
               'Gracias por tu calificación.'
             )
             if (ok) setCalificando(null)
+          }}
+        />
+      )}
+
+      {pagando && (
+        <PagarModal
+          solicitud={pagando}
+          onClose={() => setPagando(null)}
+          onElegir={(opcion) => {
+            // TODO: aquí se conectará Stripe (Google Pay / Apple Pay), PayPal y el pago en efectivo
+            setToast(
+              opcion === 'problema'
+                ? 'Reportar un problema estará disponible pronto.'
+                : `Pago con ${opcion}: estará disponible pronto.`
+            )
+            setPagando(null)
           }}
         />
       )}
@@ -1099,6 +1126,87 @@ function CalificarModal({
           </button>
         </div>
       </form>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Modal: confirmar trabajo y pagar (solo botones por ahora)           */
+/* ------------------------------------------------------------------ */
+
+// Muestra el logo oficial de /public/pay; si el archivo no existe, cae a texto
+function PayLogo({ src, nombre }: { src: string; nombre: string }) {
+  const [falla, setFalla] = useState(false)
+  if (falla) return <span>Pagar con {nombre}</span>
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt={`Pagar con ${nombre}`} className="pay-logo" onError={() => setFalla(true)} />
+  )
+}
+
+function PagarModal({
+  solicitud,
+  onClose,
+  onElegir,
+}: {
+  solicitud: Solicitud
+  onClose: () => void
+  onElegir: (opcion: string) => void
+}) {
+  const [cumplido, setCumplido] = useState(false)
+  const monto = solicitud.cotizaciones.find((c) => c.estado === 'Aceptada')?.monto ?? null
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  return (
+    <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="p-title">
+        <div className="modal-head">
+          <h2 id="p-title">Confirma y paga</h2>
+          <button type="button" className="icon-btn" onClick={onClose} aria-label="Cerrar">
+            <Icon name="close" />
+          </button>
+        </div>
+
+        <p className="muted">
+          {solicitud.especialidad.nombre} con {solicitud.trabajadorAsignado?.nombre ?? 'tu profesional'} · solicitud #{solicitud.id}
+        </p>
+
+        {monto !== null && (
+          <p className="pay-total">
+            <span>Total a pagar</span>
+            <strong>{dinero(monto)}</strong>
+          </p>
+        )}
+
+        <label className="pay-confirmar">
+          <input type="checkbox" checked={cumplido} onChange={(e) => setCumplido(e.target.checked)} />
+          Confirmo que el trabajo se realizó como acordamos
+        </label>
+
+        <div className="pay-list" role="group" aria-label="Forma de pago">
+          <button type="button" className="pay-btn pay-gpay" disabled={!cumplido} onClick={() => onElegir('Google Pay')}>
+            <PayLogo src="/pay/google-pay.svg" nombre="Google Pay" />
+          </button>
+          <button type="button" className="pay-btn pay-apple" disabled={!cumplido} onClick={() => onElegir('Apple Pay')}>
+            <PayLogo src="/pay/apple-pay.svg" nombre="Apple Pay" />
+          </button>
+          <button type="button" className="pay-btn pay-paypal" disabled={!cumplido} onClick={() => onElegir('PayPal')}>
+            <PayLogo src="/pay/paypal.svg" nombre="PayPal" />
+          </button>
+          <button type="button" className="pay-btn pay-efectivo" disabled={!cumplido} onClick={() => onElegir('efectivo')}>
+            Pagaré en efectivo
+          </button>
+        </div>
+
+        <button type="button" className="link-danger" onClick={() => onElegir('problema')}>
+          Hay un problema con el trabajo
+        </button>
+      </div>
     </div>
   )
 }

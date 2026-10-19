@@ -16,73 +16,79 @@ export async function POST(req: Request) {
     switch (body.accion) {
       /* ---------------------------------------------------------- */
       case 'crearSolicitud': {
-        const especialidadId = Number(body.especialidadId)
-        const descripcion = String(body.descripcion ?? '').trim()
-        const urgencia = body.urgencia === 'Urgente' ? 'Urgente' : 'Normal'
+  const especialidadId = Number(body.especialidadId)
+  const descripcion = String(body.descripcion ?? '').trim()
+  const urgencia = body.urgencia === 'Urgente' ? 'Urgente' : 'Normal'
 
-        if (!especialidadId) return fail('Elige el tipo de oficio.')
-        if (descripcion.length < 10) return fail('Cuéntanos un poco más del problema (mínimo 10 caracteres).')
+  if (!especialidadId) return fail('Elige el tipo de oficio.')
+  if (descripcion.length < 10) return fail('Cuéntanos un poco más del problema (mínimo 10 caracteres).')
 
-        // Dirección existente o nueva
-        let direccionId = Number(body.direccionId)
-        if (!direccionId) {
-          const nueva = body.direccionNueva
-          if (!nueva?.calle?.trim()) return fail('Agrega la dirección donde se necesita el servicio.')
-          const creada = await prisma.direccion.create({
-            data: {
-              usuarioId,
-              alias: nueva.alias?.trim() || 'Casa',
-              calle: nueva.calle.trim(),
-              colonia: nueva.colonia?.trim() || null,
-              ciudad: nueva.ciudad?.trim() || null,
-              fotos: Array.isArray(body.fotos)
-              ? body.fotos
-                  .filter((u: unknown): u is string =>
-                    typeof u === 'string' &&
-                    u.startsWith('https://jqhlnwusmwtqxxvtitht.supabase.co/storage/v1/object/public/ImagesOficioYa/OficioYa/Problemas/'))
-                  .slice(0, 5)
-              : [],
-            },
-          })
-          direccionId = creada.id
-        } else {
-          const dir = await prisma.direccion.findFirst({ where: { id: direccionId, usuarioId } })
-          if (!dir) return fail('Dirección no válida.', 403)
-        }
+  // Fotos del problema: solo URLs de tu bucket, máximo 5
+  const fotos: string[] = Array.isArray(body.fotos)
+    ? body.fotos
+        .filter(
+          (u: unknown): u is string =>
+            typeof u === 'string' &&
+            u.startsWith(
+              'https://jqhlnwusmwtqxxvtitht.supabase.co/storage/v1/object/public/ImagesOficioYa/OficioYa/Problemas/'
+            )
+        )
+        .slice(0, 5)
+    : []
 
-        const solicitud = await prisma.solicitud.create({
-          data: {
-            clienteId: usuarioId,
-            direccionId,
-            especialidadId,
-            descripcion,
-            urgencia,
-            fechaDeseada: body.fechaDeseada ? new Date(body.fechaDeseada) : null,
-          },
-        })
+  // Dirección existente o nueva
+  let direccionId = Number(body.direccionId)
+  if (!direccionId) {
+    const nueva = body.direccionNueva
+    if (!nueva?.calle?.trim()) return fail('Agrega la dirección donde se necesita el servicio.')
+    const creada = await prisma.direccion.create({
+      data: {
+        usuarioId,
+        alias: nueva.alias?.trim() || 'Casa',
+        calle: nueva.calle.trim(),
+        colonia: nueva.colonia?.trim() || null,
+        ciudad: nueva.ciudad?.trim() || null,
+      },
+    })
+    direccionId = creada.id
+  } else {
+    const dir = await prisma.direccion.findFirst({ where: { id: direccionId, usuarioId } })
+    if (!dir) return fail('Dirección no válida.', 403)
+  }
 
-        // Avisar a los trabajadores de esa especialidad
-        const trabajadores = await prisma.trabajadorEspecialidad.findMany({
-          where: { especialidadId, trabajador: { activo: true } },
-          select: { trabajadorId: true },
-        })
-        if (trabajadores.length) {
-          await prisma.notificacion.createMany({
-            data: trabajadores.map((t) => ({
-              destinatarioTipo: 'Trabajador' as const,
-              destinatarioId: t.trabajadorId,
-              tipo: 'NuevaSolicitud' as const,
-              mensaje:
-                urgencia === 'Urgente'
-                  ? `Solicitud urgente #${solicitud.id}: ${descripcion.slice(0, 80)}`
-                  : `Nueva solicitud #${solicitud.id}: ${descripcion.slice(0, 80)}`,
-            })),
-          })
-        }
+  const solicitud = await prisma.solicitud.create({
+    data: {
+      clienteId: usuarioId,
+      direccionId,
+      especialidadId,
+      descripcion,
+      urgencia,
+      fechaDeseada: body.fechaDeseada ? new Date(body.fechaDeseada) : null,
+      fotos, // ← aquí van las fotos
+    },
+  })
 
-        return NextResponse.json({ ok: true, solicitudId: solicitud.id, avisados: trabajadores.length })
-      }
+  // Avisar a los trabajadores de esa especialidad
+  const trabajadores = await prisma.trabajadorEspecialidad.findMany({
+    where: { especialidadId, trabajador: { activo: true } },
+    select: { trabajadorId: true },
+  })
+  if (trabajadores.length) {
+    await prisma.notificacion.createMany({
+      data: trabajadores.map((t) => ({
+        destinatarioTipo: 'Trabajador' as const,
+        destinatarioId: t.trabajadorId,
+        tipo: 'NuevaSolicitud' as const,
+        mensaje:
+          urgencia === 'Urgente'
+            ? `Solicitud urgente #${solicitud.id}: ${descripcion.slice(0, 80)}`
+            : `Nueva solicitud #${solicitud.id}: ${descripcion.slice(0, 80)}`,
+      })),
+    })
+  }
 
+  return NextResponse.json({ ok: true, solicitudId: solicitud.id, avisados: trabajadores.length })
+}
       /* ---------------------------------------------------------- */
       case 'aceptarCotizacion':
       case 'rechazarCotizacion': {

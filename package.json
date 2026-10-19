@@ -38,4 +38,7 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   }
+  public/pay/google-pay.svg
+public/pay/apple-pay.svg
+public/pay/paypal.svg
 }

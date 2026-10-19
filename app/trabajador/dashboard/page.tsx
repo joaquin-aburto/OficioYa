@@ -655,9 +655,18 @@ export default function TrabajadorDashboardPage() {
                           </button>
                         )}
                         {t.estado === 'EnCurso' && (
-                          <button className="btn btn-accent" onClick={() => setTerminando(t)}>
-                            Marcar como terminado
-                          </button>
+                          <div className="confirmar-box">
+                            <p>Cuando termines, pídele al cliente que confirme que se cumplió y que pague.</p>
+                            <button
+                              className="btn btn-primary"
+                              onClick={() => setToast('Solicitar confirmación al cliente estará disponible pronto.')}
+                            >
+                              Solicitar confirmación del cliente
+                            </button>
+                            <button className="btn btn-ghost btn-sm" onClick={() => setTerminando(t)}>
+                              Marcar como terminado
+                            </button>
+                          </div>
                         )}
                       </li>
                     )

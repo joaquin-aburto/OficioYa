@@ -264,6 +264,8 @@ export default function ClienteDashboardPage() {
   const [borrador, setBorrador] = useState<BorradorSolicitud | null>(null)
   const [calificando, setCalificando] = useState<Solicitud | null>(null)
   const [pagando, setPagando] = useState<Solicitud | null>(null)
+  // Solo visual por ahora: qué solicitudes eligieron efectivo y si el cliente ya marcó "Ya pagué"
+  const [efectivo, setEfectivo] = useState<Record<number, 'elegido' | 'pagado'>>({})
   const [toast, setToast] = useState('')
   const [ocupado, setOcupado] = useState(false)
 
@@ -662,7 +664,33 @@ export default function ClienteDashboardPage() {
                             Cancelar solicitud
                           </button>
                         )}
-                        {s.estado === 'EnCurso' && (
+                        {s.estado === 'EnCurso' && efectivo[s.id] === 'elegido' && (
+                          <div className="confirmar-box">
+                            <p>
+                              <strong>Pago en efectivo.</strong> Entrégale el dinero a {s.trabajadorAsignado?.nombre ?? 'tu profesional'} y
+                              confirma aquí. El trabajo se cierra cuando los dos confirmen.
+                            </p>
+                            <button
+                              className="btn btn-accent btn-sm"
+                              onClick={() => {
+                                // TODO: guardar la confirmación del cliente en el servidor
+                                setEfectivo((e) => ({ ...e, [s.id]: 'pagado' }))
+                                setToast('Listo. Avisamos al profesional para que confirme que recibió el pago.')
+                              }}
+                            >
+                              Ya pagué
+                            </button>
+                          </div>
+                        )}
+                        {s.estado === 'EnCurso' && efectivo[s.id] === 'pagado' && (
+                          <div className="confirmar-box estado-espera">
+                            <p>
+                              <strong>Esperando al profesional.</strong> Marcaste que ya pagaste en efectivo. Falta que{' '}
+                              {s.trabajadorAsignado?.nombre ?? 'tu profesional'} confirme que lo recibió.
+                            </p>
+                          </div>
+                        )}
+                        {s.estado === 'EnCurso' && !efectivo[s.id] && (
                           <div className="confirmar-box">
                             <p>
                               <strong>¿Ya terminó el trabajo?</strong> Confírmalo para pagar y cerrar la solicitud.
@@ -815,12 +843,17 @@ export default function ClienteDashboardPage() {
           solicitud={pagando}
           onClose={() => setPagando(null)}
           onElegir={(opcion) => {
-            // TODO: aquí se conectará Stripe (Google Pay / Apple Pay), PayPal y el pago en efectivo
-            setToast(
-              opcion === 'problema'
-                ? 'Reportar un problema estará disponible pronto.'
-                : `Pago con ${opcion}: estará disponible pronto.`
-            )
+            // TODO: aquí se conectará Stripe (Google Pay / Apple Pay) y PayPal
+            if (opcion === 'efectivo') {
+              setEfectivo((e) => ({ ...e, [pagando.id]: 'elegido' }))
+              setToast('Elegiste pagar en efectivo. Cuando entregues el dinero, pulsa "Ya pagué".')
+            } else {
+              setToast(
+                opcion === 'problema'
+                  ? 'Reportar un problema estará disponible pronto.'
+                  : `Pago con ${opcion}: estará disponible pronto.`
+              )
+            }
             setPagando(null)
           }}
         />
@@ -1199,7 +1232,7 @@ function PagarModal({
             <PayLogo src="/pay/paypal.svg" nombre="PayPal" />
           </button>
           <button type="button" className="pay-btn pay-efectivo" disabled={!cumplido} onClick={() => onElegir('efectivo')}>
-            Pagaré en efectivo
+            Pagare en efectivo
           </button>
         </div>
 

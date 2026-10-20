@@ -281,6 +281,8 @@ export default function TrabajadorDashboardPage() {
   const [cargando, setCargando] = useState(true)
   const [ocupado, setOcupado] = useState(false)
   const [toast, setToast] = useState('')
+  // Solo visual por ahora: trabajos donde el profesional ya marcó "Ya recibí el pago"
+  const [recibidos, setRecibidos] = useState<Record<number, boolean>>({})
 
   const [cotizando, setCotizando] = useState<Lead | null>(null)
   const [terminando, setTerminando] = useState<Trabajo | null>(null)
@@ -666,6 +668,32 @@ export default function TrabajadorDashboardPage() {
                             <button className="btn btn-ghost btn-sm" onClick={() => setTerminando(t)}>
                               Marcar como terminado
                             </button>
+                          </div>
+                        )}
+                        {t.estado === 'EnCurso' && !recibidos[t.id] && (
+                          <div className="confirmar-box">
+                            <p>
+                              <strong>¿Te pagaron en efectivo?</strong> Confirma cuando tengas el dinero. El trabajo se cierra
+                              cuando el cliente y tú confirmen.
+                            </p>
+                            <button
+                              className="btn btn-accent btn-sm"
+                              onClick={() => {
+                                // TODO: guardar la confirmación del trabajador en el servidor
+                                setRecibidos((r) => ({ ...r, [t.id]: true }))
+                                setToast('Listo. Avisamos al cliente para que confirme que pagó.')
+                              }}
+                            >
+                              Ya recibí el pago
+                            </button>
+                          </div>
+                        )}
+                        {t.estado === 'EnCurso' && recibidos[t.id] && (
+                          <div className="confirmar-box estado-espera">
+                            <p>
+                              <strong>Esperando al cliente.</strong> Marcaste que ya recibiste el pago. Falta que {t.cliente.nombre.split(' ')[0]}{' '}
+                              confirme que pagó.
+                            </p>
                           </div>
                         )}
                       </li>
@@ -1191,7 +1219,7 @@ function ServicioModal({
         <input id="s-precio" type="number" inputMode="decimal" min="1" step="1" value={precio} onChange={(e) => setPrecio(e.target.value)} />
       </div>
       <div className="field">
-        <label htmlFor="s-desc">Qué incluye (opcional)</label>
+        <label htmlFor="s-desc">Que incluye (opcional)</label>
         <textarea id="s-desc" rows={3} value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
       </div>
 

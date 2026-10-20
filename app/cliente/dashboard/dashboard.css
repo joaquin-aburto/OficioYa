@@ -1162,6 +1162,21 @@
   border: 1px solid rgba(0, 0, 0, 0.25);
 }
 
+.modal .pay-btn.pay-gpay,
+.modal .pay-btn.pay-apple {
+  background: #fff;
+  border: 1px solid #c8c8c8;
+  color: #111 !important;
+}
+
+.pay-logo { height: 28px; width: auto; }
+.pay-paypal .pay-logo { height: 30px; }
+.pay-btn:disabled { opacity: 0.75; }
+
+.pay-gpay .pay-logo { height: 52px; }
+.pay-apple .pay-logo { height: 52px; }
+.pay-paypal .pay-logo { height: 52px; }
+
 .pay-btn {
   display: flex;
   align-items: center;

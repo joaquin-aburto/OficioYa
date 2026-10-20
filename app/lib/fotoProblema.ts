@@ -1,7 +1,7 @@
 
 'use client'
 
-import { supabase } from './supabaseClient'
+import { getSupabaseClient } from './supabaseClient'
 
 const BUCKET = 'ImagesOficioYa'
 const CARPETA = 'OficioYa/Problemas'
@@ -24,6 +24,7 @@ function extensionDe(tipoMime: string) {
 
 
 export async function subirFotosProblema(archivos: File[]): Promise<string[]> {
+  const supabase = getSupabaseClient()
   const urls: string[] = []
   for (const archivo of archivos) {
     const ruta = `${CARPETA}/${crypto.randomUUID()}.${extensionDe(archivo.type)}`

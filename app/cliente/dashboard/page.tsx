@@ -1,6 +1,6 @@
 'use client'
 
-import { ChangeEvent, FormEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { ChangeEvent, FormEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import './dashboard.css'
@@ -37,6 +37,9 @@ type Cotizacion = {
   fechaEnvio: string
   trabajador: TrabajadorMini
 }
+type Metodo = 'Tarjeta' | 'Efectivo' | 'Transferencia'
+type PagoMini = { id: number; estado: 'Pendiente' | 'Completado' | 'Fallido'; metodoPago: Metodo }
+
 type Solicitud = {
   id: number
   descripcion: string
@@ -48,6 +51,7 @@ type Solicitud = {
   direccion: { alias: string | null; calle: string; colonia: string | null }
   trabajadorAsignado: { id: number; nombre: string; fotoPerfil: string | null; telefono: string | null } | null
   yaCalificada: boolean
+  pago: PagoMini | null
   cotizaciones: Cotizacion[]
 }
 type Profesional = {
@@ -85,6 +89,7 @@ type DashboardData = {
 // Debe coincidir con lo que guardes en el login (ver instrucciones)
 const STORAGE_KEY = 'oficioya_usuario'
 
+const METODOS: Metodo[] = ['Efectivo', 'Transferencia', 'Tarjeta']
 const PASOS = ['Pendiente', 'Cotizada', 'Aceptada', 'EnCurso', 'Terminada', 'Calificada']
 const ACTIVAS = ['Pendiente', 'Cotizada', 'Aceptada', 'EnCurso']
 const ETIQUETA_ESTADO: Record<string, string> = {
@@ -263,9 +268,6 @@ export default function ClienteDashboardPage() {
   const [problema, setProblema] = useState('')
   const [borrador, setBorrador] = useState<BorradorSolicitud | null>(null)
   const [calificando, setCalificando] = useState<Solicitud | null>(null)
-  const [pagando, setPagando] = useState<Solicitud | null>(null)
-  // Solo visual por ahora: qué solicitudes eligieron efectivo y si el cliente ya marcó "Ya pagué"
-  const [efectivo, setEfectivo] = useState<Record<number, 'elegido' | 'pagado'>>({})
   const [toast, setToast] = useState('')
   const [ocupado, setOcupado] = useState(false)
 
@@ -284,15 +286,33 @@ export default function ClienteDashboardPage() {
     }
   }, [router])
 
-  const cargar = useCallback(async (id: number) => {
+  const ultimaFirma = useRef('')
+  const notifVistas = useRef<Set<number> | null>(null)
+
+  const cargar = useCallback(async (id: number, silencioso = false) => {
     try {
       const res = await fetch(`/api/cliente/dashboard?usuarioId=${id}`, { cache: 'no-store' })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error)
-      setData(json)
+
+      // Aviso cuando llega una notificación nueva (estado cambiado, cotización, etc.)
+      const notifs: { id: number; mensaje: string }[] = json.notificaciones ?? []
+      if (notifVistas.current && silencioso) {
+        const nueva = notifs.find((n) => !notifVistas.current!.has(n.id))
+        if (nueva) setToast(nueva.mensaje)
+      }
+      notifVistas.current = new Set(notifs.map((n) => n.id))
+
+      // Solo vuelve a pintar si algo cambió de verdad (evita parpadeos)
+      const firma = JSON.stringify(json)
+      if (firma !== ultimaFirma.current) {
+        ultimaFirma.current = firma
+        setData(json)
+      }
       setError('')
     } catch {
-      setError('No pudimos cargar tu panel. Revisa tu conexión e intenta de nuevo.')
+      // En refrescos silenciosos no tumbamos el panel por un fallo de red momentáneo
+      if (!silencioso) setError('No pudimos cargar tu panel. Revisa tu conexión e intenta de nuevo.')
     } finally {
       setCargando(false)
     }
@@ -300,6 +320,22 @@ export default function ClienteDashboardPage() {
 
   useEffect(() => {
     if (usuarioId) cargar(usuarioId)
+  }, [usuarioId, cargar])
+
+  /* --- tiempo real: refresca en silencio cada 5 s, y al volver a la pestaña --- */
+  useEffect(() => {
+    if (!usuarioId) return
+    const refrescar = () => {
+      if (document.visibilityState === 'visible') cargar(usuarioId, true)
+    }
+    const t = setInterval(refrescar, 5000)
+    document.addEventListener('visibilitychange', refrescar)
+    window.addEventListener('focus', refrescar)
+    return () => {
+      clearInterval(t)
+      document.removeEventListener('visibilitychange', refrescar)
+      window.removeEventListener('focus', refrescar)
+    }
   }, [usuarioId, cargar])
 
   useEffect(() => {
@@ -352,6 +388,14 @@ export default function ClienteDashboardPage() {
   )
   const porCalificar = useMemo(
     () => solicitudes.filter((s) => s.estado === 'Terminada' && !s.yaCalificada),
+    [solicitudes]
+  )
+  // Trabajos terminados que aún no se pagan (sin método elegido, o con pago pendiente de confirmar)
+  const porPagar = useMemo(
+    () =>
+      solicitudes.filter(
+        (s) => ['Terminada', 'Calificada'].includes(s.estado) && (!s.pago || s.pago.estado === 'Pendiente')
+      ),
     [solicitudes]
   )
   const terminadas = solicitudes.filter((s) => ['Terminada', 'Calificada'].includes(s.estado)).length
@@ -563,6 +607,51 @@ export default function ClienteDashboardPage() {
               )}
             </section>
 
+            {/* Por pagar: el cliente elige cómo pagar */}
+            {porPagar.length > 0 && (
+              <section className="block block-calificar" aria-labelledby="t-pagar">
+                <div className="block-head"><h2 id="t-pagar">Elige cómo pagar</h2></div>
+                <ul className="cal-list">
+                  {porPagar.map((s) => {
+                    const total = s.cotizaciones.find((c) => c.estado === 'Aceptada')?.monto
+                    const nombre = s.trabajadorAsignado?.nombre ?? 'tu profesional'
+                    return (
+                      <li key={s.id} style={{ flexDirection: 'column', alignItems: 'stretch', gap: 10 }}>
+                        <span>
+                          <strong>{s.especialidad.nombre}</strong> con {nombre}
+                          {total ? ` · ${dinero(total)}` : ''}
+                          <br />
+                          <span className="muted small">
+                            {s.pago
+                              ? `Elegiste ${s.pago.metodoPago.toLowerCase()}. Págale a ${nombre}; él confirmará cuando lo reciba.`
+                              : 'El trabajo ya terminó. ¿Cómo le vas a pagar?'}
+                          </span>
+                        </span>
+                        <div className="chips" role="group" aria-label="Forma de pago">
+                          {METODOS.map((m) => (
+                            <button
+                              key={m}
+                              type="button"
+                              className={s.pago?.metodoPago === m ? 'on' : ''}
+                              disabled={ocupado}
+                              onClick={() =>
+                                ejecutar(
+                                  { accion: 'elegirMetodoPago', solicitudId: s.id, metodoPago: m },
+                                  `Listo. Le avisamos a ${nombre} que pagarás con ${m.toLowerCase()}.`
+                                )
+                              }
+                            >
+                              {m}
+                            </button>
+                          ))}
+                        </div>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </section>
+            )}
+
             {/* Por calificar */}
             {porCalificar.length > 0 && (
               <section className="block block-calificar" aria-labelledby="t-cal">
@@ -664,41 +753,30 @@ export default function ClienteDashboardPage() {
                             Cancelar solicitud
                           </button>
                         )}
-                        {s.estado === 'EnCurso' && efectivo[s.id] === 'elegido' && (
-                          <div className="confirmar-box">
-                            <p>
-                              <strong>Pago en efectivo.</strong> Entrégale el dinero a {s.trabajadorAsignado?.nombre ?? 'tu profesional'} y
-                              confirma aquí. El trabajo se cierra cuando los dos confirmen.
-                            </p>
-                            <button
-                              className="btn btn-accent btn-sm"
-                              onClick={() => {
-                                // TODO: guardar la confirmación del cliente en el servidor
-                                setEfectivo((e) => ({ ...e, [s.id]: 'pagado' }))
-                                setToast('Listo. Avisamos al profesional para que confirme que recibió el pago.')
-                              }}
-                            >
-                              Ya pagué
-                            </button>
-                          </div>
-                        )}
-                        {s.estado === 'EnCurso' && efectivo[s.id] === 'pagado' && (
+                        {s.estado === 'Aceptada' && (
                           <div className="confirmar-box estado-espera">
                             <p>
-                              <strong>Esperando al profesional.</strong> Marcaste que ya pagaste en efectivo. Falta que{' '}
-                              {s.trabajadorAsignado?.nombre ?? 'tu profesional'} confirme que lo recibió.
+                              <strong>Profesional confirmado.</strong> {s.trabajadorAsignado?.nombre ?? 'Tu profesional'} iniciará el
+                              trabajo en la fecha acordada. Puedes llamarle para coordinar.
                             </p>
                           </div>
                         )}
-                        {s.estado === 'EnCurso' && !efectivo[s.id] && (
-                          <div className="confirmar-box">
+                        {s.estado === 'EnCurso' && (
+                          <div className="confirmar-box estado-espera">
                             <p>
-                              <strong>¿Ya terminó el trabajo?</strong> Confírmalo para pagar y cerrar la solicitud.
+                              <strong>Trabajo en curso.</strong> Cuando {s.trabajadorAsignado?.nombre ?? 'tu profesional'} termine,
+                              lo marcará como terminado y te avisaremos aquí.
                             </p>
-                            <button className="btn btn-accent btn-sm" onClick={() => setPagando(s)}>
-                              Confirmar que se cumplió
-                            </button>
                           </div>
+                        )}
+                        {['Terminada', 'Calificada'].includes(s.estado) && (
+                          <p className="muted small">
+                            {!s.pago
+                              ? 'Falta elegir cómo pagar (en "Elige cómo pagar", arriba).'
+                              : s.pago.estado === 'Completado'
+                                ? `Pagado con ${s.pago.metodoPago.toLowerCase()} ✓`
+                                : `Pago con ${s.pago.metodoPago.toLowerCase()}: esperando confirmación del profesional.`}
+                          </p>
                         )}
                         {s.estado === 'Terminada' && !s.yaCalificada && (
                           <button className="btn btn-accent btn-sm" onClick={() => setCalificando(s)}>Calificar servicio</button>
@@ -834,27 +912,6 @@ export default function ClienteDashboardPage() {
               'Gracias por tu calificación.'
             )
             if (ok) setCalificando(null)
-          }}
-        />
-      )}
-
-      {pagando && (
-        <PagarModal
-          solicitud={pagando}
-          onClose={() => setPagando(null)}
-          onElegir={(opcion) => {
-            // TODO: aquí se conectará Stripe (Google Pay / Apple Pay) y PayPal
-            if (opcion === 'efectivo') {
-              setEfectivo((e) => ({ ...e, [pagando.id]: 'elegido' }))
-              setToast('Elegiste pagar en efectivo. Cuando entregues el dinero, pulsa "Ya pagué".')
-            } else {
-              setToast(
-                opcion === 'problema'
-                  ? 'Reportar un problema estará disponible pronto.'
-                  : `Pago con ${opcion}: estará disponible pronto.`
-              )
-            }
-            setPagando(null)
           }}
         />
       )}
@@ -1159,87 +1216,6 @@ function CalificarModal({
           </button>
         </div>
       </form>
-    </div>
-  )
-}
-
-/* ------------------------------------------------------------------ */
-/* Modal: confirmar trabajo y pagar (solo botones por ahora)           */
-/* ------------------------------------------------------------------ */
-
-// Muestra el logo oficial de /public/pay; si el archivo no existe, cae a texto
-function PayLogo({ src, nombre }: { src: string; nombre: string }) {
-  const [falla, setFalla] = useState(false)
-  if (falla) return <span>Pagar con {nombre}</span>
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt={`Pagar con ${nombre}`} className="pay-logo" onError={() => setFalla(true)} />
-  )
-}
-
-function PagarModal({
-  solicitud,
-  onClose,
-  onElegir,
-}: {
-  solicitud: Solicitud
-  onClose: () => void
-  onElegir: (opcion: string) => void
-}) {
-  const [cumplido, setCumplido] = useState(false)
-  const monto = solicitud.cotizaciones.find((c) => c.estado === 'Aceptada')?.monto ?? null
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
-
-  return (
-    <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="p-title">
-        <div className="modal-head">
-          <h2 id="p-title">Confirma y paga</h2>
-          <button type="button" className="icon-btn" onClick={onClose} aria-label="Cerrar">
-            <Icon name="close" />
-          </button>
-        </div>
-
-        <p className="muted">
-          {solicitud.especialidad.nombre} con {solicitud.trabajadorAsignado?.nombre ?? 'tu profesional'} · solicitud #{solicitud.id}
-        </p>
-
-        {monto !== null && (
-          <p className="pay-total">
-            <span>Total a pagar</span>
-            <strong>{dinero(monto)}</strong>
-          </p>
-        )}
-
-        <label className="pay-confirmar">
-          <input type="checkbox" checked={cumplido} onChange={(e) => setCumplido(e.target.checked)} />
-          Confirmo que el trabajo se realizó como acordamos
-        </label>
-
-        <div className="pay-list" role="group" aria-label="Forma de pago">
-          <button type="button" className="pay-btn pay-gpay" disabled={!cumplido} onClick={() => onElegir('Google Pay')}>
-            <PayLogo src="/pay/google-pay.svg" nombre="Google Pay" />
-          </button>
-          <button type="button" className="pay-btn pay-apple" disabled={!cumplido} onClick={() => onElegir('Apple Pay')}>
-            <PayLogo src="/pay/apple-pay.svg" nombre="Apple Pay" />
-          </button>
-          <button type="button" className="pay-btn pay-paypal" disabled={!cumplido} onClick={() => onElegir('PayPal')}>
-            <PayLogo src="/pay/paypal.svg" nombre="PayPal" />
-          </button>
-          <button type="button" className="pay-btn pay-efectivo" disabled={!cumplido} onClick={() => onElegir('efectivo')}>
-            Pagare en efectivo
-          </button>
-        </div>
-
-        <button type="button" className="link-danger" onClick={() => onElegir('problema')}>
-          Hay un problema con el trabajo
-        </button>
-      </div>
     </div>
   )
 }

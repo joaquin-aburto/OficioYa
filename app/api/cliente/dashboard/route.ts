@@ -36,6 +36,7 @@ export async function GET(req: Request) {
               },
             },
             calificacion: { select: { id: true } },
+            pago: { select: { id: true, estado: true, metodoPago: true } },
           },
         }),
         prisma.direccion.findMany({
@@ -118,6 +119,7 @@ export async function GET(req: Request) {
       direccion: s.direccion,
       trabajadorAsignado: s.trabajadorAsignado,
       yaCalificada: Boolean(s.calificacion),
+      pago: s.pago ?? null,
       cotizaciones: s.cotizaciones.map((c) => ({
         id: c.id,
         solicitudId: c.solicitudId,

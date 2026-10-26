@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import prisma from '../../../lib/prisma'
-import { COMISION_PORCENTAJE } from '../../../lib/comision'
 
 // POST /api/trabajador/acciones
 // Body: { trabajadorId, accion, ...datos }
@@ -9,7 +8,6 @@ import { COMISION_PORCENTAJE } from '../../../lib/comision'
 const fail = (error: string, status = 400) => NextResponse.json({ error }, { status })
 
 const DIAS = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'] as const
-const METODOS = ['Tarjeta', 'Efectivo', 'Transferencia'] as const
 const HORA = /^([01]\d|2[0-3]):[0-5]\d$/
 
 export async function POST(req: Request) {
@@ -84,44 +82,21 @@ export async function POST(req: Request) {
       }
 
       /* ---------------------------------------------------------- */
+      // El trabajador solo marca que terminó. El pago lo crea el cliente al elegir cómo pagar.
       case 'terminarTrabajo': {
         const solicitudId = Number(body.solicitudId)
-        const metodoPago = body.metodoPago
-        if (!METODOS.includes(metodoPago)) return fail('Elige cómo te pagó el cliente.')
-
-        const sol = await prisma.solicitud.findUnique({
-          where: { id: solicitudId },
-          include: {
-            pago: { select: { id: true } },
-            cotizaciones: { where: { trabajadorId, estado: 'Aceptada' }, select: { monto: true } },
-          },
-        })
+        const sol = await prisma.solicitud.findUnique({ where: { id: solicitudId } })
         if (!sol || sol.trabajadorAsignadoId !== trabajadorId) return fail('Trabajo no encontrado.', 404)
         if (sol.estado !== 'EnCurso') return fail('Solo puedes terminar trabajos que están en curso.', 409)
-        if (sol.pago) return fail('Este trabajo ya tiene un pago registrado.', 409)
-        if (!sol.cotizaciones[0]) return fail('No encontramos la cotización aceptada de este trabajo.', 409)
-
-        const montoTotal = Number(sol.cotizaciones[0].monto)
-        const montoComision = Math.round(montoTotal * COMISION_PORCENTAJE) / 100
 
         await prisma.$transaction([
           prisma.solicitud.update({ where: { id: solicitudId }, data: { estado: 'Terminada' } }),
-          prisma.pago.create({
-            data: {
-              solicitudId,
-              clienteId: sol.clienteId,
-              trabajadorId,
-              montoTotal,
-              metodoPago,
-              comision: { create: { porcentajeAplicado: COMISION_PORCENTAJE, montoComision } },
-            },
-          }),
           prisma.notificacion.create({
             data: {
               destinatarioTipo: 'Usuario',
               destinatarioId: sol.clienteId,
               tipo: 'Calificacion',
-              mensaje: `Tu solicitud #${solicitudId} está terminada. ¡Cuéntanos cómo te fue!`,
+              mensaje: `Tu solicitud #${solicitudId} está terminada. Elige cómo pagar y cuéntanos cómo te fue.`,
             },
           }),
         ])

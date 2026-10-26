@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server'
 import prisma from '../../../lib/prisma'
+import { COMISION_PORCENTAJE } from '../../../lib/comision'
 
 // POST /api/cliente/acciones
 // Body: { usuarioId, accion, ...datos }
 // TODO: igual que en el dashboard, toma usuarioId de la sesión cuando la tengas.
 
 const fail = (error: string, status = 400) => NextResponse.json({ error }, { status })
+
+const METODOS = ['Tarjeta', 'Efectivo', 'Transferencia'] as const
 
 export async function POST(req: Request) {
   try {
@@ -189,6 +192,63 @@ export async function POST(req: Request) {
             },
           }),
         ])
+        return NextResponse.json({ ok: true })
+      }
+
+      /* ---------------------------------------------------------- */
+      // El cliente elige cómo va a pagar (cuando el trabajo ya está terminado).
+      // Crea el pago la primera vez; mientras siga Pendiente puede cambiar de método.
+      case 'elegirMetodoPago': {
+        const solicitudId = Number(body.solicitudId)
+        const metodoPago = body.metodoPago
+        if (!METODOS.includes(metodoPago)) return fail('Elige una forma de pago válida.')
+
+        const sol = await prisma.solicitud.findUnique({
+          where: { id: solicitudId },
+          include: {
+            pago: { select: { id: true, estado: true } },
+            cotizaciones: { where: { estado: 'Aceptada' }, select: { monto: true } },
+          },
+        })
+        if (!sol) return fail('Solicitud no encontrada.', 404)
+        if (sol.clienteId !== usuarioId) return fail('No autorizado.', 403)
+        if (!['Terminada', 'Calificada'].includes(sol.estado) || !sol.trabajadorAsignadoId) {
+          return fail('Podrás elegir cómo pagar cuando el profesional termine el trabajo.', 409)
+        }
+        const trabajadorId = sol.trabajadorAsignadoId
+
+        const aviso = {
+          destinatarioTipo: 'Trabajador' as const,
+          destinatarioId: trabajadorId,
+          tipo: 'Pago' as const,
+          mensaje: `El cliente pagará con ${String(metodoPago).toLowerCase()} la solicitud #${solicitudId}. Confirma cuando lo recibas.`,
+        }
+
+        if (sol.pago) {
+          if (sol.pago.estado !== 'Pendiente') return fail('Este pago ya fue confirmado.', 409)
+          await prisma.$transaction([
+            prisma.pago.update({ where: { id: sol.pago.id }, data: { metodoPago } }),
+            prisma.notificacion.create({ data: aviso }),
+          ])
+        } else {
+          const cot = sol.cotizaciones[0]
+          if (!cot) return fail('No encontramos la cotización aceptada de este trabajo.', 409)
+          const montoTotal = Number(cot.monto)
+          const montoComision = Math.round(montoTotal * COMISION_PORCENTAJE) / 100
+          await prisma.$transaction([
+            prisma.pago.create({
+              data: {
+                solicitudId,
+                clienteId: usuarioId,
+                trabajadorId,
+                montoTotal,
+                metodoPago,
+                comision: { create: { porcentajeAplicado: COMISION_PORCENTAJE, montoComision } },
+              },
+            }),
+            prisma.notificacion.create({ data: aviso }),
+          ])
+        }
         return NextResponse.json({ ok: true })
       }
 

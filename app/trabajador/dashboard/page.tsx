@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { FormEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 // Reutiliza los estilos base del panel del cliente + los extras del trabajador
@@ -281,8 +281,6 @@ export default function TrabajadorDashboardPage() {
   const [cargando, setCargando] = useState(true)
   const [ocupado, setOcupado] = useState(false)
   const [toast, setToast] = useState('')
-  // Solo visual por ahora: trabajos donde el profesional ya marcó "Ya recibí el pago"
-  const [recibidos, setRecibidos] = useState<Record<number, boolean>>({})
 
   const [cotizando, setCotizando] = useState<Lead | null>(null)
   const [terminando, setTerminando] = useState<Trabajo | null>(null)
@@ -307,15 +305,33 @@ export default function TrabajadorDashboardPage() {
     }
   }, [router])
 
-  const cargar = useCallback(async (id: number) => {
+  const ultimaFirma = useRef('')
+  const notifVistas = useRef<Set<number> | null>(null)
+
+  const cargar = useCallback(async (id: number, silencioso = false) => {
     try {
       const res = await fetch(`/api/worker/dashboard?trabajadorId=${id}`, { cache: 'no-store' })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error)
-      setData(json)
+
+      // Aviso cuando llega una notificación nueva (estado cambiado, cotización, etc.)
+      const notifs: { id: number; mensaje: string }[] = json.notificaciones ?? []
+      if (notifVistas.current && silencioso) {
+        const nueva = notifs.find((n) => !notifVistas.current!.has(n.id))
+        if (nueva) setToast(nueva.mensaje)
+      }
+      notifVistas.current = new Set(notifs.map((n) => n.id))
+
+      // Solo vuelve a pintar si algo cambió de verdad (evita parpadeos)
+      const firma = JSON.stringify(json)
+      if (firma !== ultimaFirma.current) {
+        ultimaFirma.current = firma
+        setData(json)
+      }
       setError('')
     } catch {
-      setError('No pudimos cargar tu panel. Revisa tu conexión e intenta de nuevo.')
+      // En refrescos silenciosos no tumbamos el panel por un fallo de red momentáneo
+      if (!silencioso) setError('No pudimos cargar tu panel. Revisa tu conexión e intenta de nuevo.')
     } finally {
       setCargando(false)
     }
@@ -323,6 +339,22 @@ export default function TrabajadorDashboardPage() {
 
   useEffect(() => {
     if (trabajadorId) cargar(trabajadorId)
+  }, [trabajadorId, cargar])
+
+  /* --- tiempo real: refresca en silencio cada 5 s, y al volver a la pestaña --- */
+  useEffect(() => {
+    if (!trabajadorId) return
+    const refrescar = () => {
+      if (document.visibilityState === 'visible') cargar(trabajadorId, true)
+    }
+    const t = setInterval(refrescar, 5000)
+    document.addEventListener('visibilitychange', refrescar)
+    window.addEventListener('focus', refrescar)
+    return () => {
+      clearInterval(t)
+      document.removeEventListener('visibilitychange', refrescar)
+      window.removeEventListener('focus', refrescar)
+    }
   }, [trabajadorId, cargar])
 
   useEffect(() => {
@@ -622,7 +654,7 @@ export default function TrabajadorDashboardPage() {
                         <FotosProblema fotos={t.fotos} />
 
                         <p className="sol-estado">
-                          <strong>{ESTADO_TRABAJO[t.estado]}</strong>
+                          <strong>{ESTADO_TRABAJO[t.estado] ?? t.estado}</strong>
                           {t.monto !== null && <span className="monto-inline">{dinero(t.monto)}</span>}
                         </p>
 
@@ -658,43 +690,40 @@ export default function TrabajadorDashboardPage() {
                         )}
                         {t.estado === 'EnCurso' && (
                           <div className="confirmar-box">
-                            <p>Cuando termines, pídele al cliente que confirme que se cumplió y que pague.</p>
-                            <button
-                              className="btn btn-primary"
-                              onClick={() => setToast('Solicitar confirmación al cliente estará disponible pronto.')}
-                            >
-                              Solicitar confirmación del cliente
-                            </button>
-                            <button className="btn btn-ghost btn-sm" onClick={() => setTerminando(t)}>
-                              Marcar como terminado
+                            <p>
+                              <strong>¿Ya terminaste el trabajo?</strong> Márcalo como terminado. Después el cliente elegirá cómo pagarte
+                              y lo calificará.
+                            </p>
+                            <button className="btn btn-primary" disabled={ocupado} onClick={() => setTerminando(t)}>
+                              Terminé el trabajo
                             </button>
                           </div>
                         )}
-                        {t.estado === 'EnCurso' && !recibidos[t.id] && (
+                        {t.estado === 'Terminada' && !t.pago && (
+                          <div className="confirmar-box estado-espera">
+                            <p>
+                              <strong>Esperando al cliente.</strong> Falta que {t.cliente.nombre.split(' ')[0]} elija cómo va a
+                              pagarte. Te avisamos en cuanto lo haga.
+                            </p>
+                          </div>
+                        )}
+                        {t.estado === 'Terminada' && t.pago?.estado === 'Pendiente' && (
                           <div className="confirmar-box">
                             <p>
-                              <strong>¿Te pagaron en efectivo?</strong> Confirma cuando tengas el dinero. El trabajo se cierra
-                              cuando el cliente y tú confirmen.
+                              <strong>{t.cliente.nombre.split(' ')[0]} te pagará con {t.pago.metodoPago.toLowerCase()}.</strong>{' '}
+                              Cuando recibas{t.monto !== null ? ` ${dinero(t.monto)}` : ' el pago'}, confírmalo aquí.
                             </p>
                             <button
                               className="btn btn-accent btn-sm"
-                              onClick={() => {
-                                // TODO: guardar la confirmación del trabajador en el servidor
-                                setRecibidos((r) => ({ ...r, [t.id]: true }))
-                                setToast('Listo. Avisamos al cliente para que confirme que pagó.')
-                              }}
+                              disabled={ocupado}
+                              onClick={() => t.pago && ejecutar({ accion: 'confirmarCobro', pagoId: t.pago.id }, 'Cobro confirmado.')}
                             >
                               Ya recibí el pago
                             </button>
                           </div>
                         )}
-                        {t.estado === 'EnCurso' && recibidos[t.id] && (
-                          <div className="confirmar-box estado-espera">
-                            <p>
-                              <strong>Esperando al cliente.</strong> Marcaste que ya recibiste el pago. Falta que {t.cliente.nombre.split(' ')[0]}{' '}
-                              confirme que pagó.
-                            </p>
-                          </div>
+                        {t.estado === 'Terminada' && t.pago?.estado === 'Completado' && (
+                          <p className="sol-estado"><span className="tag tag-ok">Pago recibido</span></p>
                         )}
                       </li>
                     )
@@ -943,10 +972,10 @@ export default function TrabajadorDashboardPage() {
           comision={data.comisionPorcentaje}
           ocupado={ocupado}
           onClose={() => setTerminando(null)}
-          onSubmit={async (metodoPago) => {
+          onSubmit={async () => {
             const ok = await ejecutar(
-              { accion: 'terminarTrabajo', solicitudId: terminando.id, metodoPago },
-              'Trabajo terminado. Confirma el cobro cuando recibas el pago.'
+              { accion: 'terminarTrabajo', solicitudId: terminando.id },
+              'Trabajo terminado. Le pedimos al cliente que elija cómo pagar.'
             )
             if (ok) setTerminando(null)
           }}
@@ -1116,9 +1145,8 @@ function TerminarModal({
   comision: number
   ocupado: boolean
   onClose: () => void
-  onSubmit: (metodo: Metodo) => void
+  onSubmit: () => void
 }) {
-  const [metodo, setMetodo] = useState<Metodo>('Efectivo')
   const total = trabajo.monto ?? 0
   const retenido = Math.round(total * comision) / 100
 
@@ -1129,21 +1157,12 @@ function TerminarModal({
       onClose={onClose}
       onSubmit={(e) => {
         e.preventDefault()
-        onSubmit(metodo)
+        onSubmit()
       }}
     >
       <p className="muted">
         {trabajo.especialidad.nombre} para {trabajo.cliente.nombre} · solicitud #{trabajo.id}
       </p>
-
-      <div className="field">
-        <label htmlFor="t-metodo">¿Cómo te paga el cliente?</label>
-        <select id="t-metodo" value={metodo} onChange={(e) => setMetodo(e.target.value as Metodo)}>
-          <option value="Efectivo">Efectivo</option>
-          <option value="Transferencia">Transferencia</option>
-          <option value="Tarjeta">Tarjeta</option>
-        </select>
-      </div>
 
       <dl className="desglose">
         <div><dt>Total del servicio</dt><dd>{dinero(total)}</dd></div>
@@ -1151,7 +1170,7 @@ function TerminarModal({
         <div className="desglose-total"><dt>Tú recibes</dt><dd>{dinero(total - retenido)}</dd></div>
       </dl>
 
-      <p className="muted small">Al terminar, avisamos al cliente para que califique tu trabajo.</p>
+      <p className="muted small">Al terminar, avisamos al cliente para que elija cómo pagarte y califique tu trabajo.</p>
 
       <div className="modal-actions">
         <button type="button" className="btn btn-ghost" onClick={onClose}>Todavía no</button>

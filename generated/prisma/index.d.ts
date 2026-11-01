@@ -24,6 +24,11 @@ export type Usuario = $Result.DefaultSelection<Prisma.$UsuarioPayload>
  */
 export type Trabajador = $Result.DefaultSelection<Prisma.$TrabajadorPayload>
 /**
+ * Model DocumentoTrabajador
+ * 
+ */
+export type DocumentoTrabajador = $Result.DefaultSelection<Prisma.$DocumentoTrabajadorPayload>
+/**
  * Model Especialidad
  * 
  */
@@ -342,6 +347,16 @@ export class PrismaClient<
     * ```
     */
   get trabajador(): Prisma.TrabajadorDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.documentoTrabajador`: Exposes CRUD operations for the **DocumentoTrabajador** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DocumentoTrabajadors
+    * const documentoTrabajadors = await prisma.documentoTrabajador.findMany()
+    * ```
+    */
+  get documentoTrabajador(): Prisma.DocumentoTrabajadorDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.especialidad`: Exposes CRUD operations for the **Especialidad** model.
@@ -911,6 +926,7 @@ export namespace Prisma {
   export const ModelName: {
     Usuario: 'Usuario',
     Trabajador: 'Trabajador',
+    DocumentoTrabajador: 'DocumentoTrabajador',
     Especialidad: 'Especialidad',
     TrabajadorEspecialidad: 'TrabajadorEspecialidad',
     Servicio: 'Servicio',
@@ -938,7 +954,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "usuario" | "trabajador" | "especialidad" | "trabajadorEspecialidad" | "servicio" | "solicitud" | "cotizacion" | "disponibilidad" | "direccion" | "calificacion" | "fotoTrabajo" | "pago" | "comision" | "notificacion"
+      modelProps: "usuario" | "trabajador" | "documentoTrabajador" | "especialidad" | "trabajadorEspecialidad" | "servicio" | "solicitud" | "cotizacion" | "disponibilidad" | "direccion" | "calificacion" | "fotoTrabajo" | "pago" | "comision" | "notificacion"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1087,6 +1103,80 @@ export namespace Prisma {
           count: {
             args: Prisma.TrabajadorCountArgs<ExtArgs>
             result: $Utils.Optional<TrabajadorCountAggregateOutputType> | number
+          }
+        }
+      }
+      DocumentoTrabajador: {
+        payload: Prisma.$DocumentoTrabajadorPayload<ExtArgs>
+        fields: Prisma.DocumentoTrabajadorFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DocumentoTrabajadorFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentoTrabajadorPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DocumentoTrabajadorFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentoTrabajadorPayload>
+          }
+          findFirst: {
+            args: Prisma.DocumentoTrabajadorFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentoTrabajadorPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DocumentoTrabajadorFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentoTrabajadorPayload>
+          }
+          findMany: {
+            args: Prisma.DocumentoTrabajadorFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentoTrabajadorPayload>[]
+          }
+          create: {
+            args: Prisma.DocumentoTrabajadorCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentoTrabajadorPayload>
+          }
+          createMany: {
+            args: Prisma.DocumentoTrabajadorCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DocumentoTrabajadorCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentoTrabajadorPayload>[]
+          }
+          delete: {
+            args: Prisma.DocumentoTrabajadorDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentoTrabajadorPayload>
+          }
+          update: {
+            args: Prisma.DocumentoTrabajadorUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentoTrabajadorPayload>
+          }
+          deleteMany: {
+            args: Prisma.DocumentoTrabajadorDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DocumentoTrabajadorUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DocumentoTrabajadorUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentoTrabajadorPayload>[]
+          }
+          upsert: {
+            args: Prisma.DocumentoTrabajadorUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DocumentoTrabajadorPayload>
+          }
+          aggregate: {
+            args: Prisma.DocumentoTrabajadorAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDocumentoTrabajador>
+          }
+          groupBy: {
+            args: Prisma.DocumentoTrabajadorGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DocumentoTrabajadorGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DocumentoTrabajadorCountArgs<ExtArgs>
+            result: $Utils.Optional<DocumentoTrabajadorCountAggregateOutputType> | number
           }
         }
       }
@@ -2103,6 +2193,7 @@ export namespace Prisma {
   export type GlobalOmitConfig = {
     usuario?: UsuarioOmit
     trabajador?: TrabajadorOmit
+    documentoTrabajador?: DocumentoTrabajadorOmit
     especialidad?: EspecialidadOmit
     trabajadorEspecialidad?: TrabajadorEspecialidadOmit
     servicio?: ServicioOmit
@@ -2261,6 +2352,7 @@ export namespace Prisma {
     cotizaciones: number
     calificaciones: number
     pagos: number
+    documentos: number
   }
 
   export type TrabajadorCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2272,6 +2364,7 @@ export namespace Prisma {
     cotizaciones?: boolean | TrabajadorCountOutputTypeCountCotizacionesArgs
     calificaciones?: boolean | TrabajadorCountOutputTypeCountCalificacionesArgs
     pagos?: boolean | TrabajadorCountOutputTypeCountPagosArgs
+    documentos?: boolean | TrabajadorCountOutputTypeCountDocumentosArgs
   }
 
   // Custom InputTypes
@@ -2339,6 +2432,13 @@ export namespace Prisma {
    */
   export type TrabajadorCountOutputTypeCountPagosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PagoWhereInput
+  }
+
+  /**
+   * TrabajadorCountOutputType without action
+   */
+  export type TrabajadorCountOutputTypeCountDocumentosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DocumentoTrabajadorWhereInput
   }
 
 
@@ -3956,6 +4056,7 @@ export namespace Prisma {
     cotizaciones?: boolean | Trabajador$cotizacionesArgs<ExtArgs>
     calificaciones?: boolean | Trabajador$calificacionesArgs<ExtArgs>
     pagos?: boolean | Trabajador$pagosArgs<ExtArgs>
+    documentos?: boolean | Trabajador$documentosArgs<ExtArgs>
     _count?: boolean | TrabajadorCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["trabajador"]>
 
@@ -4011,6 +4112,7 @@ export namespace Prisma {
     cotizaciones?: boolean | Trabajador$cotizacionesArgs<ExtArgs>
     calificaciones?: boolean | Trabajador$calificacionesArgs<ExtArgs>
     pagos?: boolean | Trabajador$pagosArgs<ExtArgs>
+    documentos?: boolean | Trabajador$documentosArgs<ExtArgs>
     _count?: boolean | TrabajadorCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type TrabajadorIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4027,6 +4129,7 @@ export namespace Prisma {
       cotizaciones: Prisma.$CotizacionPayload<ExtArgs>[]
       calificaciones: Prisma.$CalificacionPayload<ExtArgs>[]
       pagos: Prisma.$PagoPayload<ExtArgs>[]
+      documentos: Prisma.$DocumentoTrabajadorPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -4442,6 +4545,7 @@ export namespace Prisma {
     cotizaciones<T extends Trabajador$cotizacionesArgs<ExtArgs> = {}>(args?: Subset<T, Trabajador$cotizacionesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CotizacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     calificaciones<T extends Trabajador$calificacionesArgs<ExtArgs> = {}>(args?: Subset<T, Trabajador$calificacionesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CalificacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     pagos<T extends Trabajador$pagosArgs<ExtArgs> = {}>(args?: Subset<T, Trabajador$pagosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PagoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    documentos<T extends Trabajador$documentosArgs<ExtArgs> = {}>(args?: Subset<T, Trabajador$documentosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentoTrabajadorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5067,6 +5171,30 @@ export namespace Prisma {
   }
 
   /**
+   * Trabajador.documentos
+   */
+  export type Trabajador$documentosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DocumentoTrabajador
+     */
+    select?: DocumentoTrabajadorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DocumentoTrabajador
+     */
+    omit?: DocumentoTrabajadorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentoTrabajadorInclude<ExtArgs> | null
+    where?: DocumentoTrabajadorWhereInput
+    orderBy?: DocumentoTrabajadorOrderByWithRelationInput | DocumentoTrabajadorOrderByWithRelationInput[]
+    cursor?: DocumentoTrabajadorWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DocumentoTrabajadorScalarFieldEnum | DocumentoTrabajadorScalarFieldEnum[]
+  }
+
+  /**
    * Trabajador without action
    */
   export type TrabajadorDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5082,6 +5210,1124 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: TrabajadorInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DocumentoTrabajador
+   */
+
+  export type AggregateDocumentoTrabajador = {
+    _count: DocumentoTrabajadorCountAggregateOutputType | null
+    _avg: DocumentoTrabajadorAvgAggregateOutputType | null
+    _sum: DocumentoTrabajadorSumAggregateOutputType | null
+    _min: DocumentoTrabajadorMinAggregateOutputType | null
+    _max: DocumentoTrabajadorMaxAggregateOutputType | null
+  }
+
+  export type DocumentoTrabajadorAvgAggregateOutputType = {
+    id: number | null
+    trabajadorId: number | null
+    tamano: number | null
+  }
+
+  export type DocumentoTrabajadorSumAggregateOutputType = {
+    id: number | null
+    trabajadorId: number | null
+    tamano: number | null
+  }
+
+  export type DocumentoTrabajadorMinAggregateOutputType = {
+    id: number | null
+    trabajadorId: number | null
+    nombreArchivo: string | null
+    ruta: string | null
+    tamano: number | null
+    fechaSubida: Date | null
+  }
+
+  export type DocumentoTrabajadorMaxAggregateOutputType = {
+    id: number | null
+    trabajadorId: number | null
+    nombreArchivo: string | null
+    ruta: string | null
+    tamano: number | null
+    fechaSubida: Date | null
+  }
+
+  export type DocumentoTrabajadorCountAggregateOutputType = {
+    id: number
+    trabajadorId: number
+    nombreArchivo: number
+    ruta: number
+    tamano: number
+    fechaSubida: number
+    _all: number
+  }
+
+
+  export type DocumentoTrabajadorAvgAggregateInputType = {
+    id?: true
+    trabajadorId?: true
+    tamano?: true
+  }
+
+  export type DocumentoTrabajadorSumAggregateInputType = {
+    id?: true
+    trabajadorId?: true
+    tamano?: true
+  }
+
+  export type DocumentoTrabajadorMinAggregateInputType = {
+    id?: true
+    trabajadorId?: true
+    nombreArchivo?: true
+    ruta?: true
+    tamano?: true
+    fechaSubida?: true
+  }
+
+  export type DocumentoTrabajadorMaxAggregateInputType = {
+    id?: true
+    trabajadorId?: true
+    nombreArchivo?: true
+    ruta?: true
+    tamano?: true
+    fechaSubida?: true
+  }
+
+  export type DocumentoTrabajadorCountAggregateInputType = {
+    id?: true
+    trabajadorId?: true
+    nombreArchivo?: true
+    ruta?: true
+    tamano?: true
+    fechaSubida?: true
+    _all?: true
+  }
+
+  export type DocumentoTrabajadorAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DocumentoTrabajador to aggregate.
+     */
+    where?: DocumentoTrabajadorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DocumentoTrabajadors to fetch.
+     */
+    orderBy?: DocumentoTrabajadorOrderByWithRelationInput | DocumentoTrabajadorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DocumentoTrabajadorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DocumentoTrabajadors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DocumentoTrabajadors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DocumentoTrabajadors
+    **/
+    _count?: true | DocumentoTrabajadorCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DocumentoTrabajadorAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DocumentoTrabajadorSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DocumentoTrabajadorMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DocumentoTrabajadorMaxAggregateInputType
+  }
+
+  export type GetDocumentoTrabajadorAggregateType<T extends DocumentoTrabajadorAggregateArgs> = {
+        [P in keyof T & keyof AggregateDocumentoTrabajador]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDocumentoTrabajador[P]>
+      : GetScalarType<T[P], AggregateDocumentoTrabajador[P]>
+  }
+
+
+
+
+  export type DocumentoTrabajadorGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DocumentoTrabajadorWhereInput
+    orderBy?: DocumentoTrabajadorOrderByWithAggregationInput | DocumentoTrabajadorOrderByWithAggregationInput[]
+    by: DocumentoTrabajadorScalarFieldEnum[] | DocumentoTrabajadorScalarFieldEnum
+    having?: DocumentoTrabajadorScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DocumentoTrabajadorCountAggregateInputType | true
+    _avg?: DocumentoTrabajadorAvgAggregateInputType
+    _sum?: DocumentoTrabajadorSumAggregateInputType
+    _min?: DocumentoTrabajadorMinAggregateInputType
+    _max?: DocumentoTrabajadorMaxAggregateInputType
+  }
+
+  export type DocumentoTrabajadorGroupByOutputType = {
+    id: number
+    trabajadorId: number
+    nombreArchivo: string
+    ruta: string
+    tamano: number
+    fechaSubida: Date
+    _count: DocumentoTrabajadorCountAggregateOutputType | null
+    _avg: DocumentoTrabajadorAvgAggregateOutputType | null
+    _sum: DocumentoTrabajadorSumAggregateOutputType | null
+    _min: DocumentoTrabajadorMinAggregateOutputType | null
+    _max: DocumentoTrabajadorMaxAggregateOutputType | null
+  }
+
+  type GetDocumentoTrabajadorGroupByPayload<T extends DocumentoTrabajadorGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DocumentoTrabajadorGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DocumentoTrabajadorGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DocumentoTrabajadorGroupByOutputType[P]>
+            : GetScalarType<T[P], DocumentoTrabajadorGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DocumentoTrabajadorSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    trabajadorId?: boolean
+    nombreArchivo?: boolean
+    ruta?: boolean
+    tamano?: boolean
+    fechaSubida?: boolean
+    trabajador?: boolean | TrabajadorDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["documentoTrabajador"]>
+
+  export type DocumentoTrabajadorSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    trabajadorId?: boolean
+    nombreArchivo?: boolean
+    ruta?: boolean
+    tamano?: boolean
+    fechaSubida?: boolean
+    trabajador?: boolean | TrabajadorDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["documentoTrabajador"]>
+
+  export type DocumentoTrabajadorSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    trabajadorId?: boolean
+    nombreArchivo?: boolean
+    ruta?: boolean
+    tamano?: boolean
+    fechaSubida?: boolean
+    trabajador?: boolean | TrabajadorDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["documentoTrabajador"]>
+
+  export type DocumentoTrabajadorSelectScalar = {
+    id?: boolean
+    trabajadorId?: boolean
+    nombreArchivo?: boolean
+    ruta?: boolean
+    tamano?: boolean
+    fechaSubida?: boolean
+  }
+
+  export type DocumentoTrabajadorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "trabajadorId" | "nombreArchivo" | "ruta" | "tamano" | "fechaSubida", ExtArgs["result"]["documentoTrabajador"]>
+  export type DocumentoTrabajadorInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    trabajador?: boolean | TrabajadorDefaultArgs<ExtArgs>
+  }
+  export type DocumentoTrabajadorIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    trabajador?: boolean | TrabajadorDefaultArgs<ExtArgs>
+  }
+  export type DocumentoTrabajadorIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    trabajador?: boolean | TrabajadorDefaultArgs<ExtArgs>
+  }
+
+  export type $DocumentoTrabajadorPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DocumentoTrabajador"
+    objects: {
+      trabajador: Prisma.$TrabajadorPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      trabajadorId: number
+      nombreArchivo: string
+      ruta: string
+      tamano: number
+      fechaSubida: Date
+    }, ExtArgs["result"]["documentoTrabajador"]>
+    composites: {}
+  }
+
+  type DocumentoTrabajadorGetPayload<S extends boolean | null | undefined | DocumentoTrabajadorDefaultArgs> = $Result.GetResult<Prisma.$DocumentoTrabajadorPayload, S>
+
+  type DocumentoTrabajadorCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DocumentoTrabajadorFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DocumentoTrabajadorCountAggregateInputType | true
+    }
+
+  export interface DocumentoTrabajadorDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DocumentoTrabajador'], meta: { name: 'DocumentoTrabajador' } }
+    /**
+     * Find zero or one DocumentoTrabajador that matches the filter.
+     * @param {DocumentoTrabajadorFindUniqueArgs} args - Arguments to find a DocumentoTrabajador
+     * @example
+     * // Get one DocumentoTrabajador
+     * const documentoTrabajador = await prisma.documentoTrabajador.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DocumentoTrabajadorFindUniqueArgs>(args: SelectSubset<T, DocumentoTrabajadorFindUniqueArgs<ExtArgs>>): Prisma__DocumentoTrabajadorClient<$Result.GetResult<Prisma.$DocumentoTrabajadorPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DocumentoTrabajador that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DocumentoTrabajadorFindUniqueOrThrowArgs} args - Arguments to find a DocumentoTrabajador
+     * @example
+     * // Get one DocumentoTrabajador
+     * const documentoTrabajador = await prisma.documentoTrabajador.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DocumentoTrabajadorFindUniqueOrThrowArgs>(args: SelectSubset<T, DocumentoTrabajadorFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DocumentoTrabajadorClient<$Result.GetResult<Prisma.$DocumentoTrabajadorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DocumentoTrabajador that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentoTrabajadorFindFirstArgs} args - Arguments to find a DocumentoTrabajador
+     * @example
+     * // Get one DocumentoTrabajador
+     * const documentoTrabajador = await prisma.documentoTrabajador.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DocumentoTrabajadorFindFirstArgs>(args?: SelectSubset<T, DocumentoTrabajadorFindFirstArgs<ExtArgs>>): Prisma__DocumentoTrabajadorClient<$Result.GetResult<Prisma.$DocumentoTrabajadorPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DocumentoTrabajador that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentoTrabajadorFindFirstOrThrowArgs} args - Arguments to find a DocumentoTrabajador
+     * @example
+     * // Get one DocumentoTrabajador
+     * const documentoTrabajador = await prisma.documentoTrabajador.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DocumentoTrabajadorFindFirstOrThrowArgs>(args?: SelectSubset<T, DocumentoTrabajadorFindFirstOrThrowArgs<ExtArgs>>): Prisma__DocumentoTrabajadorClient<$Result.GetResult<Prisma.$DocumentoTrabajadorPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DocumentoTrabajadors that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentoTrabajadorFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DocumentoTrabajadors
+     * const documentoTrabajadors = await prisma.documentoTrabajador.findMany()
+     * 
+     * // Get first 10 DocumentoTrabajadors
+     * const documentoTrabajadors = await prisma.documentoTrabajador.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const documentoTrabajadorWithIdOnly = await prisma.documentoTrabajador.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DocumentoTrabajadorFindManyArgs>(args?: SelectSubset<T, DocumentoTrabajadorFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentoTrabajadorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DocumentoTrabajador.
+     * @param {DocumentoTrabajadorCreateArgs} args - Arguments to create a DocumentoTrabajador.
+     * @example
+     * // Create one DocumentoTrabajador
+     * const DocumentoTrabajador = await prisma.documentoTrabajador.create({
+     *   data: {
+     *     // ... data to create a DocumentoTrabajador
+     *   }
+     * })
+     * 
+     */
+    create<T extends DocumentoTrabajadorCreateArgs>(args: SelectSubset<T, DocumentoTrabajadorCreateArgs<ExtArgs>>): Prisma__DocumentoTrabajadorClient<$Result.GetResult<Prisma.$DocumentoTrabajadorPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DocumentoTrabajadors.
+     * @param {DocumentoTrabajadorCreateManyArgs} args - Arguments to create many DocumentoTrabajadors.
+     * @example
+     * // Create many DocumentoTrabajadors
+     * const documentoTrabajador = await prisma.documentoTrabajador.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DocumentoTrabajadorCreateManyArgs>(args?: SelectSubset<T, DocumentoTrabajadorCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DocumentoTrabajadors and returns the data saved in the database.
+     * @param {DocumentoTrabajadorCreateManyAndReturnArgs} args - Arguments to create many DocumentoTrabajadors.
+     * @example
+     * // Create many DocumentoTrabajadors
+     * const documentoTrabajador = await prisma.documentoTrabajador.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DocumentoTrabajadors and only return the `id`
+     * const documentoTrabajadorWithIdOnly = await prisma.documentoTrabajador.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DocumentoTrabajadorCreateManyAndReturnArgs>(args?: SelectSubset<T, DocumentoTrabajadorCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentoTrabajadorPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DocumentoTrabajador.
+     * @param {DocumentoTrabajadorDeleteArgs} args - Arguments to delete one DocumentoTrabajador.
+     * @example
+     * // Delete one DocumentoTrabajador
+     * const DocumentoTrabajador = await prisma.documentoTrabajador.delete({
+     *   where: {
+     *     // ... filter to delete one DocumentoTrabajador
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DocumentoTrabajadorDeleteArgs>(args: SelectSubset<T, DocumentoTrabajadorDeleteArgs<ExtArgs>>): Prisma__DocumentoTrabajadorClient<$Result.GetResult<Prisma.$DocumentoTrabajadorPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DocumentoTrabajador.
+     * @param {DocumentoTrabajadorUpdateArgs} args - Arguments to update one DocumentoTrabajador.
+     * @example
+     * // Update one DocumentoTrabajador
+     * const documentoTrabajador = await prisma.documentoTrabajador.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DocumentoTrabajadorUpdateArgs>(args: SelectSubset<T, DocumentoTrabajadorUpdateArgs<ExtArgs>>): Prisma__DocumentoTrabajadorClient<$Result.GetResult<Prisma.$DocumentoTrabajadorPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DocumentoTrabajadors.
+     * @param {DocumentoTrabajadorDeleteManyArgs} args - Arguments to filter DocumentoTrabajadors to delete.
+     * @example
+     * // Delete a few DocumentoTrabajadors
+     * const { count } = await prisma.documentoTrabajador.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DocumentoTrabajadorDeleteManyArgs>(args?: SelectSubset<T, DocumentoTrabajadorDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DocumentoTrabajadors.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentoTrabajadorUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DocumentoTrabajadors
+     * const documentoTrabajador = await prisma.documentoTrabajador.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DocumentoTrabajadorUpdateManyArgs>(args: SelectSubset<T, DocumentoTrabajadorUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DocumentoTrabajadors and returns the data updated in the database.
+     * @param {DocumentoTrabajadorUpdateManyAndReturnArgs} args - Arguments to update many DocumentoTrabajadors.
+     * @example
+     * // Update many DocumentoTrabajadors
+     * const documentoTrabajador = await prisma.documentoTrabajador.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DocumentoTrabajadors and only return the `id`
+     * const documentoTrabajadorWithIdOnly = await prisma.documentoTrabajador.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DocumentoTrabajadorUpdateManyAndReturnArgs>(args: SelectSubset<T, DocumentoTrabajadorUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DocumentoTrabajadorPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DocumentoTrabajador.
+     * @param {DocumentoTrabajadorUpsertArgs} args - Arguments to update or create a DocumentoTrabajador.
+     * @example
+     * // Update or create a DocumentoTrabajador
+     * const documentoTrabajador = await prisma.documentoTrabajador.upsert({
+     *   create: {
+     *     // ... data to create a DocumentoTrabajador
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DocumentoTrabajador we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DocumentoTrabajadorUpsertArgs>(args: SelectSubset<T, DocumentoTrabajadorUpsertArgs<ExtArgs>>): Prisma__DocumentoTrabajadorClient<$Result.GetResult<Prisma.$DocumentoTrabajadorPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DocumentoTrabajadors.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentoTrabajadorCountArgs} args - Arguments to filter DocumentoTrabajadors to count.
+     * @example
+     * // Count the number of DocumentoTrabajadors
+     * const count = await prisma.documentoTrabajador.count({
+     *   where: {
+     *     // ... the filter for the DocumentoTrabajadors we want to count
+     *   }
+     * })
+    **/
+    count<T extends DocumentoTrabajadorCountArgs>(
+      args?: Subset<T, DocumentoTrabajadorCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DocumentoTrabajadorCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DocumentoTrabajador.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentoTrabajadorAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DocumentoTrabajadorAggregateArgs>(args: Subset<T, DocumentoTrabajadorAggregateArgs>): Prisma.PrismaPromise<GetDocumentoTrabajadorAggregateType<T>>
+
+    /**
+     * Group by DocumentoTrabajador.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DocumentoTrabajadorGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DocumentoTrabajadorGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DocumentoTrabajadorGroupByArgs['orderBy'] }
+        : { orderBy?: DocumentoTrabajadorGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DocumentoTrabajadorGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDocumentoTrabajadorGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DocumentoTrabajador model
+   */
+  readonly fields: DocumentoTrabajadorFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DocumentoTrabajador.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DocumentoTrabajadorClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    trabajador<T extends TrabajadorDefaultArgs<ExtArgs> = {}>(args?: Subset<T, TrabajadorDefaultArgs<ExtArgs>>): Prisma__TrabajadorClient<$Result.GetResult<Prisma.$TrabajadorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DocumentoTrabajador model
+   */
+  interface DocumentoTrabajadorFieldRefs {
+    readonly id: FieldRef<"DocumentoTrabajador", 'Int'>
+    readonly trabajadorId: FieldRef<"DocumentoTrabajador", 'Int'>
+    readonly nombreArchivo: FieldRef<"DocumentoTrabajador", 'String'>
+    readonly ruta: FieldRef<"DocumentoTrabajador", 'String'>
+    readonly tamano: FieldRef<"DocumentoTrabajador", 'Int'>
+    readonly fechaSubida: FieldRef<"DocumentoTrabajador", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DocumentoTrabajador findUnique
+   */
+  export type DocumentoTrabajadorFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DocumentoTrabajador
+     */
+    select?: DocumentoTrabajadorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DocumentoTrabajador
+     */
+    omit?: DocumentoTrabajadorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentoTrabajadorInclude<ExtArgs> | null
+    /**
+     * Filter, which DocumentoTrabajador to fetch.
+     */
+    where: DocumentoTrabajadorWhereUniqueInput
+  }
+
+  /**
+   * DocumentoTrabajador findUniqueOrThrow
+   */
+  export type DocumentoTrabajadorFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DocumentoTrabajador
+     */
+    select?: DocumentoTrabajadorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DocumentoTrabajador
+     */
+    omit?: DocumentoTrabajadorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentoTrabajadorInclude<ExtArgs> | null
+    /**
+     * Filter, which DocumentoTrabajador to fetch.
+     */
+    where: DocumentoTrabajadorWhereUniqueInput
+  }
+
+  /**
+   * DocumentoTrabajador findFirst
+   */
+  export type DocumentoTrabajadorFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DocumentoTrabajador
+     */
+    select?: DocumentoTrabajadorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DocumentoTrabajador
+     */
+    omit?: DocumentoTrabajadorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentoTrabajadorInclude<ExtArgs> | null
+    /**
+     * Filter, which DocumentoTrabajador to fetch.
+     */
+    where?: DocumentoTrabajadorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DocumentoTrabajadors to fetch.
+     */
+    orderBy?: DocumentoTrabajadorOrderByWithRelationInput | DocumentoTrabajadorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DocumentoTrabajadors.
+     */
+    cursor?: DocumentoTrabajadorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DocumentoTrabajadors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DocumentoTrabajadors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DocumentoTrabajadors.
+     */
+    distinct?: DocumentoTrabajadorScalarFieldEnum | DocumentoTrabajadorScalarFieldEnum[]
+  }
+
+  /**
+   * DocumentoTrabajador findFirstOrThrow
+   */
+  export type DocumentoTrabajadorFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DocumentoTrabajador
+     */
+    select?: DocumentoTrabajadorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DocumentoTrabajador
+     */
+    omit?: DocumentoTrabajadorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentoTrabajadorInclude<ExtArgs> | null
+    /**
+     * Filter, which DocumentoTrabajador to fetch.
+     */
+    where?: DocumentoTrabajadorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DocumentoTrabajadors to fetch.
+     */
+    orderBy?: DocumentoTrabajadorOrderByWithRelationInput | DocumentoTrabajadorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DocumentoTrabajadors.
+     */
+    cursor?: DocumentoTrabajadorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DocumentoTrabajadors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DocumentoTrabajadors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DocumentoTrabajadors.
+     */
+    distinct?: DocumentoTrabajadorScalarFieldEnum | DocumentoTrabajadorScalarFieldEnum[]
+  }
+
+  /**
+   * DocumentoTrabajador findMany
+   */
+  export type DocumentoTrabajadorFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DocumentoTrabajador
+     */
+    select?: DocumentoTrabajadorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DocumentoTrabajador
+     */
+    omit?: DocumentoTrabajadorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentoTrabajadorInclude<ExtArgs> | null
+    /**
+     * Filter, which DocumentoTrabajadors to fetch.
+     */
+    where?: DocumentoTrabajadorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DocumentoTrabajadors to fetch.
+     */
+    orderBy?: DocumentoTrabajadorOrderByWithRelationInput | DocumentoTrabajadorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DocumentoTrabajadors.
+     */
+    cursor?: DocumentoTrabajadorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DocumentoTrabajadors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DocumentoTrabajadors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DocumentoTrabajadors.
+     */
+    distinct?: DocumentoTrabajadorScalarFieldEnum | DocumentoTrabajadorScalarFieldEnum[]
+  }
+
+  /**
+   * DocumentoTrabajador create
+   */
+  export type DocumentoTrabajadorCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DocumentoTrabajador
+     */
+    select?: DocumentoTrabajadorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DocumentoTrabajador
+     */
+    omit?: DocumentoTrabajadorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentoTrabajadorInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DocumentoTrabajador.
+     */
+    data: XOR<DocumentoTrabajadorCreateInput, DocumentoTrabajadorUncheckedCreateInput>
+  }
+
+  /**
+   * DocumentoTrabajador createMany
+   */
+  export type DocumentoTrabajadorCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DocumentoTrabajadors.
+     */
+    data: DocumentoTrabajadorCreateManyInput | DocumentoTrabajadorCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DocumentoTrabajador createManyAndReturn
+   */
+  export type DocumentoTrabajadorCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DocumentoTrabajador
+     */
+    select?: DocumentoTrabajadorSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DocumentoTrabajador
+     */
+    omit?: DocumentoTrabajadorOmit<ExtArgs> | null
+    /**
+     * The data used to create many DocumentoTrabajadors.
+     */
+    data: DocumentoTrabajadorCreateManyInput | DocumentoTrabajadorCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentoTrabajadorIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DocumentoTrabajador update
+   */
+  export type DocumentoTrabajadorUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DocumentoTrabajador
+     */
+    select?: DocumentoTrabajadorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DocumentoTrabajador
+     */
+    omit?: DocumentoTrabajadorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentoTrabajadorInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DocumentoTrabajador.
+     */
+    data: XOR<DocumentoTrabajadorUpdateInput, DocumentoTrabajadorUncheckedUpdateInput>
+    /**
+     * Choose, which DocumentoTrabajador to update.
+     */
+    where: DocumentoTrabajadorWhereUniqueInput
+  }
+
+  /**
+   * DocumentoTrabajador updateMany
+   */
+  export type DocumentoTrabajadorUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DocumentoTrabajadors.
+     */
+    data: XOR<DocumentoTrabajadorUpdateManyMutationInput, DocumentoTrabajadorUncheckedUpdateManyInput>
+    /**
+     * Filter which DocumentoTrabajadors to update
+     */
+    where?: DocumentoTrabajadorWhereInput
+    /**
+     * Limit how many DocumentoTrabajadors to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DocumentoTrabajador updateManyAndReturn
+   */
+  export type DocumentoTrabajadorUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DocumentoTrabajador
+     */
+    select?: DocumentoTrabajadorSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DocumentoTrabajador
+     */
+    omit?: DocumentoTrabajadorOmit<ExtArgs> | null
+    /**
+     * The data used to update DocumentoTrabajadors.
+     */
+    data: XOR<DocumentoTrabajadorUpdateManyMutationInput, DocumentoTrabajadorUncheckedUpdateManyInput>
+    /**
+     * Filter which DocumentoTrabajadors to update
+     */
+    where?: DocumentoTrabajadorWhereInput
+    /**
+     * Limit how many DocumentoTrabajadors to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentoTrabajadorIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DocumentoTrabajador upsert
+   */
+  export type DocumentoTrabajadorUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DocumentoTrabajador
+     */
+    select?: DocumentoTrabajadorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DocumentoTrabajador
+     */
+    omit?: DocumentoTrabajadorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentoTrabajadorInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DocumentoTrabajador to update in case it exists.
+     */
+    where: DocumentoTrabajadorWhereUniqueInput
+    /**
+     * In case the DocumentoTrabajador found by the `where` argument doesn't exist, create a new DocumentoTrabajador with this data.
+     */
+    create: XOR<DocumentoTrabajadorCreateInput, DocumentoTrabajadorUncheckedCreateInput>
+    /**
+     * In case the DocumentoTrabajador was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DocumentoTrabajadorUpdateInput, DocumentoTrabajadorUncheckedUpdateInput>
+  }
+
+  /**
+   * DocumentoTrabajador delete
+   */
+  export type DocumentoTrabajadorDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DocumentoTrabajador
+     */
+    select?: DocumentoTrabajadorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DocumentoTrabajador
+     */
+    omit?: DocumentoTrabajadorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentoTrabajadorInclude<ExtArgs> | null
+    /**
+     * Filter which DocumentoTrabajador to delete.
+     */
+    where: DocumentoTrabajadorWhereUniqueInput
+  }
+
+  /**
+   * DocumentoTrabajador deleteMany
+   */
+  export type DocumentoTrabajadorDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DocumentoTrabajadors to delete
+     */
+    where?: DocumentoTrabajadorWhereInput
+    /**
+     * Limit how many DocumentoTrabajadors to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DocumentoTrabajador without action
+   */
+  export type DocumentoTrabajadorDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DocumentoTrabajador
+     */
+    select?: DocumentoTrabajadorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DocumentoTrabajador
+     */
+    omit?: DocumentoTrabajadorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DocumentoTrabajadorInclude<ExtArgs> | null
   }
 
 
@@ -18941,6 +20187,18 @@ export namespace Prisma {
   export type TrabajadorScalarFieldEnum = (typeof TrabajadorScalarFieldEnum)[keyof typeof TrabajadorScalarFieldEnum]
 
 
+  export const DocumentoTrabajadorScalarFieldEnum: {
+    id: 'id',
+    trabajadorId: 'trabajadorId',
+    nombreArchivo: 'nombreArchivo',
+    ruta: 'ruta',
+    tamano: 'tamano',
+    fechaSubida: 'fechaSubida'
+  };
+
+  export type DocumentoTrabajadorScalarFieldEnum = (typeof DocumentoTrabajadorScalarFieldEnum)[keyof typeof DocumentoTrabajadorScalarFieldEnum]
+
+
   export const EspecialidadScalarFieldEnum: {
     id: 'id',
     nombre: 'nombre',
@@ -19417,6 +20675,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionListRelationFilter
     calificaciones?: CalificacionListRelationFilter
     pagos?: PagoListRelationFilter
+    documentos?: DocumentoTrabajadorListRelationFilter
   }
 
   export type TrabajadorOrderByWithRelationInput = {
@@ -19439,6 +20698,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionOrderByRelationAggregateInput
     calificaciones?: CalificacionOrderByRelationAggregateInput
     pagos?: PagoOrderByRelationAggregateInput
+    documentos?: DocumentoTrabajadorOrderByRelationAggregateInput
   }
 
   export type TrabajadorWhereUniqueInput = Prisma.AtLeast<{
@@ -19464,6 +20724,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionListRelationFilter
     calificaciones?: CalificacionListRelationFilter
     pagos?: PagoListRelationFilter
+    documentos?: DocumentoTrabajadorListRelationFilter
   }, "id" | "correo">
 
   export type TrabajadorOrderByWithAggregationInput = {
@@ -19500,6 +20761,68 @@ export namespace Prisma {
     verificado?: BoolWithAggregatesFilter<"Trabajador"> | boolean
     fechaRegistro?: DateTimeWithAggregatesFilter<"Trabajador"> | Date | string
     activo?: BoolWithAggregatesFilter<"Trabajador"> | boolean
+  }
+
+  export type DocumentoTrabajadorWhereInput = {
+    AND?: DocumentoTrabajadorWhereInput | DocumentoTrabajadorWhereInput[]
+    OR?: DocumentoTrabajadorWhereInput[]
+    NOT?: DocumentoTrabajadorWhereInput | DocumentoTrabajadorWhereInput[]
+    id?: IntFilter<"DocumentoTrabajador"> | number
+    trabajadorId?: IntFilter<"DocumentoTrabajador"> | number
+    nombreArchivo?: StringFilter<"DocumentoTrabajador"> | string
+    ruta?: StringFilter<"DocumentoTrabajador"> | string
+    tamano?: IntFilter<"DocumentoTrabajador"> | number
+    fechaSubida?: DateTimeFilter<"DocumentoTrabajador"> | Date | string
+    trabajador?: XOR<TrabajadorScalarRelationFilter, TrabajadorWhereInput>
+  }
+
+  export type DocumentoTrabajadorOrderByWithRelationInput = {
+    id?: SortOrder
+    trabajadorId?: SortOrder
+    nombreArchivo?: SortOrder
+    ruta?: SortOrder
+    tamano?: SortOrder
+    fechaSubida?: SortOrder
+    trabajador?: TrabajadorOrderByWithRelationInput
+  }
+
+  export type DocumentoTrabajadorWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: DocumentoTrabajadorWhereInput | DocumentoTrabajadorWhereInput[]
+    OR?: DocumentoTrabajadorWhereInput[]
+    NOT?: DocumentoTrabajadorWhereInput | DocumentoTrabajadorWhereInput[]
+    trabajadorId?: IntFilter<"DocumentoTrabajador"> | number
+    nombreArchivo?: StringFilter<"DocumentoTrabajador"> | string
+    ruta?: StringFilter<"DocumentoTrabajador"> | string
+    tamano?: IntFilter<"DocumentoTrabajador"> | number
+    fechaSubida?: DateTimeFilter<"DocumentoTrabajador"> | Date | string
+    trabajador?: XOR<TrabajadorScalarRelationFilter, TrabajadorWhereInput>
+  }, "id">
+
+  export type DocumentoTrabajadorOrderByWithAggregationInput = {
+    id?: SortOrder
+    trabajadorId?: SortOrder
+    nombreArchivo?: SortOrder
+    ruta?: SortOrder
+    tamano?: SortOrder
+    fechaSubida?: SortOrder
+    _count?: DocumentoTrabajadorCountOrderByAggregateInput
+    _avg?: DocumentoTrabajadorAvgOrderByAggregateInput
+    _max?: DocumentoTrabajadorMaxOrderByAggregateInput
+    _min?: DocumentoTrabajadorMinOrderByAggregateInput
+    _sum?: DocumentoTrabajadorSumOrderByAggregateInput
+  }
+
+  export type DocumentoTrabajadorScalarWhereWithAggregatesInput = {
+    AND?: DocumentoTrabajadorScalarWhereWithAggregatesInput | DocumentoTrabajadorScalarWhereWithAggregatesInput[]
+    OR?: DocumentoTrabajadorScalarWhereWithAggregatesInput[]
+    NOT?: DocumentoTrabajadorScalarWhereWithAggregatesInput | DocumentoTrabajadorScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"DocumentoTrabajador"> | number
+    trabajadorId?: IntWithAggregatesFilter<"DocumentoTrabajador"> | number
+    nombreArchivo?: StringWithAggregatesFilter<"DocumentoTrabajador"> | string
+    ruta?: StringWithAggregatesFilter<"DocumentoTrabajador"> | string
+    tamano?: IntWithAggregatesFilter<"DocumentoTrabajador"> | number
+    fechaSubida?: DateTimeWithAggregatesFilter<"DocumentoTrabajador"> | Date | string
   }
 
   export type EspecialidadWhereInput = {
@@ -20445,6 +21768,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionCreateNestedManyWithoutTrabajadorInput
     calificaciones?: CalificacionCreateNestedManyWithoutTrabajadorInput
     pagos?: PagoCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorUncheckedCreateInput = {
@@ -20467,6 +21791,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutTrabajadorInput
     calificaciones?: CalificacionUncheckedCreateNestedManyWithoutTrabajadorInput
     pagos?: PagoUncheckedCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorUncheckedCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorUpdateInput = {
@@ -20488,6 +21813,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUpdateManyWithoutTrabajadorNestedInput
     calificaciones?: CalificacionUpdateManyWithoutTrabajadorNestedInput
     pagos?: PagoUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type TrabajadorUncheckedUpdateInput = {
@@ -20510,6 +21836,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUncheckedUpdateManyWithoutTrabajadorNestedInput
     calificaciones?: CalificacionUncheckedUpdateManyWithoutTrabajadorNestedInput
     pagos?: PagoUncheckedUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUncheckedUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type TrabajadorCreateManyInput = {
@@ -20551,6 +21878,65 @@ export namespace Prisma {
     verificado?: BoolFieldUpdateOperationsInput | boolean
     fechaRegistro?: DateTimeFieldUpdateOperationsInput | Date | string
     activo?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type DocumentoTrabajadorCreateInput = {
+    nombreArchivo: string
+    ruta: string
+    tamano: number
+    fechaSubida?: Date | string
+    trabajador: TrabajadorCreateNestedOneWithoutDocumentosInput
+  }
+
+  export type DocumentoTrabajadorUncheckedCreateInput = {
+    id?: number
+    trabajadorId: number
+    nombreArchivo: string
+    ruta: string
+    tamano: number
+    fechaSubida?: Date | string
+  }
+
+  export type DocumentoTrabajadorUpdateInput = {
+    nombreArchivo?: StringFieldUpdateOperationsInput | string
+    ruta?: StringFieldUpdateOperationsInput | string
+    tamano?: IntFieldUpdateOperationsInput | number
+    fechaSubida?: DateTimeFieldUpdateOperationsInput | Date | string
+    trabajador?: TrabajadorUpdateOneRequiredWithoutDocumentosNestedInput
+  }
+
+  export type DocumentoTrabajadorUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    trabajadorId?: IntFieldUpdateOperationsInput | number
+    nombreArchivo?: StringFieldUpdateOperationsInput | string
+    ruta?: StringFieldUpdateOperationsInput | string
+    tamano?: IntFieldUpdateOperationsInput | number
+    fechaSubida?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentoTrabajadorCreateManyInput = {
+    id?: number
+    trabajadorId: number
+    nombreArchivo: string
+    ruta: string
+    tamano: number
+    fechaSubida?: Date | string
+  }
+
+  export type DocumentoTrabajadorUpdateManyMutationInput = {
+    nombreArchivo?: StringFieldUpdateOperationsInput | string
+    ruta?: StringFieldUpdateOperationsInput | string
+    tamano?: IntFieldUpdateOperationsInput | number
+    fechaSubida?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentoTrabajadorUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    trabajadorId?: IntFieldUpdateOperationsInput | number
+    nombreArchivo?: StringFieldUpdateOperationsInput | string
+    ruta?: StringFieldUpdateOperationsInput | string
+    tamano?: IntFieldUpdateOperationsInput | number
+    fechaSubida?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type EspecialidadCreateInput = {
@@ -21599,6 +22985,12 @@ export namespace Prisma {
     none?: CotizacionWhereInput
   }
 
+  export type DocumentoTrabajadorListRelationFilter = {
+    every?: DocumentoTrabajadorWhereInput
+    some?: DocumentoTrabajadorWhereInput
+    none?: DocumentoTrabajadorWhereInput
+  }
+
   export type TrabajadorEspecialidadOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -21616,6 +23008,10 @@ export namespace Prisma {
   }
 
   export type CotizacionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DocumentoTrabajadorOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -21687,6 +23083,50 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
+  export type TrabajadorScalarRelationFilter = {
+    is?: TrabajadorWhereInput
+    isNot?: TrabajadorWhereInput
+  }
+
+  export type DocumentoTrabajadorCountOrderByAggregateInput = {
+    id?: SortOrder
+    trabajadorId?: SortOrder
+    nombreArchivo?: SortOrder
+    ruta?: SortOrder
+    tamano?: SortOrder
+    fechaSubida?: SortOrder
+  }
+
+  export type DocumentoTrabajadorAvgOrderByAggregateInput = {
+    id?: SortOrder
+    trabajadorId?: SortOrder
+    tamano?: SortOrder
+  }
+
+  export type DocumentoTrabajadorMaxOrderByAggregateInput = {
+    id?: SortOrder
+    trabajadorId?: SortOrder
+    nombreArchivo?: SortOrder
+    ruta?: SortOrder
+    tamano?: SortOrder
+    fechaSubida?: SortOrder
+  }
+
+  export type DocumentoTrabajadorMinOrderByAggregateInput = {
+    id?: SortOrder
+    trabajadorId?: SortOrder
+    nombreArchivo?: SortOrder
+    ruta?: SortOrder
+    tamano?: SortOrder
+    fechaSubida?: SortOrder
+  }
+
+  export type DocumentoTrabajadorSumOrderByAggregateInput = {
+    id?: SortOrder
+    trabajadorId?: SortOrder
+    tamano?: SortOrder
+  }
+
   export type EspecialidadCountOrderByAggregateInput = {
     id?: SortOrder
     nombre?: SortOrder
@@ -21714,11 +23154,6 @@ export namespace Prisma {
 
   export type EspecialidadSumOrderByAggregateInput = {
     id?: SortOrder
-  }
-
-  export type TrabajadorScalarRelationFilter = {
-    is?: TrabajadorWhereInput
-    isNot?: TrabajadorWhereInput
   }
 
   export type EspecialidadScalarRelationFilter = {
@@ -22715,6 +24150,13 @@ export namespace Prisma {
     connect?: PagoWhereUniqueInput | PagoWhereUniqueInput[]
   }
 
+  export type DocumentoTrabajadorCreateNestedManyWithoutTrabajadorInput = {
+    create?: XOR<DocumentoTrabajadorCreateWithoutTrabajadorInput, DocumentoTrabajadorUncheckedCreateWithoutTrabajadorInput> | DocumentoTrabajadorCreateWithoutTrabajadorInput[] | DocumentoTrabajadorUncheckedCreateWithoutTrabajadorInput[]
+    connectOrCreate?: DocumentoTrabajadorCreateOrConnectWithoutTrabajadorInput | DocumentoTrabajadorCreateOrConnectWithoutTrabajadorInput[]
+    createMany?: DocumentoTrabajadorCreateManyTrabajadorInputEnvelope
+    connect?: DocumentoTrabajadorWhereUniqueInput | DocumentoTrabajadorWhereUniqueInput[]
+  }
+
   export type TrabajadorEspecialidadUncheckedCreateNestedManyWithoutTrabajadorInput = {
     create?: XOR<TrabajadorEspecialidadCreateWithoutTrabajadorInput, TrabajadorEspecialidadUncheckedCreateWithoutTrabajadorInput> | TrabajadorEspecialidadCreateWithoutTrabajadorInput[] | TrabajadorEspecialidadUncheckedCreateWithoutTrabajadorInput[]
     connectOrCreate?: TrabajadorEspecialidadCreateOrConnectWithoutTrabajadorInput | TrabajadorEspecialidadCreateOrConnectWithoutTrabajadorInput[]
@@ -22769,6 +24211,13 @@ export namespace Prisma {
     connectOrCreate?: PagoCreateOrConnectWithoutTrabajadorInput | PagoCreateOrConnectWithoutTrabajadorInput[]
     createMany?: PagoCreateManyTrabajadorInputEnvelope
     connect?: PagoWhereUniqueInput | PagoWhereUniqueInput[]
+  }
+
+  export type DocumentoTrabajadorUncheckedCreateNestedManyWithoutTrabajadorInput = {
+    create?: XOR<DocumentoTrabajadorCreateWithoutTrabajadorInput, DocumentoTrabajadorUncheckedCreateWithoutTrabajadorInput> | DocumentoTrabajadorCreateWithoutTrabajadorInput[] | DocumentoTrabajadorUncheckedCreateWithoutTrabajadorInput[]
+    connectOrCreate?: DocumentoTrabajadorCreateOrConnectWithoutTrabajadorInput | DocumentoTrabajadorCreateOrConnectWithoutTrabajadorInput[]
+    createMany?: DocumentoTrabajadorCreateManyTrabajadorInputEnvelope
+    connect?: DocumentoTrabajadorWhereUniqueInput | DocumentoTrabajadorWhereUniqueInput[]
   }
 
   export type NullableIntFieldUpdateOperationsInput = {
@@ -22891,6 +24340,20 @@ export namespace Prisma {
     deleteMany?: PagoScalarWhereInput | PagoScalarWhereInput[]
   }
 
+  export type DocumentoTrabajadorUpdateManyWithoutTrabajadorNestedInput = {
+    create?: XOR<DocumentoTrabajadorCreateWithoutTrabajadorInput, DocumentoTrabajadorUncheckedCreateWithoutTrabajadorInput> | DocumentoTrabajadorCreateWithoutTrabajadorInput[] | DocumentoTrabajadorUncheckedCreateWithoutTrabajadorInput[]
+    connectOrCreate?: DocumentoTrabajadorCreateOrConnectWithoutTrabajadorInput | DocumentoTrabajadorCreateOrConnectWithoutTrabajadorInput[]
+    upsert?: DocumentoTrabajadorUpsertWithWhereUniqueWithoutTrabajadorInput | DocumentoTrabajadorUpsertWithWhereUniqueWithoutTrabajadorInput[]
+    createMany?: DocumentoTrabajadorCreateManyTrabajadorInputEnvelope
+    set?: DocumentoTrabajadorWhereUniqueInput | DocumentoTrabajadorWhereUniqueInput[]
+    disconnect?: DocumentoTrabajadorWhereUniqueInput | DocumentoTrabajadorWhereUniqueInput[]
+    delete?: DocumentoTrabajadorWhereUniqueInput | DocumentoTrabajadorWhereUniqueInput[]
+    connect?: DocumentoTrabajadorWhereUniqueInput | DocumentoTrabajadorWhereUniqueInput[]
+    update?: DocumentoTrabajadorUpdateWithWhereUniqueWithoutTrabajadorInput | DocumentoTrabajadorUpdateWithWhereUniqueWithoutTrabajadorInput[]
+    updateMany?: DocumentoTrabajadorUpdateManyWithWhereWithoutTrabajadorInput | DocumentoTrabajadorUpdateManyWithWhereWithoutTrabajadorInput[]
+    deleteMany?: DocumentoTrabajadorScalarWhereInput | DocumentoTrabajadorScalarWhereInput[]
+  }
+
   export type TrabajadorEspecialidadUncheckedUpdateManyWithoutTrabajadorNestedInput = {
     create?: XOR<TrabajadorEspecialidadCreateWithoutTrabajadorInput, TrabajadorEspecialidadUncheckedCreateWithoutTrabajadorInput> | TrabajadorEspecialidadCreateWithoutTrabajadorInput[] | TrabajadorEspecialidadUncheckedCreateWithoutTrabajadorInput[]
     connectOrCreate?: TrabajadorEspecialidadCreateOrConnectWithoutTrabajadorInput | TrabajadorEspecialidadCreateOrConnectWithoutTrabajadorInput[]
@@ -23001,6 +24464,34 @@ export namespace Prisma {
     update?: PagoUpdateWithWhereUniqueWithoutTrabajadorInput | PagoUpdateWithWhereUniqueWithoutTrabajadorInput[]
     updateMany?: PagoUpdateManyWithWhereWithoutTrabajadorInput | PagoUpdateManyWithWhereWithoutTrabajadorInput[]
     deleteMany?: PagoScalarWhereInput | PagoScalarWhereInput[]
+  }
+
+  export type DocumentoTrabajadorUncheckedUpdateManyWithoutTrabajadorNestedInput = {
+    create?: XOR<DocumentoTrabajadorCreateWithoutTrabajadorInput, DocumentoTrabajadorUncheckedCreateWithoutTrabajadorInput> | DocumentoTrabajadorCreateWithoutTrabajadorInput[] | DocumentoTrabajadorUncheckedCreateWithoutTrabajadorInput[]
+    connectOrCreate?: DocumentoTrabajadorCreateOrConnectWithoutTrabajadorInput | DocumentoTrabajadorCreateOrConnectWithoutTrabajadorInput[]
+    upsert?: DocumentoTrabajadorUpsertWithWhereUniqueWithoutTrabajadorInput | DocumentoTrabajadorUpsertWithWhereUniqueWithoutTrabajadorInput[]
+    createMany?: DocumentoTrabajadorCreateManyTrabajadorInputEnvelope
+    set?: DocumentoTrabajadorWhereUniqueInput | DocumentoTrabajadorWhereUniqueInput[]
+    disconnect?: DocumentoTrabajadorWhereUniqueInput | DocumentoTrabajadorWhereUniqueInput[]
+    delete?: DocumentoTrabajadorWhereUniqueInput | DocumentoTrabajadorWhereUniqueInput[]
+    connect?: DocumentoTrabajadorWhereUniqueInput | DocumentoTrabajadorWhereUniqueInput[]
+    update?: DocumentoTrabajadorUpdateWithWhereUniqueWithoutTrabajadorInput | DocumentoTrabajadorUpdateWithWhereUniqueWithoutTrabajadorInput[]
+    updateMany?: DocumentoTrabajadorUpdateManyWithWhereWithoutTrabajadorInput | DocumentoTrabajadorUpdateManyWithWhereWithoutTrabajadorInput[]
+    deleteMany?: DocumentoTrabajadorScalarWhereInput | DocumentoTrabajadorScalarWhereInput[]
+  }
+
+  export type TrabajadorCreateNestedOneWithoutDocumentosInput = {
+    create?: XOR<TrabajadorCreateWithoutDocumentosInput, TrabajadorUncheckedCreateWithoutDocumentosInput>
+    connectOrCreate?: TrabajadorCreateOrConnectWithoutDocumentosInput
+    connect?: TrabajadorWhereUniqueInput
+  }
+
+  export type TrabajadorUpdateOneRequiredWithoutDocumentosNestedInput = {
+    create?: XOR<TrabajadorCreateWithoutDocumentosInput, TrabajadorUncheckedCreateWithoutDocumentosInput>
+    connectOrCreate?: TrabajadorCreateOrConnectWithoutDocumentosInput
+    upsert?: TrabajadorUpsertWithoutDocumentosInput
+    connect?: TrabajadorWhereUniqueInput
+    update?: XOR<XOR<TrabajadorUpdateToOneWithWhereWithoutDocumentosInput, TrabajadorUpdateWithoutDocumentosInput>, TrabajadorUncheckedUpdateWithoutDocumentosInput>
   }
 
   export type TrabajadorEspecialidadCreateNestedManyWithoutEspecialidadInput = {
@@ -24584,6 +26075,31 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type DocumentoTrabajadorCreateWithoutTrabajadorInput = {
+    nombreArchivo: string
+    ruta: string
+    tamano: number
+    fechaSubida?: Date | string
+  }
+
+  export type DocumentoTrabajadorUncheckedCreateWithoutTrabajadorInput = {
+    id?: number
+    nombreArchivo: string
+    ruta: string
+    tamano: number
+    fechaSubida?: Date | string
+  }
+
+  export type DocumentoTrabajadorCreateOrConnectWithoutTrabajadorInput = {
+    where: DocumentoTrabajadorWhereUniqueInput
+    create: XOR<DocumentoTrabajadorCreateWithoutTrabajadorInput, DocumentoTrabajadorUncheckedCreateWithoutTrabajadorInput>
+  }
+
+  export type DocumentoTrabajadorCreateManyTrabajadorInputEnvelope = {
+    data: DocumentoTrabajadorCreateManyTrabajadorInput | DocumentoTrabajadorCreateManyTrabajadorInput[]
+    skipDuplicates?: boolean
+  }
+
   export type TrabajadorEspecialidadUpsertWithWhereUniqueWithoutTrabajadorInput = {
     where: TrabajadorEspecialidadWhereUniqueInput
     update: XOR<TrabajadorEspecialidadUpdateWithoutTrabajadorInput, TrabajadorEspecialidadUncheckedUpdateWithoutTrabajadorInput>
@@ -24769,6 +26285,136 @@ export namespace Prisma {
     data: XOR<PagoUpdateManyMutationInput, PagoUncheckedUpdateManyWithoutTrabajadorInput>
   }
 
+  export type DocumentoTrabajadorUpsertWithWhereUniqueWithoutTrabajadorInput = {
+    where: DocumentoTrabajadorWhereUniqueInput
+    update: XOR<DocumentoTrabajadorUpdateWithoutTrabajadorInput, DocumentoTrabajadorUncheckedUpdateWithoutTrabajadorInput>
+    create: XOR<DocumentoTrabajadorCreateWithoutTrabajadorInput, DocumentoTrabajadorUncheckedCreateWithoutTrabajadorInput>
+  }
+
+  export type DocumentoTrabajadorUpdateWithWhereUniqueWithoutTrabajadorInput = {
+    where: DocumentoTrabajadorWhereUniqueInput
+    data: XOR<DocumentoTrabajadorUpdateWithoutTrabajadorInput, DocumentoTrabajadorUncheckedUpdateWithoutTrabajadorInput>
+  }
+
+  export type DocumentoTrabajadorUpdateManyWithWhereWithoutTrabajadorInput = {
+    where: DocumentoTrabajadorScalarWhereInput
+    data: XOR<DocumentoTrabajadorUpdateManyMutationInput, DocumentoTrabajadorUncheckedUpdateManyWithoutTrabajadorInput>
+  }
+
+  export type DocumentoTrabajadorScalarWhereInput = {
+    AND?: DocumentoTrabajadorScalarWhereInput | DocumentoTrabajadorScalarWhereInput[]
+    OR?: DocumentoTrabajadorScalarWhereInput[]
+    NOT?: DocumentoTrabajadorScalarWhereInput | DocumentoTrabajadorScalarWhereInput[]
+    id?: IntFilter<"DocumentoTrabajador"> | number
+    trabajadorId?: IntFilter<"DocumentoTrabajador"> | number
+    nombreArchivo?: StringFilter<"DocumentoTrabajador"> | string
+    ruta?: StringFilter<"DocumentoTrabajador"> | string
+    tamano?: IntFilter<"DocumentoTrabajador"> | number
+    fechaSubida?: DateTimeFilter<"DocumentoTrabajador"> | Date | string
+  }
+
+  export type TrabajadorCreateWithoutDocumentosInput = {
+    nombre: string
+    correo: string
+    telefono?: string | null
+    contrasenaHash: string
+    fotoPerfil?: string | null
+    descripcion?: string | null
+    anosExperiencia?: number | null
+    verificado?: boolean
+    fechaRegistro?: Date | string
+    activo?: boolean
+    especialidades?: TrabajadorEspecialidadCreateNestedManyWithoutTrabajadorInput
+    servicios?: ServicioCreateNestedManyWithoutTrabajadorInput
+    disponibilidad?: DisponibilidadCreateNestedManyWithoutTrabajadorInput
+    fotosTrabajos?: FotoTrabajoCreateNestedManyWithoutTrabajadorInput
+    solicitudes?: SolicitudCreateNestedManyWithoutTrabajadorAsignadoInput
+    cotizaciones?: CotizacionCreateNestedManyWithoutTrabajadorInput
+    calificaciones?: CalificacionCreateNestedManyWithoutTrabajadorInput
+    pagos?: PagoCreateNestedManyWithoutTrabajadorInput
+  }
+
+  export type TrabajadorUncheckedCreateWithoutDocumentosInput = {
+    id?: number
+    nombre: string
+    correo: string
+    telefono?: string | null
+    contrasenaHash: string
+    fotoPerfil?: string | null
+    descripcion?: string | null
+    anosExperiencia?: number | null
+    verificado?: boolean
+    fechaRegistro?: Date | string
+    activo?: boolean
+    especialidades?: TrabajadorEspecialidadUncheckedCreateNestedManyWithoutTrabajadorInput
+    servicios?: ServicioUncheckedCreateNestedManyWithoutTrabajadorInput
+    disponibilidad?: DisponibilidadUncheckedCreateNestedManyWithoutTrabajadorInput
+    fotosTrabajos?: FotoTrabajoUncheckedCreateNestedManyWithoutTrabajadorInput
+    solicitudes?: SolicitudUncheckedCreateNestedManyWithoutTrabajadorAsignadoInput
+    cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutTrabajadorInput
+    calificaciones?: CalificacionUncheckedCreateNestedManyWithoutTrabajadorInput
+    pagos?: PagoUncheckedCreateNestedManyWithoutTrabajadorInput
+  }
+
+  export type TrabajadorCreateOrConnectWithoutDocumentosInput = {
+    where: TrabajadorWhereUniqueInput
+    create: XOR<TrabajadorCreateWithoutDocumentosInput, TrabajadorUncheckedCreateWithoutDocumentosInput>
+  }
+
+  export type TrabajadorUpsertWithoutDocumentosInput = {
+    update: XOR<TrabajadorUpdateWithoutDocumentosInput, TrabajadorUncheckedUpdateWithoutDocumentosInput>
+    create: XOR<TrabajadorCreateWithoutDocumentosInput, TrabajadorUncheckedCreateWithoutDocumentosInput>
+    where?: TrabajadorWhereInput
+  }
+
+  export type TrabajadorUpdateToOneWithWhereWithoutDocumentosInput = {
+    where?: TrabajadorWhereInput
+    data: XOR<TrabajadorUpdateWithoutDocumentosInput, TrabajadorUncheckedUpdateWithoutDocumentosInput>
+  }
+
+  export type TrabajadorUpdateWithoutDocumentosInput = {
+    nombre?: StringFieldUpdateOperationsInput | string
+    correo?: StringFieldUpdateOperationsInput | string
+    telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    contrasenaHash?: StringFieldUpdateOperationsInput | string
+    fotoPerfil?: NullableStringFieldUpdateOperationsInput | string | null
+    descripcion?: NullableStringFieldUpdateOperationsInput | string | null
+    anosExperiencia?: NullableIntFieldUpdateOperationsInput | number | null
+    verificado?: BoolFieldUpdateOperationsInput | boolean
+    fechaRegistro?: DateTimeFieldUpdateOperationsInput | Date | string
+    activo?: BoolFieldUpdateOperationsInput | boolean
+    especialidades?: TrabajadorEspecialidadUpdateManyWithoutTrabajadorNestedInput
+    servicios?: ServicioUpdateManyWithoutTrabajadorNestedInput
+    disponibilidad?: DisponibilidadUpdateManyWithoutTrabajadorNestedInput
+    fotosTrabajos?: FotoTrabajoUpdateManyWithoutTrabajadorNestedInput
+    solicitudes?: SolicitudUpdateManyWithoutTrabajadorAsignadoNestedInput
+    cotizaciones?: CotizacionUpdateManyWithoutTrabajadorNestedInput
+    calificaciones?: CalificacionUpdateManyWithoutTrabajadorNestedInput
+    pagos?: PagoUpdateManyWithoutTrabajadorNestedInput
+  }
+
+  export type TrabajadorUncheckedUpdateWithoutDocumentosInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    nombre?: StringFieldUpdateOperationsInput | string
+    correo?: StringFieldUpdateOperationsInput | string
+    telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    contrasenaHash?: StringFieldUpdateOperationsInput | string
+    fotoPerfil?: NullableStringFieldUpdateOperationsInput | string | null
+    descripcion?: NullableStringFieldUpdateOperationsInput | string | null
+    anosExperiencia?: NullableIntFieldUpdateOperationsInput | number | null
+    verificado?: BoolFieldUpdateOperationsInput | boolean
+    fechaRegistro?: DateTimeFieldUpdateOperationsInput | Date | string
+    activo?: BoolFieldUpdateOperationsInput | boolean
+    especialidades?: TrabajadorEspecialidadUncheckedUpdateManyWithoutTrabajadorNestedInput
+    servicios?: ServicioUncheckedUpdateManyWithoutTrabajadorNestedInput
+    disponibilidad?: DisponibilidadUncheckedUpdateManyWithoutTrabajadorNestedInput
+    fotosTrabajos?: FotoTrabajoUncheckedUpdateManyWithoutTrabajadorNestedInput
+    solicitudes?: SolicitudUncheckedUpdateManyWithoutTrabajadorAsignadoNestedInput
+    cotizaciones?: CotizacionUncheckedUpdateManyWithoutTrabajadorNestedInput
+    calificaciones?: CalificacionUncheckedUpdateManyWithoutTrabajadorNestedInput
+    pagos?: PagoUncheckedUpdateManyWithoutTrabajadorNestedInput
+  }
+
   export type TrabajadorEspecialidadCreateWithoutEspecialidadInput = {
     trabajador: TrabajadorCreateNestedOneWithoutEspecialidadesInput
   }
@@ -24925,6 +26571,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionCreateNestedManyWithoutTrabajadorInput
     calificaciones?: CalificacionCreateNestedManyWithoutTrabajadorInput
     pagos?: PagoCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorUncheckedCreateWithoutEspecialidadesInput = {
@@ -24946,6 +26593,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutTrabajadorInput
     calificaciones?: CalificacionUncheckedCreateNestedManyWithoutTrabajadorInput
     pagos?: PagoUncheckedCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorUncheckedCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorCreateOrConnectWithoutEspecialidadesInput = {
@@ -25004,6 +26652,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUpdateManyWithoutTrabajadorNestedInput
     calificaciones?: CalificacionUpdateManyWithoutTrabajadorNestedInput
     pagos?: PagoUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type TrabajadorUncheckedUpdateWithoutEspecialidadesInput = {
@@ -25025,6 +26674,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUncheckedUpdateManyWithoutTrabajadorNestedInput
     calificaciones?: CalificacionUncheckedUpdateManyWithoutTrabajadorNestedInput
     pagos?: PagoUncheckedUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUncheckedUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type EspecialidadUpsertWithoutTrabajadoresInput = {
@@ -25073,6 +26723,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionCreateNestedManyWithoutTrabajadorInput
     calificaciones?: CalificacionCreateNestedManyWithoutTrabajadorInput
     pagos?: PagoCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorUncheckedCreateWithoutServiciosInput = {
@@ -25094,6 +26745,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutTrabajadorInput
     calificaciones?: CalificacionUncheckedCreateNestedManyWithoutTrabajadorInput
     pagos?: PagoUncheckedCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorUncheckedCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorCreateOrConnectWithoutServiciosInput = {
@@ -25152,6 +26804,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUpdateManyWithoutTrabajadorNestedInput
     calificaciones?: CalificacionUpdateManyWithoutTrabajadorNestedInput
     pagos?: PagoUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type TrabajadorUncheckedUpdateWithoutServiciosInput = {
@@ -25173,6 +26826,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUncheckedUpdateManyWithoutTrabajadorNestedInput
     calificaciones?: CalificacionUncheckedUpdateManyWithoutTrabajadorNestedInput
     pagos?: PagoUncheckedUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUncheckedUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type EspecialidadUpsertWithoutServiciosInput = {
@@ -25253,6 +26907,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionCreateNestedManyWithoutTrabajadorInput
     calificaciones?: CalificacionCreateNestedManyWithoutTrabajadorInput
     pagos?: PagoCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorUncheckedCreateWithoutSolicitudesInput = {
@@ -25274,6 +26929,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutTrabajadorInput
     calificaciones?: CalificacionUncheckedCreateNestedManyWithoutTrabajadorInput
     pagos?: PagoUncheckedCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorUncheckedCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorCreateOrConnectWithoutSolicitudesInput = {
@@ -25498,6 +27154,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUpdateManyWithoutTrabajadorNestedInput
     calificaciones?: CalificacionUpdateManyWithoutTrabajadorNestedInput
     pagos?: PagoUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type TrabajadorUncheckedUpdateWithoutSolicitudesInput = {
@@ -25519,6 +27176,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUncheckedUpdateManyWithoutTrabajadorNestedInput
     calificaciones?: CalificacionUncheckedUpdateManyWithoutTrabajadorNestedInput
     pagos?: PagoUncheckedUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUncheckedUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type DireccionUpsertWithoutSolicitudesInput = {
@@ -25733,6 +27391,7 @@ export namespace Prisma {
     solicitudes?: SolicitudCreateNestedManyWithoutTrabajadorAsignadoInput
     calificaciones?: CalificacionCreateNestedManyWithoutTrabajadorInput
     pagos?: PagoCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorUncheckedCreateWithoutCotizacionesInput = {
@@ -25754,6 +27413,7 @@ export namespace Prisma {
     solicitudes?: SolicitudUncheckedCreateNestedManyWithoutTrabajadorAsignadoInput
     calificaciones?: CalificacionUncheckedCreateNestedManyWithoutTrabajadorInput
     pagos?: PagoUncheckedCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorUncheckedCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorCreateOrConnectWithoutCotizacionesInput = {
@@ -25836,6 +27496,7 @@ export namespace Prisma {
     solicitudes?: SolicitudUpdateManyWithoutTrabajadorAsignadoNestedInput
     calificaciones?: CalificacionUpdateManyWithoutTrabajadorNestedInput
     pagos?: PagoUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type TrabajadorUncheckedUpdateWithoutCotizacionesInput = {
@@ -25857,6 +27518,7 @@ export namespace Prisma {
     solicitudes?: SolicitudUncheckedUpdateManyWithoutTrabajadorAsignadoNestedInput
     calificaciones?: CalificacionUncheckedUpdateManyWithoutTrabajadorNestedInput
     pagos?: PagoUncheckedUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUncheckedUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type TrabajadorCreateWithoutDisponibilidadInput = {
@@ -25877,6 +27539,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionCreateNestedManyWithoutTrabajadorInput
     calificaciones?: CalificacionCreateNestedManyWithoutTrabajadorInput
     pagos?: PagoCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorUncheckedCreateWithoutDisponibilidadInput = {
@@ -25898,6 +27561,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutTrabajadorInput
     calificaciones?: CalificacionUncheckedCreateNestedManyWithoutTrabajadorInput
     pagos?: PagoUncheckedCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorUncheckedCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorCreateOrConnectWithoutDisponibilidadInput = {
@@ -25934,6 +27598,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUpdateManyWithoutTrabajadorNestedInput
     calificaciones?: CalificacionUpdateManyWithoutTrabajadorNestedInput
     pagos?: PagoUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type TrabajadorUncheckedUpdateWithoutDisponibilidadInput = {
@@ -25955,6 +27620,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUncheckedUpdateManyWithoutTrabajadorNestedInput
     calificaciones?: CalificacionUncheckedUpdateManyWithoutTrabajadorNestedInput
     pagos?: PagoUncheckedUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUncheckedUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type UsuarioCreateWithoutDireccionesInput = {
@@ -26178,6 +27844,7 @@ export namespace Prisma {
     solicitudes?: SolicitudCreateNestedManyWithoutTrabajadorAsignadoInput
     cotizaciones?: CotizacionCreateNestedManyWithoutTrabajadorInput
     pagos?: PagoCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorUncheckedCreateWithoutCalificacionesInput = {
@@ -26199,6 +27866,7 @@ export namespace Prisma {
     solicitudes?: SolicitudUncheckedCreateNestedManyWithoutTrabajadorAsignadoInput
     cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutTrabajadorInput
     pagos?: PagoUncheckedCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorUncheckedCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorCreateOrConnectWithoutCalificacionesInput = {
@@ -26319,6 +27987,7 @@ export namespace Prisma {
     solicitudes?: SolicitudUpdateManyWithoutTrabajadorAsignadoNestedInput
     cotizaciones?: CotizacionUpdateManyWithoutTrabajadorNestedInput
     pagos?: PagoUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type TrabajadorUncheckedUpdateWithoutCalificacionesInput = {
@@ -26340,6 +28009,7 @@ export namespace Prisma {
     solicitudes?: SolicitudUncheckedUpdateManyWithoutTrabajadorAsignadoNestedInput
     cotizaciones?: CotizacionUncheckedUpdateManyWithoutTrabajadorNestedInput
     pagos?: PagoUncheckedUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUncheckedUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type TrabajadorCreateWithoutFotosTrabajosInput = {
@@ -26360,6 +28030,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionCreateNestedManyWithoutTrabajadorInput
     calificaciones?: CalificacionCreateNestedManyWithoutTrabajadorInput
     pagos?: PagoCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorUncheckedCreateWithoutFotosTrabajosInput = {
@@ -26381,6 +28052,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutTrabajadorInput
     calificaciones?: CalificacionUncheckedCreateNestedManyWithoutTrabajadorInput
     pagos?: PagoUncheckedCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorUncheckedCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorCreateOrConnectWithoutFotosTrabajosInput = {
@@ -26457,6 +28129,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUpdateManyWithoutTrabajadorNestedInput
     calificaciones?: CalificacionUpdateManyWithoutTrabajadorNestedInput
     pagos?: PagoUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type TrabajadorUncheckedUpdateWithoutFotosTrabajosInput = {
@@ -26478,6 +28151,7 @@ export namespace Prisma {
     cotizaciones?: CotizacionUncheckedUpdateManyWithoutTrabajadorNestedInput
     calificaciones?: CalificacionUncheckedUpdateManyWithoutTrabajadorNestedInput
     pagos?: PagoUncheckedUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUncheckedUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type SolicitudUpsertWithoutFotosTrabajosInput = {
@@ -26616,6 +28290,7 @@ export namespace Prisma {
     solicitudes?: SolicitudCreateNestedManyWithoutTrabajadorAsignadoInput
     cotizaciones?: CotizacionCreateNestedManyWithoutTrabajadorInput
     calificaciones?: CalificacionCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorUncheckedCreateWithoutPagosInput = {
@@ -26637,6 +28312,7 @@ export namespace Prisma {
     solicitudes?: SolicitudUncheckedCreateNestedManyWithoutTrabajadorAsignadoInput
     cotizaciones?: CotizacionUncheckedCreateNestedManyWithoutTrabajadorInput
     calificaciones?: CalificacionUncheckedCreateNestedManyWithoutTrabajadorInput
+    documentos?: DocumentoTrabajadorUncheckedCreateNestedManyWithoutTrabajadorInput
   }
 
   export type TrabajadorCreateOrConnectWithoutPagosInput = {
@@ -26775,6 +28451,7 @@ export namespace Prisma {
     solicitudes?: SolicitudUpdateManyWithoutTrabajadorAsignadoNestedInput
     cotizaciones?: CotizacionUpdateManyWithoutTrabajadorNestedInput
     calificaciones?: CalificacionUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type TrabajadorUncheckedUpdateWithoutPagosInput = {
@@ -26796,6 +28473,7 @@ export namespace Prisma {
     solicitudes?: SolicitudUncheckedUpdateManyWithoutTrabajadorAsignadoNestedInput
     cotizaciones?: CotizacionUncheckedUpdateManyWithoutTrabajadorNestedInput
     calificaciones?: CalificacionUncheckedUpdateManyWithoutTrabajadorNestedInput
+    documentos?: DocumentoTrabajadorUncheckedUpdateManyWithoutTrabajadorNestedInput
   }
 
   export type ComisionUpsertWithoutPagoInput = {
@@ -27134,6 +28812,14 @@ export namespace Prisma {
     fechaPago?: Date | string
   }
 
+  export type DocumentoTrabajadorCreateManyTrabajadorInput = {
+    id?: number
+    nombreArchivo: string
+    ruta: string
+    tamano: number
+    fechaSubida?: Date | string
+  }
+
   export type TrabajadorEspecialidadUpdateWithoutTrabajadorInput = {
     especialidad?: EspecialidadUpdateOneRequiredWithoutTrabajadoresNestedInput
   }
@@ -27345,6 +29031,29 @@ export namespace Prisma {
     metodoPago?: EnumMetodoPagoFieldUpdateOperationsInput | $Enums.MetodoPago
     estado?: EnumEstadoPagoFieldUpdateOperationsInput | $Enums.EstadoPago
     fechaPago?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentoTrabajadorUpdateWithoutTrabajadorInput = {
+    nombreArchivo?: StringFieldUpdateOperationsInput | string
+    ruta?: StringFieldUpdateOperationsInput | string
+    tamano?: IntFieldUpdateOperationsInput | number
+    fechaSubida?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentoTrabajadorUncheckedUpdateWithoutTrabajadorInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    nombreArchivo?: StringFieldUpdateOperationsInput | string
+    ruta?: StringFieldUpdateOperationsInput | string
+    tamano?: IntFieldUpdateOperationsInput | number
+    fechaSubida?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DocumentoTrabajadorUncheckedUpdateManyWithoutTrabajadorInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    nombreArchivo?: StringFieldUpdateOperationsInput | string
+    ruta?: StringFieldUpdateOperationsInput | string
+    tamano?: IntFieldUpdateOperationsInput | number
+    fechaSubida?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TrabajadorEspecialidadCreateManyEspecialidadInput = {

@@ -145,6 +145,15 @@ exports.Prisma.TrabajadorScalarFieldEnum = {
   activo: 'activo'
 };
 
+exports.Prisma.DocumentoTrabajadorScalarFieldEnum = {
+  id: 'id',
+  trabajadorId: 'trabajadorId',
+  nombreArchivo: 'nombreArchivo',
+  ruta: 'ruta',
+  tamano: 'tamano',
+  fechaSubida: 'fechaSubida'
+};
+
 exports.Prisma.EspecialidadScalarFieldEnum = {
   id: 'id',
   nombre: 'nombre',
@@ -334,6 +343,7 @@ exports.TipoNotificacion = exports.$Enums.TipoNotificacion = {
 exports.Prisma.ModelName = {
   Usuario: 'Usuario',
   Trabajador: 'Trabajador',
+  DocumentoTrabajador: 'DocumentoTrabajador',
   Especialidad: 'Especialidad',
   TrabajadorEspecialidad: 'TrabajadorEspecialidad',
   Servicio: 'Servicio',

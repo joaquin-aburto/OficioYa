@@ -19,12 +19,15 @@ const DESTINO: Record<Tipo, string> = {
   admin: '/admin/dashboard',
 }
 
+
+
 export default function LoginPage() {
   const router = useRouter()
   const [correo, setCorreo] = useState('')
   const [contrasena, setContrasena] = useState('')
   const [mensaje, setMensaje] = useState('')
   const [cargando, setCargando] = useState(false)
+   const [mostrarContrasena, setMostrarContrasena] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -90,20 +93,47 @@ export default function LoginPage() {
             required
           />
 
+         
+
           <div className="password-row">
-            <label htmlFor="contrasena">Contraseña</label>
-            <Link href="/auth/login/recoverPassword">¿La olvidaste?</Link>
-          </div>
-          <input
-            id="contrasena"
-            name="contrasena"
-            type="password"
-            value={contrasena}
-            onChange={(event) => setContrasena(event.target.value)}
-            placeholder="Tu contraseña"
-            autoComplete="current-password"
-            required
-          />
+  <label htmlFor="contrasena">Contraseña</label>
+  <Link href="/auth/login/recoverPassword">¿La olvidaste?</Link>
+</div>
+<div className="password-field">
+  <input
+    id="contrasena"
+    name="contrasena"
+    type={mostrarContrasena ? "text" : "password"}
+    value={contrasena}
+    onChange={(event) => setContrasena(event.target.value)}
+    placeholder="Tu contraseña"
+    autoComplete="current-password"
+    required
+  />
+  <button
+    type="button"
+    className="toggle-password"
+    onClick={() => setMostrarContrasena((prev) => !prev)}
+    aria-label={mostrarContrasena ? "Ocultar contraseña" : "Mostrar contraseña"}
+    aria-pressed={mostrarContrasena}
+  >
+    {mostrarContrasena ? (
+      // Ojo tachado (ocultar)
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+        <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+        <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24" />
+        <line x1="1" y1="1" x2="23" y2="23" />
+      </svg>
+    ) : (
+      // Ojo (mostrar)
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+    )}
+  </button>
+</div>
 
           <button type="submit" disabled={cargando}>
             {cargando ? 'Ingresando...' : 'Entrar a mi cuenta'}

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import prisma from '../../../lib/prisma'
 
+
 // GET /api/admin/dashboard
 // TODO: cuando tengas sesión real de administrador (cookie httpOnly), protege
 // esta ruta verificando esa sesión en el servidor antes de responder.

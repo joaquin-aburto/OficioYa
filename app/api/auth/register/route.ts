@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import prisma from '../../../lib/prisma'
 import { subirFotoPerfil } from '../../../lib/fotoPerfil'
+import { validarPdfs, subirPdfs } from '../../../lib/documentosTrabajador'
 import bcrypt from 'bcryptjs'
-
 
 const CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const fail = (error: string, status = 400) => NextResponse.json({ error }, { status })
@@ -27,6 +27,17 @@ export async function POST(req: Request) {
       return fail('El teléfono debe tener al menos 10 dígitos.')
     }
     const telefono = telefonoDigitos || null
+
+    // Documentos PDF (solo profesionales). Se validan antes de subir nada,
+    // para no dejar la foto subida si los documentos están mal.
+    const documentos = form
+      .getAll('documentos')
+      .filter((f): f is File => f instanceof File && f.size > 0)
+
+    if (tipo === 'trabajador') {
+      const errorDocs = await validarPdfs(documentos)
+      if (errorDocs) return fail(errorDocs)
+    }
 
     // El archivo es opcional: si no viene, form.get devuelve null y
     // subirFotoPerfil usa la foto por defecto de ese tipo de cuenta.
@@ -95,11 +106,26 @@ export async function POST(req: Request) {
         fotoPerfil,
         anosExperiencia,
         descripcion,
-        // verificado queda en false hasta que lo revises
+        // verificado queda en false hasta que revises los documentos
         especialidades: { create: ids.map((especialidadId) => ({ especialidadId })) },
       },
       select: { id: true, nombre: true, correo: true },
     })
+
+    // Sube los PDFs al bucket y guarda sus rutas. Si falla, deshace el registro
+    // para no dejar un profesional sin documentos.
+    try {
+      const subidos = await subirPdfs(trabajador.id, documentos)
+      await prisma.documentoTrabajador.createMany({
+        data: subidos.map((d) => ({ ...d, trabajadorId: trabajador.id })),
+      })
+    } catch (e) {
+      console.error('Error subiendo documentos:', e)
+      await prisma.trabajadorEspecialidad.deleteMany({ where: { trabajadorId: trabajador.id } })
+      await prisma.documentoTrabajador.deleteMany({ where: { trabajadorId: trabajador.id } })
+      await prisma.trabajador.delete({ where: { id: trabajador.id } })
+      return fail('No pudimos subir tus documentos. Intenta nuevamente.', 500)
+    }
 
     return NextResponse.json(
       { message: 'Cuenta creada', user: { ...trabajador, tipo } },

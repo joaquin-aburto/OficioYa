@@ -223,6 +223,46 @@
   font-weight: 800;
 }
 
+.password-field {
+  position: relative;
+  width: 100%;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 48px;
+  box-sizing: border-box;
+}
+
+.password-field .toggle-password,
+.password-field .toggle-password:hover,
+.password-field .toggle-password:active,
+.password-field .toggle-password:focus {
+  position: absolute;
+  right: 8px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;          /* centra vertical sin usar transform */
+  transform: none !important;
+  transition: none;
+  width: 32px;
+  height: 32px;
+  min-width: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+.password-field .toggle-password:hover {
+  color: #0f4c5c;
+}
+
 
 @media (max-width: 800px) {
   .login-page {

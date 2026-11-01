@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 // Reutiliza los estilos base del panel del cliente + los extras del admin
 import '../../cliente/dashboard/dashboard.css'
 import './admin.css'
+import DocumentosModal from './DocumentosModal'
 
 /* ------------------------------------------------------------------ */
 /* Tipos                                                               */
@@ -361,7 +362,10 @@ export default function AdminDashboardPage() {
                       </div>
 
                       <div className="pend-actions">
-                        <button
+                        <button className="btn btn-ghost" onClick={() => setVerTrabajador(t)}>
+                        Ver documentos
+                      </button>
+                         <button
                           className="btn btn-primary"
                           disabled={ocupado}
                           onClick={() => ejecutar({ accion: 'verificarTrabajador', trabajadorId: t.id }, `${t.nombre} fue verificado.`)}
@@ -502,6 +506,13 @@ export default function AdminDashboardPage() {
         />
       )}
 
+      {verTrabajador && (
+  <DocumentosModal
+    trabajador={{ id: verTrabajador.id, nombre: verTrabajador.nombre }}
+    onClose={() => setVerTrabajador(null)}
+  />
+)}
+
       {toast && (
         <div className="toast" role="status">
           {toast}
@@ -541,6 +552,8 @@ function RechazarModal({
     setAviso('')
     onSubmit(motivo.trim())
   }
+
+  
 
   return (
     <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>

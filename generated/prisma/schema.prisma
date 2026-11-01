@@ -109,7 +109,22 @@ model Trabajador {
   calificaciones Calificacion[]           @relation("CalificacionTrabajador")
   pagos          Pago[]                   @relation("PagoTrabajador")
 
+  documentos DocumentoTrabajador[]
+
   @@map("trabajadores")
+}
+
+model DocumentoTrabajador {
+  id            Int      @id @default(autoincrement())
+  trabajadorId  Int
+  nombreArchivo String
+  ruta          String // ruta dentro del bucket, no la URL
+  tamano        Int
+  fechaSubida   DateTime @default(now())
+
+  trabajador Trabajador @relation(fields: [trabajadorId], references: [id])
+
+  @@map("documentos_trabajadores")
 }
 
 model Especialidad {

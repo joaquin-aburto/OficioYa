@@ -34,17 +34,21 @@ export async function POST(req: Request) {
       .getAll('documentos')
       .filter((f): f is File => f instanceof File && f.size > 0)
 
-    if (tipo === 'trabajador') {
+       if (tipo === 'trabajador') {
       const errorDocs = await validarPdfs(documentos)
       if (errorDocs) return fail(errorDocs)
     }
 
-    // El archivo es opcional: si no viene, form.get devuelve null y
-    // subirFotoPerfil usa la foto por defecto de ese tipo de cuenta.
     const archivo = form.get('archivo')
+    const archivoFoto = archivo instanceof File && archivo.size > 0 ? archivo : null
+
+    if (tipo === 'trabajador' && !archivoFoto) {
+      return fail('Sube una foto de perfil para registrarte como profesional.')
+    }
+
     let fotoPerfil: string
     try {
-      fotoPerfil = await subirFotoPerfil(tipo, archivo instanceof File ? archivo : null)
+      fotoPerfil = await subirFotoPerfil(tipo, archivoFoto)
     } catch (e) {
       return fail(e instanceof Error ? e.message : 'No pudimos subir tu foto.')
     }

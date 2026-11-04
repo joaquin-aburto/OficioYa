@@ -334,3 +334,22 @@
 .register-page .foto-botones .reg-link-quitar {
   color: var(--reg-error);
 }
+
+/* En escritorio: la página no crece; solo el formulario hace scroll */
+@media (min-width: 901px) {
+  .register-page {
+    height: 100vh;
+    overflow: hidden;
+  }
+  .register-page .login-panel {
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .register-page .login-aside {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+}
+

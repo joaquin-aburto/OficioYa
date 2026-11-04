@@ -1,11 +1,20 @@
 'use client'
 
-import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  ChangeEvent,
+  FormEvent,
+  KeyboardEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import '../login/login.css' // mismos estilos base que el login
 import './register.css' // extras del registro
-import './oficios-docs.css' // buscador de oficios y documentos
+import './oficios-docs.css' // oficios y documentos
+import './register-mejoras.css' // NUEVO: scroll corregido + autocompletado + años de experiencia
 
 type Tipo = 'cliente' | 'trabajador'
 type Oficio = { id: number; nombre: string }
@@ -33,6 +42,17 @@ const TAMANO_MAXIMO_FOTO = 5 * 1024 * 1024 // 5 MB
 const MAX_DOCS = 5
 const TAMANO_MAXIMO_DOC = 10 * 1024 * 1024 // 10 MB
 
+// Años de experiencia
+const MAX_ANOS = 60
+const ANOS_RAPIDOS: { valor: number; etiqueta: string }[] = [
+  { valor: 0, etiqueta: 'Menos de 1' },
+  { valor: 1, etiqueta: '1' },
+  { valor: 3, etiqueta: '3' },
+  { valor: 5, etiqueta: '5' },
+  { valor: 10, etiqueta: '10' },
+  { valor: 20, etiqueta: '20+' },
+]
+
 // Quita acentos y mayúsculas para que "plomeria" encuentre "Plomería"
 const normalizar = (s: string) =>
   s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -49,7 +69,7 @@ export default function RegisterPage() {
   const [telefono, setTelefono] = useState('')
   const [contrasena, setContrasena] = useState('')
 
-  // Foto de perfil (opcional para ambos tipos de cuenta)
+  // Foto de perfil (opcional para clientes, obligatoria para profesionales)
   const [foto, setFoto] = useState<File | null>(null)
   const [fotoPreview, setFotoPreview] = useState<string | null>(null)
   const inputFotoRef = useRef<HTMLInputElement>(null)
@@ -63,12 +83,19 @@ export default function RegisterPage() {
   const [anos, setAnos] = useState('')
   const [descripcion, setDescripcion] = useState('')
 
+  // Autocompletado de oficios
+  const [abierto, setAbierto] = useState(false)
+  const [activo, setActivo] = useState(0)
+  const comboRef = useRef<HTMLDivElement>(null)
+  const listaRef = useRef<HTMLUListElement>(null)
+
   // Documentos PDF que avalan la experiencia (obligatorios para profesionales)
   const [documentos, setDocumentos] = useState<File[]>([])
   const inputDocsRef = useRef<HTMLInputElement>(null)
 
   const [mensaje, setMensaje] = useState('')
   const [cargando, setCargando] = useState(false)
+  const mensajeRef = useRef<HTMLParagraphElement>(null)
 
   // Los oficios se piden solo cuando alguien elige "Soy profesional"
   useEffect(() => {
@@ -83,29 +110,111 @@ export default function RegisterPage() {
     }
   }, [tipo, oficios, intento])
 
-  // Libera la URL de vista previa cuando cambia la foto o se cierra la página,
-  // para no dejar memoria del navegador ocupada de más
+  // Libera la URL de vista previa cuando cambia la foto o se cierra la página
   useEffect(() => {
     return () => {
       if (fotoPreview) URL.revokeObjectURL(fotoPreview)
     }
   }, [fotoPreview])
 
-  const oficiosFiltrados = useMemo(() => {
+  // Cierra el desplegable de oficios al hacer clic fuera
+  useEffect(() => {
+    function fuera(e: MouseEvent) {
+      if (comboRef.current && !comboRef.current.contains(e.target as Node)) setAbierto(false)
+    }
+    document.addEventListener('mousedown', fuera)
+    return () => document.removeEventListener('mousedown', fuera)
+  }, [])
+
+  // Cuando aparece un mensaje de error, lo lleva a la vista
+  useEffect(() => {
+    if (mensaje) mensajeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [mensaje])
+
+  // Sugerencias: sin los ya elegidos, y primero los que empiezan con lo escrito
+  const sugerencias = useMemo(() => {
     if (!oficios) return []
     const q = normalizar(busqueda.trim())
-    return q ? oficios.filter((o) => normalizar(o.nombre).includes(q)) : oficios
-  }, [oficios, busqueda])
+    const disponibles = oficios.filter(
+      (o) => !seleccion.includes(o.id) && (!q || normalizar(o.nombre).includes(q)),
+    )
+    if (!q) return disponibles
+    return [...disponibles].sort((a, b) => {
+      const aIni = normalizar(a.nombre).startsWith(q) ? 0 : 1
+      const bIni = normalizar(b.nombre).startsWith(q) ? 0 : 1
+      return aIni - bIni
+    })
+  }, [oficios, busqueda, seleccion])
+
+  // Mantiene visible la opción resaltada al navegar con el teclado
+  useEffect(() => {
+    if (!abierto) return
+    const lista = listaRef.current
+    const el = lista?.children[activo] as HTMLElement | undefined
+    if (!lista || !el) return
+    if (el.offsetTop < lista.scrollTop) {
+      lista.scrollTop = el.offsetTop
+    } else if (el.offsetTop + el.offsetHeight > lista.scrollTop + lista.clientHeight) {
+      lista.scrollTop = el.offsetTop + el.offsetHeight - lista.clientHeight
+    }
+  }, [activo, abierto])
 
   const oficiosElegidos = oficios?.filter((o) => seleccion.includes(o.id)) ?? []
 
-  function alternarOficio(id: number) {
-    setSeleccion((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]))
+  function quitarOficio(id: number) {
+    setSeleccion((s) => s.filter((x) => x !== id))
+  }
+
+  function elegirOficio(id: number) {
+    setSeleccion((s) => (s.includes(id) ? s : [...s, id]))
+    setBusqueda('')
+    setActivo(0)
+    setAbierto(true) // se queda abierto para agregar otro rápido
+  }
+
+  function teclasBuscador(e: KeyboardEvent<HTMLInputElement>) {
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault()
+        setAbierto(true)
+        setActivo((i) => Math.min(i + 1, Math.max(sugerencias.length - 1, 0)))
+        break
+      case 'ArrowUp':
+        e.preventDefault()
+        setActivo((i) => Math.max(i - 1, 0))
+        break
+      case 'Enter':
+        e.preventDefault() // nunca envía el formulario desde aquí
+        if (abierto && sugerencias[activo]) elegirOficio(sugerencias[activo].id)
+        break
+      case 'Escape':
+        setAbierto(false)
+        break
+      case 'Tab':
+        setAbierto(false)
+        break
+      case 'Backspace':
+        if (busqueda === '' && seleccion.length > 0) {
+          setSeleccion((s) => s.slice(0, -1))
+        }
+        break
+    }
+  }
+
+  // Años de experiencia
+  function cambiarAnos(delta: number) {
+    const actual = anos === '' ? 0 : Number(anos)
+    setAnos(String(Math.min(MAX_ANOS, Math.max(0, actual + delta))))
+  }
+
+  function escribirAnos(e: ChangeEvent<HTMLInputElement>) {
+    const limpio = e.target.value.replace(/\D/g, '').slice(0, 2)
+    setAnos(limpio === '' ? '' : String(Math.min(MAX_ANOS, Number(limpio))))
   }
 
   function elegirFoto(event: ChangeEvent<HTMLInputElement>) {
     const archivo = event.target.files?.[0]
-    event.target.value = '' // permite volver a elegir el mismo archivo si lo quita y lo repone
+    event.target.value = '' // permite volver a elegir el mismo archivo
 
     if (!archivo) return
     if (!TIPOS_FOTO_PERMITIDOS.includes(archivo.type)) {
@@ -163,6 +272,9 @@ export default function RegisterPage() {
     setMensaje('')
 
     if (contrasena.length < 8) return setMensaje('La contraseña debe tener al menos 8 caracteres.')
+    if (tipo === 'trabajador' && !foto) {
+      return setMensaje('Sube una foto de perfil para registrarte como profesional.')
+    }
     if (tipo === 'trabajador' && seleccion.length === 0) {
       return setMensaje('Elige al menos un oficio para poder recibir solicitudes.')
     }
@@ -207,6 +319,7 @@ export default function RegisterPage() {
   }
 
   const esTrabajador = tipo === 'trabajador'
+  const anosNum = anos === '' ? null : Number(anos)
 
   return (
     <main className="login-page register-page">
@@ -251,8 +364,7 @@ export default function RegisterPage() {
           ))}
         </div>
 
-        {/* Foto de perfil: opcional para cliente y trabajador. Si no eligen
-            ninguna, el servidor asigna una foto por defecto. */}
+        {/* Foto de perfil: obligatoria para profesionales, opcional para clientes */}
         <div className="foto-picker">
           <button
             type="button"
@@ -277,11 +389,15 @@ export default function RegisterPage() {
             tabIndex={-1}
           />
           <div className="foto-texto">
-            <p className="foto-titulo">Foto de perfil (opcional)</p>
+            <p className="foto-titulo">
+              Foto de perfil {esTrabajador ? '(obligatoria)' : '(opcional)'}
+            </p>
             <p className="foto-ayuda">
               {fotoPreview
                 ? 'Así te van a ver.'
-                : 'Si no subes una, te asignamos una por defecto. Puedes cambiarla luego.'}
+                : esTrabajador
+                  ? 'Los clientes confían más en perfiles con foto real.'
+                  : 'Si no subes una, te asignamos una por defecto. Puedes cambiarla luego.'}
             </p>
             <div className="foto-botones">
               <button type="button" className="reg-link" onClick={() => inputFotoRef.current?.click()}>
@@ -321,7 +437,9 @@ export default function RegisterPage() {
             required
           />
 
-          <label htmlFor="telefono">Teléfono {esTrabajador ? '(los clientes te llamarán a este número)' : '(opcional)'}</label>
+          <label htmlFor="telefono">
+            Teléfono {esTrabajador ? '(los clientes te llamarán a este número)' : '(opcional)'}
+          </label>
           <input
             id="telefono"
             name="telefono"
@@ -349,17 +467,18 @@ export default function RegisterPage() {
 
           {esTrabajador && (
             <>
+              {/* ───────── Oficios con autocompletado ───────── */}
               <fieldset className="oficio-fieldset">
                 <legend>¿Qué oficios ofreces?</legend>
 
                 {oficiosElegidos.length > 0 && (
-                  <div className="oficio-tags">
+                  <div className="oficio-tags" aria-live="polite">
                     {oficiosElegidos.map((o) => (
                       <button
                         type="button"
                         key={o.id}
                         className="oficio-tag"
-                        onClick={() => alternarOficio(o.id)}
+                        onClick={() => quitarOficio(o.id)}
                         aria-label={`Quitar ${o.nombre}`}
                       >
                         {o.nombre} <span aria-hidden="true">×</span>
@@ -368,16 +487,68 @@ export default function RegisterPage() {
                   </div>
                 )}
 
-                <input
-                  type="search"
-                  className="oficio-buscador"
-                  value={busqueda}
-                  onChange={(e) => setBusqueda(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}
-                  placeholder="Busca tu oficio (ej. plomería, electricidad)"
-                  aria-label="Buscar oficio"
-                  autoComplete="off"
-                />
+                <div className="oficio-combo" ref={comboRef}>
+                  <input
+                    type="text"
+                    className="oficio-buscador"
+                    value={busqueda}
+                    onChange={(e) => {
+                      setBusqueda(e.target.value)
+                      setAbierto(true)
+                      setActivo(0)
+                    }}
+                    onFocus={() => setAbierto(true)}
+                    onKeyDown={teclasBuscador}
+                    placeholder={
+                      oficiosElegidos.length > 0
+                        ? 'Agrega otro oficio…'
+                        : 'Escribe tu oficio (ej. plomería, electricidad)'
+                    }
+                    role="combobox"
+                    aria-label="Buscar oficio"
+                    aria-expanded={abierto}
+                    aria-controls="oficio-sugerencias"
+                    aria-autocomplete="list"
+                    aria-activedescendant={
+                      abierto && sugerencias[activo] ? `oficio-op-${sugerencias[activo].id}` : undefined
+                    }
+                    autoComplete="off"
+                    disabled={oficios === null && !errorOficios}
+                  />
+                  <span className="oficio-flecha" aria-hidden="true">⌄</span>
+
+                  {abierto && oficios && (
+                    <ul className="oficio-dropdown" id="oficio-sugerencias" role="listbox" ref={listaRef}>
+                      {sugerencias.length > 0 ? (
+                        sugerencias.map((o, i) => (
+                          <li
+                            key={o.id}
+                            id={`oficio-op-${o.id}`}
+                            role="option"
+                            aria-selected={i === activo}
+                            className={`oficio-opcion ${i === activo ? 'activa' : ''}`}
+                            onMouseEnter={() => setActivo(i)}
+                            onMouseDown={(e) => {
+                              e.preventDefault() // evita que el input pierda el foco
+                              elegirOficio(o.id)
+                            }}
+                          >
+                            <span>{o.nombre}</span>
+                            <span className="oficio-mas" aria-hidden="true">+ Agregar</span>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="oficio-vacio" role="presentation">
+                          {oficios.length === 0
+                            ? 'Todavía no hay oficios registrados.'
+                            : busqueda.trim()
+                              ? `No encontramos “${busqueda.trim()}”. Prueba con otra palabra.`
+                              : 'Ya elegiste todos los oficios disponibles.'}
+                        </li>
+                      )}
+                    </ul>
+                  )}
+                </div>
 
                 {oficios === null && !errorOficios && <p className="reg-hint">Cargando oficios…</p>}
                 {errorOficios && (
@@ -395,28 +566,14 @@ export default function RegisterPage() {
                     </button>
                   </p>
                 )}
-                {oficios?.length === 0 && (
-                  <p className="reg-hint">Todavía no hay oficios registrados en la base de datos.</p>
-                )}
-                {oficios && oficios.length > 0 && oficiosFiltrados.length === 0 && (
-                  <p className="reg-hint">No encontramos “{busqueda}”. Prueba con otra palabra.</p>
-                )}
-
-                <ul className="oficio-lista">
-                  {oficiosFiltrados.map((o) => {
-                    const on = seleccion.includes(o.id)
-                    return (
-                      <li key={o.id}>
-                        <label className={`oficio-item ${on ? 'on' : ''}`}>
-                          <input type="checkbox" checked={on} onChange={() => alternarOficio(o.id)} />
-                          <span>{o.nombre}</span>
-                        </label>
-                      </li>
-                    )
-                  })}
-                </ul>
+                <p className="reg-hint">
+                  {seleccion.length === 0
+                    ? 'Escribe y elige de la lista. Puedes agregar varios oficios.'
+                    : `${seleccion.length} ${seleccion.length === 1 ? 'oficio elegido' : 'oficios elegidos'}.`}
+                </p>
               </fieldset>
 
+              {/* ───────── Documentos ───────── */}
               <div className="docs-bloque">
                 <p className="docs-titulo">Documentos que avalen tu experiencia</p>
                 <p className="foto-ayuda">
@@ -463,18 +620,64 @@ export default function RegisterPage() {
                 )}
               </div>
 
-              <label htmlFor="anos">Años de experiencia (opcional)</label>
-              <input
-                id="anos"
-                name="anos"
-                type="number"
-                inputMode="numeric"
-                min={0}
-                max={60}
-                value={anos}
-                onChange={(e) => setAnos(e.target.value)}
-                placeholder="Ej. 8"
-              />
+              {/* ───────── Años de experiencia (contador + atajos) ───────── */}
+              <div className="anos-bloque" role="group" aria-labelledby="anos-titulo">
+                <p className="docs-titulo" id="anos-titulo">Años de experiencia (opcional)</p>
+
+                <div className="anos-stepper">
+                  <button
+                    type="button"
+                    className="anos-btn"
+                    onClick={() => cambiarAnos(-1)}
+                    disabled={anosNum === null || anosNum <= 0}
+                    aria-label="Restar un año"
+                  >
+                    −
+                  </button>
+
+                  <div className="anos-valor">
+                    <input
+                      id="anos"
+                      name="anos"
+                      className="anos-input"
+                      type="text"
+                      inputMode="numeric"
+                      value={anos}
+                      onChange={escribirAnos}
+                      placeholder="0"
+                      aria-label="Años de experiencia"
+                      autoComplete="off"
+                    />
+                    <span className="anos-unidad">
+                      {anosNum === 1 ? 'año' : 'años'}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="anos-btn"
+                    onClick={() => cambiarAnos(1)}
+                    disabled={anosNum !== null && anosNum >= MAX_ANOS}
+                    aria-label="Sumar un año"
+                  >
+                    +
+                  </button>
+                </div>
+
+                <div className="anos-chips">
+                  {ANOS_RAPIDOS.map((a) => (
+                    <button
+                      type="button"
+                      key={a.valor}
+                      className={`anos-chip ${anos === String(a.valor) ? 'on' : ''}`}
+                      onClick={() => setAnos(String(a.valor))}
+                      aria-pressed={anos === String(a.valor)}
+                    >
+                      {a.etiqueta}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               <label htmlFor="descripcion">Cuéntale a tus clientes quién eres (opcional)</label>
               <textarea
@@ -494,7 +697,11 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        {mensaje && <p className="login-message" role="alert">{mensaje}</p>}
+        {mensaje && (
+          <p className="login-message" role="alert" ref={mensajeRef}>
+            {mensaje}
+          </p>
+        )}
 
         {esTrabajador && (
           <p className="reg-hint reg-verif">

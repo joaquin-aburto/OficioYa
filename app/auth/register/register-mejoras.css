@@ -1,0 +1,257 @@
+/* ============================================================
+   register-mejoras.css
+   Se importa DESPUÉS de login.css, register.css y oficios-docs.css
+   para poder sobrescribirlos.
+   ============================================================ */
+
+.register-page {
+  /* Cambia este color por el de tu marca si no coincide */
+  --ry-accent: #f97316;
+  --ry-accent-soft: rgba(249, 115, 22, 0.12);
+  --ry-border: #d9dde3;
+  --ry-text: #1f2937;
+  --ry-muted: #6b7280;
+}
+
+/* ------------------------------------------------------------
+   1) FIX DEL SCROLL
+   Cuando el contenido es más alto que la pantalla y está centrado
+   verticalmente (flex/grid + center), la parte de arriba queda
+   cortada y no se puede volver a ver al subir. Aquí se alinea
+   arriba, se deja crecer la página y el panel lateral queda fijo.
+   ------------------------------------------------------------ */
+.register-page {
+  height: auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  align-items: stretch;
+  overflow: visible;
+}
+
+.register-page .login-panel {
+  height: auto;
+  max-height: none;
+  min-height: 100vh;
+  min-height: 100dvh;
+  justify-content: flex-start;
+  overflow: visible;
+  padding-bottom: 48px;
+}
+
+.register-page .login-aside {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* ------------------------------------------------------------
+   2) OFICIOS: autocompletado
+   ------------------------------------------------------------ */
+.register-page .oficio-combo {
+  position: relative;
+  width: 100%;
+}
+
+.register-page .login-form .oficio-combo .oficio-buscador {
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 40px;
+}
+
+.register-page .oficio-flecha {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-55%);
+  color: var(--ry-muted);
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.register-page .oficio-dropdown {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--ry-border);
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+  overscroll-behavior: contain;
+}
+
+.register-page .oficio-opcion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--ry-text);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.register-page .oficio-opcion.activa {
+  background: var(--ry-accent-soft);
+  color: var(--ry-accent);
+  font-weight: 600;
+}
+
+.register-page .oficio-mas {
+  font-size: 0.78rem;
+  opacity: 0;
+  white-space: nowrap;
+}
+
+.register-page .oficio-opcion.activa .oficio-mas {
+  opacity: 1;
+}
+
+.register-page .oficio-vacio {
+  padding: 12px;
+  color: var(--ry-muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------
+   3) AÑOS DE EXPERIENCIA: contador + atajos
+   ------------------------------------------------------------ */
+.register-page .anos-bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 4px 0;
+}
+
+.register-page .anos-stepper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.register-page .login-form .anos-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid var(--ry-border);
+  background: #fff;
+  color: var(--ry-text);
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1;
+  box-shadow: none;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.register-page .login-form .anos-btn:hover:not(:disabled) {
+  border-color: var(--ry-accent);
+  color: var(--ry-accent);
+  background: var(--ry-accent-soft);
+}
+
+.register-page .login-form .anos-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.register-page .anos-valor {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--ry-border);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.register-page .anos-valor:focus-within {
+  border-color: var(--ry-accent);
+  box-shadow: 0 0 0 3px var(--ry-accent-soft);
+}
+
+.register-page .login-form .anos-input {
+  width: 3ch;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  outline: none;
+  text-align: right;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ry-text);
+  align-self: center;
+}
+
+.register-page .anos-unidad {
+  align-self: center;
+  color: var(--ry-muted);
+  font-size: 0.95rem;
+}
+
+.register-page .anos-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.register-page .login-form .anos-chip {
+  width: auto;
+  margin: 0;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--ry-border);
+  background: #fff;
+  color: var(--ry-text);
+  font-size: 0.88rem;
+  font-weight: 500;
+  box-shadow: none;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.register-page .login-form .anos-chip:hover {
+  border-color: var(--ry-accent);
+  color: var(--ry-accent);
+}
+
+.register-page .login-form .anos-chip.on {
+  background: var(--ry-accent);
+  border-color: var(--ry-accent);
+  color: #fff;
+}
+
+/* ------------------------------------------------------------
+   4) Móvil
+   ------------------------------------------------------------ */
+@media (max-width: 900px) {
+  .register-page .login-aside {
+    position: static;
+    height: auto;
+  }
+  .register-page .login-panel {
+    min-height: auto;
+  }
+}

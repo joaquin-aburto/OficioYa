@@ -1,6 +1,7 @@
 'use client'
 
 import { FormEvent, ReactNode, useEffect, useMemo, useState, useCallback } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 // Reutiliza los estilos base del panel del cliente + los extras del admin
 import '../../cliente/dashboard/dashboard.css'
@@ -64,6 +65,8 @@ type Data = {
 /* ------------------------------------------------------------------ */
 
 const STORAGE_KEY = 'oficioya_admin'
+const LOGO_URL =
+  'https://jqhlnwusmwtqxxvtitht.supabase.co/storage/v1/object/public/ImagesOficioYa/OficioYa/Logo/LogoOficioYa-Log.png'
 
 const dinero = (n: number) =>
   new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(n)
@@ -90,9 +93,9 @@ const ESTADO_SOLICITUD_LABEL: Record<string, string> = {
   Aceptada: 'Aceptadas',
   EnCurso: 'En curso',
   Terminada: 'Terminadas',
+  Calificada: 'Calificadas',
   Cancelada: 'Canceladas',
   Rechazada: 'Rechazadas',
-  Calificada: 'Calificadas',
 }
 
 /* ------------------------------------------------------------------ */
@@ -105,11 +108,14 @@ const ICONOS: Record<string, ReactNode> = {
   users: <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></>,
   wallet: <path d="M20 12V8H6a2 2 0 0 1 0-4h12v4M4 6v12a2 2 0 0 0 2 2h14v-4M18 12a2 2 0 0 0 0 4h4v-4z" />,
   list: <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />,
+  card: <><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /></>,
   out: <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />,
   close: <path d="M18 6L6 18M6 6l12 12" />,
   phone: <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.4-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" />,
   up: <path d="M18 15l-6-6-6 6" />,
   down: <path d="M6 9l6 6 6-6" />,
+  file: <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5" />,
+  arrow: <path d="M5 12h14M13 6l6 6-6 6" />,
 }
 function Icon({ name, size = 18 }: { name: keyof typeof ICONOS; size?: number }) {
   return (
@@ -163,12 +169,12 @@ export default function AdminDashboardPage() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY)
       if (!raw) {
-        router.replace('/admin/login')
+        router.replace('/auth/login')
         return
       }
       setAutorizado(true)
     } catch {
-      router.replace('/admin/login')
+      router.replace('/auth/login')
     }
   }, [router])
 
@@ -222,7 +228,7 @@ export default function AdminDashboardPage() {
 
   function cerrarSesion() {
     localStorage.removeItem(STORAGE_KEY)
-    router.push('/admin/login')
+    router.push('/auth/login')
   }
 
   const verificadosFiltrados = useMemo(() => {
@@ -255,25 +261,31 @@ export default function AdminDashboardPage() {
 
   const { comisiones, totales, solicitudesPorEstado, pendientesVerificacion, pagosRecientes } = data
   const varMes = variacion(comisiones.esteMes, comisiones.mesPasado)
+  const hoy = new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })
 
   return (
     <div className="dash">
       {/* ----------------------------- Barra lateral ----------------------------- */}
       <aside className="side">
-        <div className="side-brand">
-          <span className="admin-icon" aria-hidden="true">🛡️</span>
-          <span>OficioYa Admin</span>
-        </div>
+        <Link href="/" className="side-brand" aria-label="OficioYa, ir al inicio">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={LOGO_URL} alt="" className="side-logo" />
+          <span className="side-brand-text">
+            OficioYa
+            <small className="side-brand-role">Administrador</small>
+          </span>
+        </Link>
 
         <nav className="side-nav" aria-label="Secciones">
           <a href="#inicio"><Icon name="home" /> Inicio</a>
+          <a href="#comisiones"><Icon name="wallet" /> Comisiones</a>
           <a href="#verificacion">
             <Icon name="shield" /> Por verificar
             {pendientesVerificacion.length > 0 && <b className="pill">{pendientesVerificacion.length}</b>}
           </a>
           <a href="#trabajadores"><Icon name="users" /> Trabajadores</a>
-          <a href="#comisiones"><Icon name="wallet" /> Comisiones</a>
           <a href="#solicitudes"><Icon name="list" /> Solicitudes</a>
+          <a href="#pagos"><Icon name="card" /> Pagos</a>
         </nav>
 
         <button className="side-out" onClick={cerrarSesion}>
@@ -284,18 +296,39 @@ export default function AdminDashboardPage() {
       {/* ----------------------------- Contenido ----------------------------- */}
       <div className="main" id="inicio">
         <header className="top">
-          <p className="top-hello">Panel de administración</p>
+          <div>
+            <p className="top-hello">Panel de administración</p>
+            <p className="admin-fecha">{hoy}</p>
+          </div>
         </header>
+
+        {/* Aviso: lo que requiere atención */}
+        {pendientesVerificacion.length > 0 && (
+          <a href="#verificacion" className="admin-alert">
+            <span className="admin-alert-icon"><Icon name="shield" size={20} /></span>
+            <span className="admin-alert-text">
+              <strong>
+                {pendientesVerificacion.length === 1
+                  ? '1 trabajador espera tu verificación'
+                  : `${pendientesVerificacion.length} trabajadores esperan tu verificación`}
+              </strong>
+              <small>Revisa sus documentos y apruébalos para que puedan recibir solicitudes.</small>
+            </span>
+            <Icon name="arrow" size={18} />
+          </a>
+        )}
 
         {/* Resumen de comisiones */}
         <section id="comisiones" className="admin-hero" aria-labelledby="hero-title">
           <div className="admin-hero-main">
             <p className="admin-hero-label">Comisiones de este mes</p>
             <h1 id="hero-title">{dinero(comisiones.esteMes)}</h1>
-            {varMes && (
+            {varMes ? (
               <p className={`admin-hero-var ${varMes.positiva ? 'up' : 'down'}`}>
                 <Icon name={varMes.positiva ? 'up' : 'down'} size={14} /> {varMes.texto}
               </p>
+            ) : (
+              <p className="admin-hero-var neutral">Aún no hay mes anterior para comparar</p>
             )}
           </div>
           <div className="admin-hero-mini">
@@ -304,8 +337,9 @@ export default function AdminDashboardPage() {
               <strong>{dinero(comisiones.historico)}</strong>
             </div>
             <div>
-              <span>Por cobrar (pagos pendientes)</span>
+              <span>Por cobrar</span>
               <strong>{dinero(comisiones.pendiente)}</strong>
+              <small>de pagos pendientes</small>
             </div>
           </div>
         </section>
@@ -322,7 +356,7 @@ export default function AdminDashboardPage() {
           </div>
           <div className={`stat ${totales.porVerificar ? 'stat-hot' : ''}`}>
             <strong>{totales.porVerificar}</strong>
-            <span>{totales.porVerificar === 1 ? 'por verificar' : 'por verificar'}</span>
+            <span>por verificar</span>
           </div>
           <div className="stat">
             <strong>{totales.solicitudes}</strong>
@@ -334,7 +368,15 @@ export default function AdminDashboardPage() {
           <div className="col-main">
             {/* Verificación de trabajadores */}
             <section id="verificacion" className="block" aria-labelledby="t-ver">
-              <div className="block-head"><h2 id="t-ver">Trabajadores por verificar</h2></div>
+              <div className="block-head">
+                <div>
+                  <h2 id="t-ver">
+                    Trabajadores por verificar
+                    {pendientesVerificacion.length > 0 && <span className="count-chip hot">{pendientesVerificacion.length}</span>}
+                  </h2>
+                  <p className="block-sub">Revisa sus documentos y decide si apruebas o rechazas su perfil.</p>
+                </div>
+              </div>
 
               {pendientesVerificacion.length === 0 ? (
                 <p className="vacio">No hay trabajadores esperando verificación. Buen trabajo.</p>
@@ -353,7 +395,16 @@ export default function AdminDashboardPage() {
                         </div>
                       </div>
 
-                      <p className="pend-esp">{t.especialidades.map((e) => e.nombre).join(', ') || 'Sin oficios'}</p>
+                      <div className="pend-tags">
+                        {t.especialidades.length === 0 ? (
+                          <span className="chip-oficio chip-vacio">Sin oficios</span>
+                        ) : (
+                          t.especialidades.map((e) => (
+                            <span key={e.id} className="chip-oficio">{e.nombre}</span>
+                          ))
+                        )}
+                      </div>
+
                       {t.descripcion && <p className="pend-desc">{t.descripcion}</p>}
 
                       <div className="pend-contacto">
@@ -362,22 +413,26 @@ export default function AdminDashboardPage() {
                       </div>
 
                       <div className="pend-actions">
-                        <button className="btn btn-ghost" onClick={() => setVerTrabajador(t)}>
-                        Ver documentos
-                      </button>
-                         <button
-                          className="btn btn-primary"
-                          disabled={ocupado}
-                          onClick={() => ejecutar({ accion: 'verificarTrabajador', trabajadorId: t.id }, `${t.nombre} fue verificado.`)}
-                        >
-                          <Icon name="shield" size={16} /> Verificar
+                        <button className="btn btn-ghost pend-docs" onClick={() => setVerTrabajador(t)}>
+                          <Icon name="file" size={16} /> Ver documentos
                         </button>
-                        <button className="btn btn-ghost" onClick={() => setRechazando(t)}>
-                          Rechazar
-                        </button>
+                        <div className="pend-decision">
+                          <button
+                            className="btn btn-primary"
+                            disabled={ocupado}
+                            onClick={() =>
+                              ejecutar({ accion: 'verificarTrabajador', trabajadorId: t.id }, `${t.nombre} fue verificado.`)
+                            }
+                          >
+                            <Icon name="shield" size={16} /> Verificar
+                          </button>
+                          <button className="btn btn-reject" disabled={ocupado} onClick={() => setRechazando(t)}>
+                            Rechazar
+                          </button>
+                        </div>
                         {t.telefono && (
-                          <a className="btn btn-ghost btn-sm" href={`tel:${t.telefono}`}>
-                            <Icon name="phone" size={14} /> Llamar
+                          <a className="pend-call" href={`tel:${t.telefono}`}>
+                            <Icon name="phone" size={14} /> Llamar a {t.nombre.split(' ')[0]}
                           </a>
                         )}
                       </div>
@@ -390,7 +445,13 @@ export default function AdminDashboardPage() {
             {/* Trabajadores verificados */}
             <section id="trabajadores" className="block" aria-labelledby="t-trab">
               <div className="block-head">
-                <h2 id="t-trab">Trabajadores verificados</h2>
+                <div>
+                  <h2 id="t-trab">
+                    Trabajadores verificados
+                    <span className="count-chip">{data.trabajadoresVerificados.length}</span>
+                  </h2>
+                  <p className="block-sub">Suspende o reactiva cuentas con el interruptor de estado.</p>
+                </div>
                 <input
                   className="admin-search"
                   type="search"
@@ -417,19 +478,29 @@ export default function AdminDashboardPage() {
                     <span role="columnheader">Estado</span>
                   </li>
                   {verificadosFiltrados.map((t) => (
-                    <li key={t.id} className="admin-row" role="row">
+                    <li key={t.id} className={`admin-row ${t.activo ? '' : 'admin-row-off'}`} role="row">
                       <span className="admin-cell-who" role="cell">
-                        <Avatar nombre={t.nombre} foto={t.fotoPerfil} size={32} />
-                        {t.nombre}
+                        <Avatar nombre={t.nombre} foto={t.fotoPerfil} size={34} />
+                        <span>
+                          {t.nombre}
+                          <small className="admin-mail">{t.correo}</small>
+                        </span>
                       </span>
-                      <span className="muted small" role="cell">{t.especialidades.map((e) => e.nombre).join(', ') || '—'}</span>
-                      <span role="cell"><Estrellas valor={t.calificacion} total={t.totalResenas} /></span>
-                      <span role="cell">{t.trabajosCompletados}</span>
+                      <span className="admin-cell" data-label="Oficios" role="cell">
+                        {t.especialidades.map((e) => e.nombre).join(', ') || '—'}
+                      </span>
+                      <span className="admin-cell" data-label="Calificación" role="cell">
+                        <Estrellas valor={t.calificacion} total={t.totalResenas} />
+                      </span>
+                      <span className="admin-cell" data-label="Trabajos" role="cell">
+                        {t.trabajosCompletados} {t.trabajosCompletados === 1 ? 'trabajo' : 'trabajos'}
+                      </span>
                       <span role="cell">
                         <button
                           className={`toggle ${t.activo ? 'on' : ''}`}
                           disabled={ocupado}
                           aria-pressed={t.activo}
+                          title={t.activo ? 'Clic para suspender' : 'Clic para reactivar'}
                           onClick={() =>
                             ejecutar(
                               { accion: 'alternarActivoTrabajador', trabajadorId: t.id },
@@ -437,6 +508,7 @@ export default function AdminDashboardPage() {
                             )
                           }
                         >
+                          <span className="toggle-dot" aria-hidden="true" />
                           {t.activo ? 'Activo' : 'Suspendido'}
                         </button>
                       </span>
@@ -448,10 +520,15 @@ export default function AdminDashboardPage() {
 
             {/* Solicitudes por estado */}
             <section id="solicitudes" className="block" aria-labelledby="t-sol">
-              <div className="block-head"><h2 id="t-sol">Solicitudes por estado</h2></div>
+              <div className="block-head">
+                <div>
+                  <h2 id="t-sol">Solicitudes por estado</h2>
+                  <p className="block-sub">Cuántas solicitudes hay en cada etapa del proceso.</p>
+                </div>
+              </div>
               <ul className="estado-grid">
                 {Object.entries(ESTADO_SOLICITUD_LABEL).map(([clave, label]) => (
-                  <li key={clave}>
+                  <li key={clave} data-estado={clave}>
                     <strong>{solicitudesPorEstado[clave] ?? 0}</strong>
                     <span>{label}</span>
                   </li>
@@ -460,8 +537,13 @@ export default function AdminDashboardPage() {
             </section>
 
             {/* Pagos recientes */}
-            <section className="block" aria-labelledby="t-pagos">
-              <div className="block-head"><h2 id="t-pagos">Pagos recientes</h2></div>
+            <section id="pagos" className="block" aria-labelledby="t-pagos">
+              <div className="block-head">
+                <div>
+                  <h2 id="t-pagos">Pagos recientes</h2>
+                  <p className="block-sub">Lo que pagó cada cliente y la comisión que te corresponde.</p>
+                </div>
+              </div>
               {pagosRecientes.length === 0 ? (
                 <p className="vacio">Todavía no hay pagos registrados.</p>
               ) : (
@@ -471,7 +553,7 @@ export default function AdminDashboardPage() {
                       <div className="fila-main">
                         <strong>{p.especialidad}</strong>
                         <span className="muted small">
-                          {p.trabajador} → {p.cliente} · {fechaCorta(p.fechaPago)} · {p.metodoPago}
+                          {p.cliente} → {p.trabajador} · {fechaCorta(p.fechaPago)} · {p.metodoPago}
                         </span>
                       </div>
                       <div className="fila-side">
@@ -507,11 +589,11 @@ export default function AdminDashboardPage() {
       )}
 
       {verTrabajador && (
-  <DocumentosModal
-    trabajador={{ id: verTrabajador.id, nombre: verTrabajador.nombre }}
-    onClose={() => setVerTrabajador(null)}
-  />
-)}
+        <DocumentosModal
+          trabajador={{ id: verTrabajador.id, nombre: verTrabajador.nombre }}
+          onClose={() => setVerTrabajador(null)}
+        />
+      )}
 
       {toast && (
         <div className="toast" role="status">
@@ -553,8 +635,6 @@ function RechazarModal({
     onSubmit(motivo.trim())
   }
 
-  
-
   return (
     <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <form className="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="r-title" onSubmit={enviar}>
@@ -584,7 +664,7 @@ function RechazarModal({
 
         <div className="modal-actions">
           <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
-          <button type="submit" className="btn btn-primary" disabled={ocupado}>
+          <button type="submit" className="btn btn-reject-solid" disabled={ocupado}>
             {ocupado ? 'Enviando…' : 'Rechazar y avisar'}
           </button>
         </div>

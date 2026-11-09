@@ -79,10 +79,11 @@ model Usuario {
   fechaRegistro  DateTime @default(now())
   activo         Boolean  @default(true)
 
-  direcciones    Direccion[]
-  solicitudes    Solicitud[]    @relation("SolicitudCliente")
-  calificaciones Calificacion[] @relation("CalificacionCliente")
-  pagos          Pago[]         @relation("PagoCliente")
+  direcciones       Direccion[]
+  solicitudes       Solicitud[]       @relation("SolicitudCliente")
+  calificaciones    Calificacion[]    @relation("CalificacionCliente")
+  pagos             Pago[]            @relation("PagoCliente")
+  suscripcionesPush SuscripcionPush[]
 
   @@map("usuarios")
 }
@@ -307,4 +308,18 @@ model Notificacion {
   fechaCreacion    DateTime         @default(now())
 
   @@map("notificaciones")
+}
+
+model SuscripcionPush {
+  id            BigInt   @id @default(autoincrement())
+  usuarioId     Int      @map("usuario_id")
+  endpoint      String   @unique
+  p256dh        String
+  auth          String
+  fechaCreacion DateTime @default(now()) @map("fecha_creacion") @db.Timestamptz
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@map("suscripcion_push")
 }

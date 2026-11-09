@@ -88,6 +88,11 @@ export type Comision = $Result.DefaultSelection<Prisma.$ComisionPayload>
  * 
  */
 export type Notificacion = $Result.DefaultSelection<Prisma.$NotificacionPayload>
+/**
+ * Model SuscripcionPush
+ * 
+ */
+export type SuscripcionPush = $Result.DefaultSelection<Prisma.$SuscripcionPushPayload>
 
 /**
  * Enums
@@ -477,6 +482,16 @@ export class PrismaClient<
     * ```
     */
   get notificacion(): Prisma.NotificacionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.suscripcionPush`: Exposes CRUD operations for the **SuscripcionPush** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SuscripcionPushes
+    * const suscripcionPushes = await prisma.suscripcionPush.findMany()
+    * ```
+    */
+  get suscripcionPush(): Prisma.SuscripcionPushDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -938,7 +953,8 @@ export namespace Prisma {
     FotoTrabajo: 'FotoTrabajo',
     Pago: 'Pago',
     Comision: 'Comision',
-    Notificacion: 'Notificacion'
+    Notificacion: 'Notificacion',
+    SuscripcionPush: 'SuscripcionPush'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -954,7 +970,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "usuario" | "trabajador" | "documentoTrabajador" | "especialidad" | "trabajadorEspecialidad" | "servicio" | "solicitud" | "cotizacion" | "disponibilidad" | "direccion" | "calificacion" | "fotoTrabajo" | "pago" | "comision" | "notificacion"
+      modelProps: "usuario" | "trabajador" | "documentoTrabajador" | "especialidad" | "trabajadorEspecialidad" | "servicio" | "solicitud" | "cotizacion" | "disponibilidad" | "direccion" | "calificacion" | "fotoTrabajo" | "pago" | "comision" | "notificacion" | "suscripcionPush"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2068,6 +2084,80 @@ export namespace Prisma {
           }
         }
       }
+      SuscripcionPush: {
+        payload: Prisma.$SuscripcionPushPayload<ExtArgs>
+        fields: Prisma.SuscripcionPushFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SuscripcionPushFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SuscripcionPushPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SuscripcionPushFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SuscripcionPushPayload>
+          }
+          findFirst: {
+            args: Prisma.SuscripcionPushFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SuscripcionPushPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SuscripcionPushFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SuscripcionPushPayload>
+          }
+          findMany: {
+            args: Prisma.SuscripcionPushFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SuscripcionPushPayload>[]
+          }
+          create: {
+            args: Prisma.SuscripcionPushCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SuscripcionPushPayload>
+          }
+          createMany: {
+            args: Prisma.SuscripcionPushCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SuscripcionPushCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SuscripcionPushPayload>[]
+          }
+          delete: {
+            args: Prisma.SuscripcionPushDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SuscripcionPushPayload>
+          }
+          update: {
+            args: Prisma.SuscripcionPushUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SuscripcionPushPayload>
+          }
+          deleteMany: {
+            args: Prisma.SuscripcionPushDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SuscripcionPushUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SuscripcionPushUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SuscripcionPushPayload>[]
+          }
+          upsert: {
+            args: Prisma.SuscripcionPushUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SuscripcionPushPayload>
+          }
+          aggregate: {
+            args: Prisma.SuscripcionPushAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSuscripcionPush>
+          }
+          groupBy: {
+            args: Prisma.SuscripcionPushGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SuscripcionPushGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SuscripcionPushCountArgs<ExtArgs>
+            result: $Utils.Optional<SuscripcionPushCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2206,6 +2296,7 @@ export namespace Prisma {
     pago?: PagoOmit
     comision?: ComisionOmit
     notificacion?: NotificacionOmit
+    suscripcionPush?: SuscripcionPushOmit
   }
 
   /* Types for Logging */
@@ -2290,6 +2381,7 @@ export namespace Prisma {
     solicitudes: number
     calificaciones: number
     pagos: number
+    suscripcionesPush: number
   }
 
   export type UsuarioCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2297,6 +2389,7 @@ export namespace Prisma {
     solicitudes?: boolean | UsuarioCountOutputTypeCountSolicitudesArgs
     calificaciones?: boolean | UsuarioCountOutputTypeCountCalificacionesArgs
     pagos?: boolean | UsuarioCountOutputTypeCountPagosArgs
+    suscripcionesPush?: boolean | UsuarioCountOutputTypeCountSuscripcionesPushArgs
   }
 
   // Custom InputTypes
@@ -2336,6 +2429,13 @@ export namespace Prisma {
    */
   export type UsuarioCountOutputTypeCountPagosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PagoWhereInput
+  }
+
+  /**
+   * UsuarioCountOutputType without action
+   */
+  export type UsuarioCountOutputTypeCountSuscripcionesPushArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SuscripcionPushWhereInput
   }
 
 
@@ -2792,6 +2892,7 @@ export namespace Prisma {
     solicitudes?: boolean | Usuario$solicitudesArgs<ExtArgs>
     calificaciones?: boolean | Usuario$calificacionesArgs<ExtArgs>
     pagos?: boolean | Usuario$pagosArgs<ExtArgs>
+    suscripcionesPush?: boolean | Usuario$suscripcionesPushArgs<ExtArgs>
     _count?: boolean | UsuarioCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["usuario"]>
 
@@ -2834,6 +2935,7 @@ export namespace Prisma {
     solicitudes?: boolean | Usuario$solicitudesArgs<ExtArgs>
     calificaciones?: boolean | Usuario$calificacionesArgs<ExtArgs>
     pagos?: boolean | Usuario$pagosArgs<ExtArgs>
+    suscripcionesPush?: boolean | Usuario$suscripcionesPushArgs<ExtArgs>
     _count?: boolean | UsuarioCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UsuarioIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2846,6 +2948,7 @@ export namespace Prisma {
       solicitudes: Prisma.$SolicitudPayload<ExtArgs>[]
       calificaciones: Prisma.$CalificacionPayload<ExtArgs>[]
       pagos: Prisma.$PagoPayload<ExtArgs>[]
+      suscripcionesPush: Prisma.$SuscripcionPushPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -3254,6 +3357,7 @@ export namespace Prisma {
     solicitudes<T extends Usuario$solicitudesArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$solicitudesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SolicitudPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     calificaciones<T extends Usuario$calificacionesArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$calificacionesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CalificacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     pagos<T extends Usuario$pagosArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$pagosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PagoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    suscripcionesPush<T extends Usuario$suscripcionesPushArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$suscripcionesPushArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SuscripcionPushPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3777,6 +3881,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PagoScalarFieldEnum | PagoScalarFieldEnum[]
+  }
+
+  /**
+   * Usuario.suscripcionesPush
+   */
+  export type Usuario$suscripcionesPushArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SuscripcionPush
+     */
+    select?: SuscripcionPushSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SuscripcionPush
+     */
+    omit?: SuscripcionPushOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SuscripcionPushInclude<ExtArgs> | null
+    where?: SuscripcionPushWhereInput
+    orderBy?: SuscripcionPushOrderByWithRelationInput | SuscripcionPushOrderByWithRelationInput[]
+    cursor?: SuscripcionPushWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SuscripcionPushScalarFieldEnum | SuscripcionPushScalarFieldEnum[]
   }
 
   /**
@@ -20143,6 +20271,1120 @@ export namespace Prisma {
 
 
   /**
+   * Model SuscripcionPush
+   */
+
+  export type AggregateSuscripcionPush = {
+    _count: SuscripcionPushCountAggregateOutputType | null
+    _avg: SuscripcionPushAvgAggregateOutputType | null
+    _sum: SuscripcionPushSumAggregateOutputType | null
+    _min: SuscripcionPushMinAggregateOutputType | null
+    _max: SuscripcionPushMaxAggregateOutputType | null
+  }
+
+  export type SuscripcionPushAvgAggregateOutputType = {
+    id: number | null
+    usuarioId: number | null
+  }
+
+  export type SuscripcionPushSumAggregateOutputType = {
+    id: bigint | null
+    usuarioId: number | null
+  }
+
+  export type SuscripcionPushMinAggregateOutputType = {
+    id: bigint | null
+    usuarioId: number | null
+    endpoint: string | null
+    p256dh: string | null
+    auth: string | null
+    fechaCreacion: Date | null
+  }
+
+  export type SuscripcionPushMaxAggregateOutputType = {
+    id: bigint | null
+    usuarioId: number | null
+    endpoint: string | null
+    p256dh: string | null
+    auth: string | null
+    fechaCreacion: Date | null
+  }
+
+  export type SuscripcionPushCountAggregateOutputType = {
+    id: number
+    usuarioId: number
+    endpoint: number
+    p256dh: number
+    auth: number
+    fechaCreacion: number
+    _all: number
+  }
+
+
+  export type SuscripcionPushAvgAggregateInputType = {
+    id?: true
+    usuarioId?: true
+  }
+
+  export type SuscripcionPushSumAggregateInputType = {
+    id?: true
+    usuarioId?: true
+  }
+
+  export type SuscripcionPushMinAggregateInputType = {
+    id?: true
+    usuarioId?: true
+    endpoint?: true
+    p256dh?: true
+    auth?: true
+    fechaCreacion?: true
+  }
+
+  export type SuscripcionPushMaxAggregateInputType = {
+    id?: true
+    usuarioId?: true
+    endpoint?: true
+    p256dh?: true
+    auth?: true
+    fechaCreacion?: true
+  }
+
+  export type SuscripcionPushCountAggregateInputType = {
+    id?: true
+    usuarioId?: true
+    endpoint?: true
+    p256dh?: true
+    auth?: true
+    fechaCreacion?: true
+    _all?: true
+  }
+
+  export type SuscripcionPushAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SuscripcionPush to aggregate.
+     */
+    where?: SuscripcionPushWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SuscripcionPushes to fetch.
+     */
+    orderBy?: SuscripcionPushOrderByWithRelationInput | SuscripcionPushOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SuscripcionPushWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SuscripcionPushes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SuscripcionPushes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SuscripcionPushes
+    **/
+    _count?: true | SuscripcionPushCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SuscripcionPushAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SuscripcionPushSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SuscripcionPushMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SuscripcionPushMaxAggregateInputType
+  }
+
+  export type GetSuscripcionPushAggregateType<T extends SuscripcionPushAggregateArgs> = {
+        [P in keyof T & keyof AggregateSuscripcionPush]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSuscripcionPush[P]>
+      : GetScalarType<T[P], AggregateSuscripcionPush[P]>
+  }
+
+
+
+
+  export type SuscripcionPushGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SuscripcionPushWhereInput
+    orderBy?: SuscripcionPushOrderByWithAggregationInput | SuscripcionPushOrderByWithAggregationInput[]
+    by: SuscripcionPushScalarFieldEnum[] | SuscripcionPushScalarFieldEnum
+    having?: SuscripcionPushScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SuscripcionPushCountAggregateInputType | true
+    _avg?: SuscripcionPushAvgAggregateInputType
+    _sum?: SuscripcionPushSumAggregateInputType
+    _min?: SuscripcionPushMinAggregateInputType
+    _max?: SuscripcionPushMaxAggregateInputType
+  }
+
+  export type SuscripcionPushGroupByOutputType = {
+    id: bigint
+    usuarioId: number
+    endpoint: string
+    p256dh: string
+    auth: string
+    fechaCreacion: Date
+    _count: SuscripcionPushCountAggregateOutputType | null
+    _avg: SuscripcionPushAvgAggregateOutputType | null
+    _sum: SuscripcionPushSumAggregateOutputType | null
+    _min: SuscripcionPushMinAggregateOutputType | null
+    _max: SuscripcionPushMaxAggregateOutputType | null
+  }
+
+  type GetSuscripcionPushGroupByPayload<T extends SuscripcionPushGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SuscripcionPushGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SuscripcionPushGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SuscripcionPushGroupByOutputType[P]>
+            : GetScalarType<T[P], SuscripcionPushGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SuscripcionPushSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    usuarioId?: boolean
+    endpoint?: boolean
+    p256dh?: boolean
+    auth?: boolean
+    fechaCreacion?: boolean
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["suscripcionPush"]>
+
+  export type SuscripcionPushSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    usuarioId?: boolean
+    endpoint?: boolean
+    p256dh?: boolean
+    auth?: boolean
+    fechaCreacion?: boolean
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["suscripcionPush"]>
+
+  export type SuscripcionPushSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    usuarioId?: boolean
+    endpoint?: boolean
+    p256dh?: boolean
+    auth?: boolean
+    fechaCreacion?: boolean
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["suscripcionPush"]>
+
+  export type SuscripcionPushSelectScalar = {
+    id?: boolean
+    usuarioId?: boolean
+    endpoint?: boolean
+    p256dh?: boolean
+    auth?: boolean
+    fechaCreacion?: boolean
+  }
+
+  export type SuscripcionPushOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "usuarioId" | "endpoint" | "p256dh" | "auth" | "fechaCreacion", ExtArgs["result"]["suscripcionPush"]>
+  export type SuscripcionPushInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }
+  export type SuscripcionPushIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }
+  export type SuscripcionPushIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }
+
+  export type $SuscripcionPushPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SuscripcionPush"
+    objects: {
+      usuario: Prisma.$UsuarioPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: bigint
+      usuarioId: number
+      endpoint: string
+      p256dh: string
+      auth: string
+      fechaCreacion: Date
+    }, ExtArgs["result"]["suscripcionPush"]>
+    composites: {}
+  }
+
+  type SuscripcionPushGetPayload<S extends boolean | null | undefined | SuscripcionPushDefaultArgs> = $Result.GetResult<Prisma.$SuscripcionPushPayload, S>
+
+  type SuscripcionPushCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SuscripcionPushFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SuscripcionPushCountAggregateInputType | true
+    }
+
+  export interface SuscripcionPushDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SuscripcionPush'], meta: { name: 'SuscripcionPush' } }
+    /**
+     * Find zero or one SuscripcionPush that matches the filter.
+     * @param {SuscripcionPushFindUniqueArgs} args - Arguments to find a SuscripcionPush
+     * @example
+     * // Get one SuscripcionPush
+     * const suscripcionPush = await prisma.suscripcionPush.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SuscripcionPushFindUniqueArgs>(args: SelectSubset<T, SuscripcionPushFindUniqueArgs<ExtArgs>>): Prisma__SuscripcionPushClient<$Result.GetResult<Prisma.$SuscripcionPushPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SuscripcionPush that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SuscripcionPushFindUniqueOrThrowArgs} args - Arguments to find a SuscripcionPush
+     * @example
+     * // Get one SuscripcionPush
+     * const suscripcionPush = await prisma.suscripcionPush.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SuscripcionPushFindUniqueOrThrowArgs>(args: SelectSubset<T, SuscripcionPushFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SuscripcionPushClient<$Result.GetResult<Prisma.$SuscripcionPushPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SuscripcionPush that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SuscripcionPushFindFirstArgs} args - Arguments to find a SuscripcionPush
+     * @example
+     * // Get one SuscripcionPush
+     * const suscripcionPush = await prisma.suscripcionPush.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SuscripcionPushFindFirstArgs>(args?: SelectSubset<T, SuscripcionPushFindFirstArgs<ExtArgs>>): Prisma__SuscripcionPushClient<$Result.GetResult<Prisma.$SuscripcionPushPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SuscripcionPush that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SuscripcionPushFindFirstOrThrowArgs} args - Arguments to find a SuscripcionPush
+     * @example
+     * // Get one SuscripcionPush
+     * const suscripcionPush = await prisma.suscripcionPush.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SuscripcionPushFindFirstOrThrowArgs>(args?: SelectSubset<T, SuscripcionPushFindFirstOrThrowArgs<ExtArgs>>): Prisma__SuscripcionPushClient<$Result.GetResult<Prisma.$SuscripcionPushPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SuscripcionPushes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SuscripcionPushFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SuscripcionPushes
+     * const suscripcionPushes = await prisma.suscripcionPush.findMany()
+     * 
+     * // Get first 10 SuscripcionPushes
+     * const suscripcionPushes = await prisma.suscripcionPush.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const suscripcionPushWithIdOnly = await prisma.suscripcionPush.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SuscripcionPushFindManyArgs>(args?: SelectSubset<T, SuscripcionPushFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SuscripcionPushPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SuscripcionPush.
+     * @param {SuscripcionPushCreateArgs} args - Arguments to create a SuscripcionPush.
+     * @example
+     * // Create one SuscripcionPush
+     * const SuscripcionPush = await prisma.suscripcionPush.create({
+     *   data: {
+     *     // ... data to create a SuscripcionPush
+     *   }
+     * })
+     * 
+     */
+    create<T extends SuscripcionPushCreateArgs>(args: SelectSubset<T, SuscripcionPushCreateArgs<ExtArgs>>): Prisma__SuscripcionPushClient<$Result.GetResult<Prisma.$SuscripcionPushPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SuscripcionPushes.
+     * @param {SuscripcionPushCreateManyArgs} args - Arguments to create many SuscripcionPushes.
+     * @example
+     * // Create many SuscripcionPushes
+     * const suscripcionPush = await prisma.suscripcionPush.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SuscripcionPushCreateManyArgs>(args?: SelectSubset<T, SuscripcionPushCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SuscripcionPushes and returns the data saved in the database.
+     * @param {SuscripcionPushCreateManyAndReturnArgs} args - Arguments to create many SuscripcionPushes.
+     * @example
+     * // Create many SuscripcionPushes
+     * const suscripcionPush = await prisma.suscripcionPush.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SuscripcionPushes and only return the `id`
+     * const suscripcionPushWithIdOnly = await prisma.suscripcionPush.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SuscripcionPushCreateManyAndReturnArgs>(args?: SelectSubset<T, SuscripcionPushCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SuscripcionPushPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SuscripcionPush.
+     * @param {SuscripcionPushDeleteArgs} args - Arguments to delete one SuscripcionPush.
+     * @example
+     * // Delete one SuscripcionPush
+     * const SuscripcionPush = await prisma.suscripcionPush.delete({
+     *   where: {
+     *     // ... filter to delete one SuscripcionPush
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SuscripcionPushDeleteArgs>(args: SelectSubset<T, SuscripcionPushDeleteArgs<ExtArgs>>): Prisma__SuscripcionPushClient<$Result.GetResult<Prisma.$SuscripcionPushPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SuscripcionPush.
+     * @param {SuscripcionPushUpdateArgs} args - Arguments to update one SuscripcionPush.
+     * @example
+     * // Update one SuscripcionPush
+     * const suscripcionPush = await prisma.suscripcionPush.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SuscripcionPushUpdateArgs>(args: SelectSubset<T, SuscripcionPushUpdateArgs<ExtArgs>>): Prisma__SuscripcionPushClient<$Result.GetResult<Prisma.$SuscripcionPushPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SuscripcionPushes.
+     * @param {SuscripcionPushDeleteManyArgs} args - Arguments to filter SuscripcionPushes to delete.
+     * @example
+     * // Delete a few SuscripcionPushes
+     * const { count } = await prisma.suscripcionPush.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SuscripcionPushDeleteManyArgs>(args?: SelectSubset<T, SuscripcionPushDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SuscripcionPushes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SuscripcionPushUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SuscripcionPushes
+     * const suscripcionPush = await prisma.suscripcionPush.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SuscripcionPushUpdateManyArgs>(args: SelectSubset<T, SuscripcionPushUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SuscripcionPushes and returns the data updated in the database.
+     * @param {SuscripcionPushUpdateManyAndReturnArgs} args - Arguments to update many SuscripcionPushes.
+     * @example
+     * // Update many SuscripcionPushes
+     * const suscripcionPush = await prisma.suscripcionPush.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SuscripcionPushes and only return the `id`
+     * const suscripcionPushWithIdOnly = await prisma.suscripcionPush.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SuscripcionPushUpdateManyAndReturnArgs>(args: SelectSubset<T, SuscripcionPushUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SuscripcionPushPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SuscripcionPush.
+     * @param {SuscripcionPushUpsertArgs} args - Arguments to update or create a SuscripcionPush.
+     * @example
+     * // Update or create a SuscripcionPush
+     * const suscripcionPush = await prisma.suscripcionPush.upsert({
+     *   create: {
+     *     // ... data to create a SuscripcionPush
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SuscripcionPush we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SuscripcionPushUpsertArgs>(args: SelectSubset<T, SuscripcionPushUpsertArgs<ExtArgs>>): Prisma__SuscripcionPushClient<$Result.GetResult<Prisma.$SuscripcionPushPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SuscripcionPushes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SuscripcionPushCountArgs} args - Arguments to filter SuscripcionPushes to count.
+     * @example
+     * // Count the number of SuscripcionPushes
+     * const count = await prisma.suscripcionPush.count({
+     *   where: {
+     *     // ... the filter for the SuscripcionPushes we want to count
+     *   }
+     * })
+    **/
+    count<T extends SuscripcionPushCountArgs>(
+      args?: Subset<T, SuscripcionPushCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SuscripcionPushCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SuscripcionPush.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SuscripcionPushAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SuscripcionPushAggregateArgs>(args: Subset<T, SuscripcionPushAggregateArgs>): Prisma.PrismaPromise<GetSuscripcionPushAggregateType<T>>
+
+    /**
+     * Group by SuscripcionPush.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SuscripcionPushGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SuscripcionPushGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SuscripcionPushGroupByArgs['orderBy'] }
+        : { orderBy?: SuscripcionPushGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SuscripcionPushGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSuscripcionPushGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SuscripcionPush model
+   */
+  readonly fields: SuscripcionPushFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SuscripcionPush.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SuscripcionPushClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    usuario<T extends UsuarioDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UsuarioDefaultArgs<ExtArgs>>): Prisma__UsuarioClient<$Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SuscripcionPush model
+   */
+  interface SuscripcionPushFieldRefs {
+    readonly id: FieldRef<"SuscripcionPush", 'BigInt'>
+    readonly usuarioId: FieldRef<"SuscripcionPush", 'Int'>
+    readonly endpoint: FieldRef<"SuscripcionPush", 'String'>
+    readonly p256dh: FieldRef<"SuscripcionPush", 'String'>
+    readonly auth: FieldRef<"SuscripcionPush", 'String'>
+    readonly fechaCreacion: FieldRef<"SuscripcionPush", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SuscripcionPush findUnique
+   */
+  export type SuscripcionPushFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SuscripcionPush
+     */
+    select?: SuscripcionPushSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SuscripcionPush
+     */
+    omit?: SuscripcionPushOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SuscripcionPushInclude<ExtArgs> | null
+    /**
+     * Filter, which SuscripcionPush to fetch.
+     */
+    where: SuscripcionPushWhereUniqueInput
+  }
+
+  /**
+   * SuscripcionPush findUniqueOrThrow
+   */
+  export type SuscripcionPushFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SuscripcionPush
+     */
+    select?: SuscripcionPushSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SuscripcionPush
+     */
+    omit?: SuscripcionPushOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SuscripcionPushInclude<ExtArgs> | null
+    /**
+     * Filter, which SuscripcionPush to fetch.
+     */
+    where: SuscripcionPushWhereUniqueInput
+  }
+
+  /**
+   * SuscripcionPush findFirst
+   */
+  export type SuscripcionPushFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SuscripcionPush
+     */
+    select?: SuscripcionPushSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SuscripcionPush
+     */
+    omit?: SuscripcionPushOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SuscripcionPushInclude<ExtArgs> | null
+    /**
+     * Filter, which SuscripcionPush to fetch.
+     */
+    where?: SuscripcionPushWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SuscripcionPushes to fetch.
+     */
+    orderBy?: SuscripcionPushOrderByWithRelationInput | SuscripcionPushOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SuscripcionPushes.
+     */
+    cursor?: SuscripcionPushWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SuscripcionPushes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SuscripcionPushes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SuscripcionPushes.
+     */
+    distinct?: SuscripcionPushScalarFieldEnum | SuscripcionPushScalarFieldEnum[]
+  }
+
+  /**
+   * SuscripcionPush findFirstOrThrow
+   */
+  export type SuscripcionPushFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SuscripcionPush
+     */
+    select?: SuscripcionPushSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SuscripcionPush
+     */
+    omit?: SuscripcionPushOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SuscripcionPushInclude<ExtArgs> | null
+    /**
+     * Filter, which SuscripcionPush to fetch.
+     */
+    where?: SuscripcionPushWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SuscripcionPushes to fetch.
+     */
+    orderBy?: SuscripcionPushOrderByWithRelationInput | SuscripcionPushOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SuscripcionPushes.
+     */
+    cursor?: SuscripcionPushWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SuscripcionPushes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SuscripcionPushes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SuscripcionPushes.
+     */
+    distinct?: SuscripcionPushScalarFieldEnum | SuscripcionPushScalarFieldEnum[]
+  }
+
+  /**
+   * SuscripcionPush findMany
+   */
+  export type SuscripcionPushFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SuscripcionPush
+     */
+    select?: SuscripcionPushSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SuscripcionPush
+     */
+    omit?: SuscripcionPushOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SuscripcionPushInclude<ExtArgs> | null
+    /**
+     * Filter, which SuscripcionPushes to fetch.
+     */
+    where?: SuscripcionPushWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SuscripcionPushes to fetch.
+     */
+    orderBy?: SuscripcionPushOrderByWithRelationInput | SuscripcionPushOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SuscripcionPushes.
+     */
+    cursor?: SuscripcionPushWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SuscripcionPushes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SuscripcionPushes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SuscripcionPushes.
+     */
+    distinct?: SuscripcionPushScalarFieldEnum | SuscripcionPushScalarFieldEnum[]
+  }
+
+  /**
+   * SuscripcionPush create
+   */
+  export type SuscripcionPushCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SuscripcionPush
+     */
+    select?: SuscripcionPushSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SuscripcionPush
+     */
+    omit?: SuscripcionPushOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SuscripcionPushInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SuscripcionPush.
+     */
+    data: XOR<SuscripcionPushCreateInput, SuscripcionPushUncheckedCreateInput>
+  }
+
+  /**
+   * SuscripcionPush createMany
+   */
+  export type SuscripcionPushCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SuscripcionPushes.
+     */
+    data: SuscripcionPushCreateManyInput | SuscripcionPushCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SuscripcionPush createManyAndReturn
+   */
+  export type SuscripcionPushCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SuscripcionPush
+     */
+    select?: SuscripcionPushSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SuscripcionPush
+     */
+    omit?: SuscripcionPushOmit<ExtArgs> | null
+    /**
+     * The data used to create many SuscripcionPushes.
+     */
+    data: SuscripcionPushCreateManyInput | SuscripcionPushCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SuscripcionPushIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SuscripcionPush update
+   */
+  export type SuscripcionPushUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SuscripcionPush
+     */
+    select?: SuscripcionPushSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SuscripcionPush
+     */
+    omit?: SuscripcionPushOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SuscripcionPushInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SuscripcionPush.
+     */
+    data: XOR<SuscripcionPushUpdateInput, SuscripcionPushUncheckedUpdateInput>
+    /**
+     * Choose, which SuscripcionPush to update.
+     */
+    where: SuscripcionPushWhereUniqueInput
+  }
+
+  /**
+   * SuscripcionPush updateMany
+   */
+  export type SuscripcionPushUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SuscripcionPushes.
+     */
+    data: XOR<SuscripcionPushUpdateManyMutationInput, SuscripcionPushUncheckedUpdateManyInput>
+    /**
+     * Filter which SuscripcionPushes to update
+     */
+    where?: SuscripcionPushWhereInput
+    /**
+     * Limit how many SuscripcionPushes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SuscripcionPush updateManyAndReturn
+   */
+  export type SuscripcionPushUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SuscripcionPush
+     */
+    select?: SuscripcionPushSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SuscripcionPush
+     */
+    omit?: SuscripcionPushOmit<ExtArgs> | null
+    /**
+     * The data used to update SuscripcionPushes.
+     */
+    data: XOR<SuscripcionPushUpdateManyMutationInput, SuscripcionPushUncheckedUpdateManyInput>
+    /**
+     * Filter which SuscripcionPushes to update
+     */
+    where?: SuscripcionPushWhereInput
+    /**
+     * Limit how many SuscripcionPushes to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SuscripcionPushIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SuscripcionPush upsert
+   */
+  export type SuscripcionPushUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SuscripcionPush
+     */
+    select?: SuscripcionPushSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SuscripcionPush
+     */
+    omit?: SuscripcionPushOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SuscripcionPushInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SuscripcionPush to update in case it exists.
+     */
+    where: SuscripcionPushWhereUniqueInput
+    /**
+     * In case the SuscripcionPush found by the `where` argument doesn't exist, create a new SuscripcionPush with this data.
+     */
+    create: XOR<SuscripcionPushCreateInput, SuscripcionPushUncheckedCreateInput>
+    /**
+     * In case the SuscripcionPush was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SuscripcionPushUpdateInput, SuscripcionPushUncheckedUpdateInput>
+  }
+
+  /**
+   * SuscripcionPush delete
+   */
+  export type SuscripcionPushDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SuscripcionPush
+     */
+    select?: SuscripcionPushSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SuscripcionPush
+     */
+    omit?: SuscripcionPushOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SuscripcionPushInclude<ExtArgs> | null
+    /**
+     * Filter which SuscripcionPush to delete.
+     */
+    where: SuscripcionPushWhereUniqueInput
+  }
+
+  /**
+   * SuscripcionPush deleteMany
+   */
+  export type SuscripcionPushDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SuscripcionPushes to delete
+     */
+    where?: SuscripcionPushWhereInput
+    /**
+     * Limit how many SuscripcionPushes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SuscripcionPush without action
+   */
+  export type SuscripcionPushDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SuscripcionPush
+     */
+    select?: SuscripcionPushSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SuscripcionPush
+     */
+    omit?: SuscripcionPushOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SuscripcionPushInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -20350,6 +21592,18 @@ export namespace Prisma {
   export type NotificacionScalarFieldEnum = (typeof NotificacionScalarFieldEnum)[keyof typeof NotificacionScalarFieldEnum]
 
 
+  export const SuscripcionPushScalarFieldEnum: {
+    id: 'id',
+    usuarioId: 'usuarioId',
+    endpoint: 'endpoint',
+    p256dh: 'p256dh',
+    auth: 'auth',
+    fechaCreacion: 'fechaCreacion'
+  };
+
+  export type SuscripcionPushScalarFieldEnum = (typeof SuscripcionPushScalarFieldEnum)[keyof typeof SuscripcionPushScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -20555,6 +21809,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'BigInt'
+   */
+  export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
+    
+
+
+  /**
+   * Reference to a field of type 'BigInt[]'
+   */
+  export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -20587,6 +21855,7 @@ export namespace Prisma {
     solicitudes?: SolicitudListRelationFilter
     calificaciones?: CalificacionListRelationFilter
     pagos?: PagoListRelationFilter
+    suscripcionesPush?: SuscripcionPushListRelationFilter
   }
 
   export type UsuarioOrderByWithRelationInput = {
@@ -20602,6 +21871,7 @@ export namespace Prisma {
     solicitudes?: SolicitudOrderByRelationAggregateInput
     calificaciones?: CalificacionOrderByRelationAggregateInput
     pagos?: PagoOrderByRelationAggregateInput
+    suscripcionesPush?: SuscripcionPushOrderByRelationAggregateInput
   }
 
   export type UsuarioWhereUniqueInput = Prisma.AtLeast<{
@@ -20620,6 +21890,7 @@ export namespace Prisma {
     solicitudes?: SolicitudListRelationFilter
     calificaciones?: CalificacionListRelationFilter
     pagos?: PagoListRelationFilter
+    suscripcionesPush?: SuscripcionPushListRelationFilter
   }, "id" | "correo">
 
   export type UsuarioOrderByWithAggregationInput = {
@@ -21659,6 +22930,68 @@ export namespace Prisma {
     fechaCreacion?: DateTimeWithAggregatesFilter<"Notificacion"> | Date | string
   }
 
+  export type SuscripcionPushWhereInput = {
+    AND?: SuscripcionPushWhereInput | SuscripcionPushWhereInput[]
+    OR?: SuscripcionPushWhereInput[]
+    NOT?: SuscripcionPushWhereInput | SuscripcionPushWhereInput[]
+    id?: BigIntFilter<"SuscripcionPush"> | bigint | number
+    usuarioId?: IntFilter<"SuscripcionPush"> | number
+    endpoint?: StringFilter<"SuscripcionPush"> | string
+    p256dh?: StringFilter<"SuscripcionPush"> | string
+    auth?: StringFilter<"SuscripcionPush"> | string
+    fechaCreacion?: DateTimeFilter<"SuscripcionPush"> | Date | string
+    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
+  }
+
+  export type SuscripcionPushOrderByWithRelationInput = {
+    id?: SortOrder
+    usuarioId?: SortOrder
+    endpoint?: SortOrder
+    p256dh?: SortOrder
+    auth?: SortOrder
+    fechaCreacion?: SortOrder
+    usuario?: UsuarioOrderByWithRelationInput
+  }
+
+  export type SuscripcionPushWhereUniqueInput = Prisma.AtLeast<{
+    id?: bigint | number
+    endpoint?: string
+    AND?: SuscripcionPushWhereInput | SuscripcionPushWhereInput[]
+    OR?: SuscripcionPushWhereInput[]
+    NOT?: SuscripcionPushWhereInput | SuscripcionPushWhereInput[]
+    usuarioId?: IntFilter<"SuscripcionPush"> | number
+    p256dh?: StringFilter<"SuscripcionPush"> | string
+    auth?: StringFilter<"SuscripcionPush"> | string
+    fechaCreacion?: DateTimeFilter<"SuscripcionPush"> | Date | string
+    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
+  }, "id" | "endpoint">
+
+  export type SuscripcionPushOrderByWithAggregationInput = {
+    id?: SortOrder
+    usuarioId?: SortOrder
+    endpoint?: SortOrder
+    p256dh?: SortOrder
+    auth?: SortOrder
+    fechaCreacion?: SortOrder
+    _count?: SuscripcionPushCountOrderByAggregateInput
+    _avg?: SuscripcionPushAvgOrderByAggregateInput
+    _max?: SuscripcionPushMaxOrderByAggregateInput
+    _min?: SuscripcionPushMinOrderByAggregateInput
+    _sum?: SuscripcionPushSumOrderByAggregateInput
+  }
+
+  export type SuscripcionPushScalarWhereWithAggregatesInput = {
+    AND?: SuscripcionPushScalarWhereWithAggregatesInput | SuscripcionPushScalarWhereWithAggregatesInput[]
+    OR?: SuscripcionPushScalarWhereWithAggregatesInput[]
+    NOT?: SuscripcionPushScalarWhereWithAggregatesInput | SuscripcionPushScalarWhereWithAggregatesInput[]
+    id?: BigIntWithAggregatesFilter<"SuscripcionPush"> | bigint | number
+    usuarioId?: IntWithAggregatesFilter<"SuscripcionPush"> | number
+    endpoint?: StringWithAggregatesFilter<"SuscripcionPush"> | string
+    p256dh?: StringWithAggregatesFilter<"SuscripcionPush"> | string
+    auth?: StringWithAggregatesFilter<"SuscripcionPush"> | string
+    fechaCreacion?: DateTimeWithAggregatesFilter<"SuscripcionPush"> | Date | string
+  }
+
   export type UsuarioCreateInput = {
     nombre: string
     correo: string
@@ -21671,6 +23004,7 @@ export namespace Prisma {
     solicitudes?: SolicitudCreateNestedManyWithoutClienteInput
     calificaciones?: CalificacionCreateNestedManyWithoutClienteInput
     pagos?: PagoCreateNestedManyWithoutClienteInput
+    suscripcionesPush?: SuscripcionPushCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateInput = {
@@ -21686,6 +23020,7 @@ export namespace Prisma {
     solicitudes?: SolicitudUncheckedCreateNestedManyWithoutClienteInput
     calificaciones?: CalificacionUncheckedCreateNestedManyWithoutClienteInput
     pagos?: PagoUncheckedCreateNestedManyWithoutClienteInput
+    suscripcionesPush?: SuscripcionPushUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUpdateInput = {
@@ -21700,6 +23035,7 @@ export namespace Prisma {
     solicitudes?: SolicitudUpdateManyWithoutClienteNestedInput
     calificaciones?: CalificacionUpdateManyWithoutClienteNestedInput
     pagos?: PagoUpdateManyWithoutClienteNestedInput
+    suscripcionesPush?: SuscripcionPushUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateInput = {
@@ -21715,6 +23051,7 @@ export namespace Prisma {
     solicitudes?: SolicitudUncheckedUpdateManyWithoutClienteNestedInput
     calificaciones?: CalificacionUncheckedUpdateManyWithoutClienteNestedInput
     pagos?: PagoUncheckedUpdateManyWithoutClienteNestedInput
+    suscripcionesPush?: SuscripcionPushUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioCreateManyInput = {
@@ -22727,6 +24064,68 @@ export namespace Prisma {
     fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SuscripcionPushCreateInput = {
+    id?: bigint | number
+    endpoint: string
+    p256dh: string
+    auth: string
+    fechaCreacion?: Date | string
+    usuario: UsuarioCreateNestedOneWithoutSuscripcionesPushInput
+  }
+
+  export type SuscripcionPushUncheckedCreateInput = {
+    id?: bigint | number
+    usuarioId: number
+    endpoint: string
+    p256dh: string
+    auth: string
+    fechaCreacion?: Date | string
+  }
+
+  export type SuscripcionPushUpdateInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    endpoint?: StringFieldUpdateOperationsInput | string
+    p256dh?: StringFieldUpdateOperationsInput | string
+    auth?: StringFieldUpdateOperationsInput | string
+    fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    usuario?: UsuarioUpdateOneRequiredWithoutSuscripcionesPushNestedInput
+  }
+
+  export type SuscripcionPushUncheckedUpdateInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    usuarioId?: IntFieldUpdateOperationsInput | number
+    endpoint?: StringFieldUpdateOperationsInput | string
+    p256dh?: StringFieldUpdateOperationsInput | string
+    auth?: StringFieldUpdateOperationsInput | string
+    fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SuscripcionPushCreateManyInput = {
+    id?: bigint | number
+    usuarioId: number
+    endpoint: string
+    p256dh: string
+    auth: string
+    fechaCreacion?: Date | string
+  }
+
+  export type SuscripcionPushUpdateManyMutationInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    endpoint?: StringFieldUpdateOperationsInput | string
+    p256dh?: StringFieldUpdateOperationsInput | string
+    auth?: StringFieldUpdateOperationsInput | string
+    fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SuscripcionPushUncheckedUpdateManyInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    usuarioId?: IntFieldUpdateOperationsInput | number
+    endpoint?: StringFieldUpdateOperationsInput | string
+    p256dh?: StringFieldUpdateOperationsInput | string
+    auth?: StringFieldUpdateOperationsInput | string
+    fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -22808,6 +24207,12 @@ export namespace Prisma {
     none?: PagoWhereInput
   }
 
+  export type SuscripcionPushListRelationFilter = {
+    every?: SuscripcionPushWhereInput
+    some?: SuscripcionPushWhereInput
+    none?: SuscripcionPushWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -22826,6 +24231,10 @@ export namespace Prisma {
   }
 
   export type PagoOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SuscripcionPushOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -23902,6 +25311,70 @@ export namespace Prisma {
     _max?: NestedEnumTipoNotificacionFilter<$PrismaModel>
   }
 
+  export type BigIntFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntFilter<$PrismaModel> | bigint | number
+  }
+
+  export type SuscripcionPushCountOrderByAggregateInput = {
+    id?: SortOrder
+    usuarioId?: SortOrder
+    endpoint?: SortOrder
+    p256dh?: SortOrder
+    auth?: SortOrder
+    fechaCreacion?: SortOrder
+  }
+
+  export type SuscripcionPushAvgOrderByAggregateInput = {
+    id?: SortOrder
+    usuarioId?: SortOrder
+  }
+
+  export type SuscripcionPushMaxOrderByAggregateInput = {
+    id?: SortOrder
+    usuarioId?: SortOrder
+    endpoint?: SortOrder
+    p256dh?: SortOrder
+    auth?: SortOrder
+    fechaCreacion?: SortOrder
+  }
+
+  export type SuscripcionPushMinOrderByAggregateInput = {
+    id?: SortOrder
+    usuarioId?: SortOrder
+    endpoint?: SortOrder
+    p256dh?: SortOrder
+    auth?: SortOrder
+    fechaCreacion?: SortOrder
+  }
+
+  export type SuscripcionPushSumOrderByAggregateInput = {
+    id?: SortOrder
+    usuarioId?: SortOrder
+  }
+
+  export type BigIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedBigIntFilter<$PrismaModel>
+    _min?: NestedBigIntFilter<$PrismaModel>
+    _max?: NestedBigIntFilter<$PrismaModel>
+  }
+
   export type DireccionCreateNestedManyWithoutUsuarioInput = {
     create?: XOR<DireccionCreateWithoutUsuarioInput, DireccionUncheckedCreateWithoutUsuarioInput> | DireccionCreateWithoutUsuarioInput[] | DireccionUncheckedCreateWithoutUsuarioInput[]
     connectOrCreate?: DireccionCreateOrConnectWithoutUsuarioInput | DireccionCreateOrConnectWithoutUsuarioInput[]
@@ -23930,6 +25403,13 @@ export namespace Prisma {
     connect?: PagoWhereUniqueInput | PagoWhereUniqueInput[]
   }
 
+  export type SuscripcionPushCreateNestedManyWithoutUsuarioInput = {
+    create?: XOR<SuscripcionPushCreateWithoutUsuarioInput, SuscripcionPushUncheckedCreateWithoutUsuarioInput> | SuscripcionPushCreateWithoutUsuarioInput[] | SuscripcionPushUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: SuscripcionPushCreateOrConnectWithoutUsuarioInput | SuscripcionPushCreateOrConnectWithoutUsuarioInput[]
+    createMany?: SuscripcionPushCreateManyUsuarioInputEnvelope
+    connect?: SuscripcionPushWhereUniqueInput | SuscripcionPushWhereUniqueInput[]
+  }
+
   export type DireccionUncheckedCreateNestedManyWithoutUsuarioInput = {
     create?: XOR<DireccionCreateWithoutUsuarioInput, DireccionUncheckedCreateWithoutUsuarioInput> | DireccionCreateWithoutUsuarioInput[] | DireccionUncheckedCreateWithoutUsuarioInput[]
     connectOrCreate?: DireccionCreateOrConnectWithoutUsuarioInput | DireccionCreateOrConnectWithoutUsuarioInput[]
@@ -23956,6 +25436,13 @@ export namespace Prisma {
     connectOrCreate?: PagoCreateOrConnectWithoutClienteInput | PagoCreateOrConnectWithoutClienteInput[]
     createMany?: PagoCreateManyClienteInputEnvelope
     connect?: PagoWhereUniqueInput | PagoWhereUniqueInput[]
+  }
+
+  export type SuscripcionPushUncheckedCreateNestedManyWithoutUsuarioInput = {
+    create?: XOR<SuscripcionPushCreateWithoutUsuarioInput, SuscripcionPushUncheckedCreateWithoutUsuarioInput> | SuscripcionPushCreateWithoutUsuarioInput[] | SuscripcionPushUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: SuscripcionPushCreateOrConnectWithoutUsuarioInput | SuscripcionPushCreateOrConnectWithoutUsuarioInput[]
+    createMany?: SuscripcionPushCreateManyUsuarioInputEnvelope
+    connect?: SuscripcionPushWhereUniqueInput | SuscripcionPushWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -24030,6 +25517,20 @@ export namespace Prisma {
     deleteMany?: PagoScalarWhereInput | PagoScalarWhereInput[]
   }
 
+  export type SuscripcionPushUpdateManyWithoutUsuarioNestedInput = {
+    create?: XOR<SuscripcionPushCreateWithoutUsuarioInput, SuscripcionPushUncheckedCreateWithoutUsuarioInput> | SuscripcionPushCreateWithoutUsuarioInput[] | SuscripcionPushUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: SuscripcionPushCreateOrConnectWithoutUsuarioInput | SuscripcionPushCreateOrConnectWithoutUsuarioInput[]
+    upsert?: SuscripcionPushUpsertWithWhereUniqueWithoutUsuarioInput | SuscripcionPushUpsertWithWhereUniqueWithoutUsuarioInput[]
+    createMany?: SuscripcionPushCreateManyUsuarioInputEnvelope
+    set?: SuscripcionPushWhereUniqueInput | SuscripcionPushWhereUniqueInput[]
+    disconnect?: SuscripcionPushWhereUniqueInput | SuscripcionPushWhereUniqueInput[]
+    delete?: SuscripcionPushWhereUniqueInput | SuscripcionPushWhereUniqueInput[]
+    connect?: SuscripcionPushWhereUniqueInput | SuscripcionPushWhereUniqueInput[]
+    update?: SuscripcionPushUpdateWithWhereUniqueWithoutUsuarioInput | SuscripcionPushUpdateWithWhereUniqueWithoutUsuarioInput[]
+    updateMany?: SuscripcionPushUpdateManyWithWhereWithoutUsuarioInput | SuscripcionPushUpdateManyWithWhereWithoutUsuarioInput[]
+    deleteMany?: SuscripcionPushScalarWhereInput | SuscripcionPushScalarWhereInput[]
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -24092,6 +25593,20 @@ export namespace Prisma {
     update?: PagoUpdateWithWhereUniqueWithoutClienteInput | PagoUpdateWithWhereUniqueWithoutClienteInput[]
     updateMany?: PagoUpdateManyWithWhereWithoutClienteInput | PagoUpdateManyWithWhereWithoutClienteInput[]
     deleteMany?: PagoScalarWhereInput | PagoScalarWhereInput[]
+  }
+
+  export type SuscripcionPushUncheckedUpdateManyWithoutUsuarioNestedInput = {
+    create?: XOR<SuscripcionPushCreateWithoutUsuarioInput, SuscripcionPushUncheckedCreateWithoutUsuarioInput> | SuscripcionPushCreateWithoutUsuarioInput[] | SuscripcionPushUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: SuscripcionPushCreateOrConnectWithoutUsuarioInput | SuscripcionPushCreateOrConnectWithoutUsuarioInput[]
+    upsert?: SuscripcionPushUpsertWithWhereUniqueWithoutUsuarioInput | SuscripcionPushUpsertWithWhereUniqueWithoutUsuarioInput[]
+    createMany?: SuscripcionPushCreateManyUsuarioInputEnvelope
+    set?: SuscripcionPushWhereUniqueInput | SuscripcionPushWhereUniqueInput[]
+    disconnect?: SuscripcionPushWhereUniqueInput | SuscripcionPushWhereUniqueInput[]
+    delete?: SuscripcionPushWhereUniqueInput | SuscripcionPushWhereUniqueInput[]
+    connect?: SuscripcionPushWhereUniqueInput | SuscripcionPushWhereUniqueInput[]
+    update?: SuscripcionPushUpdateWithWhereUniqueWithoutUsuarioInput | SuscripcionPushUpdateWithWhereUniqueWithoutUsuarioInput[]
+    updateMany?: SuscripcionPushUpdateManyWithWhereWithoutUsuarioInput | SuscripcionPushUpdateManyWithWhereWithoutUsuarioInput[]
+    deleteMany?: SuscripcionPushScalarWhereInput | SuscripcionPushScalarWhereInput[]
   }
 
   export type TrabajadorEspecialidadCreateNestedManyWithoutTrabajadorInput = {
@@ -25201,6 +26716,28 @@ export namespace Prisma {
     set?: $Enums.TipoNotificacion
   }
 
+  export type UsuarioCreateNestedOneWithoutSuscripcionesPushInput = {
+    create?: XOR<UsuarioCreateWithoutSuscripcionesPushInput, UsuarioUncheckedCreateWithoutSuscripcionesPushInput>
+    connectOrCreate?: UsuarioCreateOrConnectWithoutSuscripcionesPushInput
+    connect?: UsuarioWhereUniqueInput
+  }
+
+  export type BigIntFieldUpdateOperationsInput = {
+    set?: bigint | number
+    increment?: bigint | number
+    decrement?: bigint | number
+    multiply?: bigint | number
+    divide?: bigint | number
+  }
+
+  export type UsuarioUpdateOneRequiredWithoutSuscripcionesPushNestedInput = {
+    create?: XOR<UsuarioCreateWithoutSuscripcionesPushInput, UsuarioUncheckedCreateWithoutSuscripcionesPushInput>
+    connectOrCreate?: UsuarioCreateOrConnectWithoutSuscripcionesPushInput
+    upsert?: UsuarioUpsertWithoutSuscripcionesPushInput
+    connect?: UsuarioWhereUniqueInput
+    update?: XOR<XOR<UsuarioUpdateToOneWithWhereWithoutSuscripcionesPushInput, UsuarioUpdateWithoutSuscripcionesPushInput>, UsuarioUncheckedUpdateWithoutSuscripcionesPushInput>
+  }
+
   export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -25592,6 +27129,33 @@ export namespace Prisma {
     _max?: NestedEnumTipoNotificacionFilter<$PrismaModel>
   }
 
+  export type NestedBigIntFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntFilter<$PrismaModel> | bigint | number
+  }
+
+  export type NestedBigIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedBigIntFilter<$PrismaModel>
+    _min?: NestedBigIntFilter<$PrismaModel>
+    _max?: NestedBigIntFilter<$PrismaModel>
+  }
+
   export type DireccionCreateWithoutUsuarioInput = {
     alias?: string | null
     calle: string
@@ -25728,6 +27292,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type SuscripcionPushCreateWithoutUsuarioInput = {
+    id?: bigint | number
+    endpoint: string
+    p256dh: string
+    auth: string
+    fechaCreacion?: Date | string
+  }
+
+  export type SuscripcionPushUncheckedCreateWithoutUsuarioInput = {
+    id?: bigint | number
+    endpoint: string
+    p256dh: string
+    auth: string
+    fechaCreacion?: Date | string
+  }
+
+  export type SuscripcionPushCreateOrConnectWithoutUsuarioInput = {
+    where: SuscripcionPushWhereUniqueInput
+    create: XOR<SuscripcionPushCreateWithoutUsuarioInput, SuscripcionPushUncheckedCreateWithoutUsuarioInput>
+  }
+
+  export type SuscripcionPushCreateManyUsuarioInputEnvelope = {
+    data: SuscripcionPushCreateManyUsuarioInput | SuscripcionPushCreateManyUsuarioInput[]
+    skipDuplicates?: boolean
+  }
+
   export type DireccionUpsertWithWhereUniqueWithoutUsuarioInput = {
     where: DireccionWhereUniqueInput
     update: XOR<DireccionUpdateWithoutUsuarioInput, DireccionUncheckedUpdateWithoutUsuarioInput>
@@ -25850,6 +27440,34 @@ export namespace Prisma {
     metodoPago?: EnumMetodoPagoFilter<"Pago"> | $Enums.MetodoPago
     estado?: EnumEstadoPagoFilter<"Pago"> | $Enums.EstadoPago
     fechaPago?: DateTimeFilter<"Pago"> | Date | string
+  }
+
+  export type SuscripcionPushUpsertWithWhereUniqueWithoutUsuarioInput = {
+    where: SuscripcionPushWhereUniqueInput
+    update: XOR<SuscripcionPushUpdateWithoutUsuarioInput, SuscripcionPushUncheckedUpdateWithoutUsuarioInput>
+    create: XOR<SuscripcionPushCreateWithoutUsuarioInput, SuscripcionPushUncheckedCreateWithoutUsuarioInput>
+  }
+
+  export type SuscripcionPushUpdateWithWhereUniqueWithoutUsuarioInput = {
+    where: SuscripcionPushWhereUniqueInput
+    data: XOR<SuscripcionPushUpdateWithoutUsuarioInput, SuscripcionPushUncheckedUpdateWithoutUsuarioInput>
+  }
+
+  export type SuscripcionPushUpdateManyWithWhereWithoutUsuarioInput = {
+    where: SuscripcionPushScalarWhereInput
+    data: XOR<SuscripcionPushUpdateManyMutationInput, SuscripcionPushUncheckedUpdateManyWithoutUsuarioInput>
+  }
+
+  export type SuscripcionPushScalarWhereInput = {
+    AND?: SuscripcionPushScalarWhereInput | SuscripcionPushScalarWhereInput[]
+    OR?: SuscripcionPushScalarWhereInput[]
+    NOT?: SuscripcionPushScalarWhereInput | SuscripcionPushScalarWhereInput[]
+    id?: BigIntFilter<"SuscripcionPush"> | bigint | number
+    usuarioId?: IntFilter<"SuscripcionPush"> | number
+    endpoint?: StringFilter<"SuscripcionPush"> | string
+    p256dh?: StringFilter<"SuscripcionPush"> | string
+    auth?: StringFilter<"SuscripcionPush"> | string
+    fechaCreacion?: DateTimeFilter<"SuscripcionPush"> | Date | string
   }
 
   export type TrabajadorEspecialidadCreateWithoutTrabajadorInput = {
@@ -26868,6 +28486,7 @@ export namespace Prisma {
     direcciones?: DireccionCreateNestedManyWithoutUsuarioInput
     calificaciones?: CalificacionCreateNestedManyWithoutClienteInput
     pagos?: PagoCreateNestedManyWithoutClienteInput
+    suscripcionesPush?: SuscripcionPushCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutSolicitudesInput = {
@@ -26882,6 +28501,7 @@ export namespace Prisma {
     direcciones?: DireccionUncheckedCreateNestedManyWithoutUsuarioInput
     calificaciones?: CalificacionUncheckedCreateNestedManyWithoutClienteInput
     pagos?: PagoUncheckedCreateNestedManyWithoutClienteInput
+    suscripcionesPush?: SuscripcionPushUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutSolicitudesInput = {
@@ -27109,6 +28729,7 @@ export namespace Prisma {
     direcciones?: DireccionUpdateManyWithoutUsuarioNestedInput
     calificaciones?: CalificacionUpdateManyWithoutClienteNestedInput
     pagos?: PagoUpdateManyWithoutClienteNestedInput
+    suscripcionesPush?: SuscripcionPushUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutSolicitudesInput = {
@@ -27123,6 +28744,7 @@ export namespace Prisma {
     direcciones?: DireccionUncheckedUpdateManyWithoutUsuarioNestedInput
     calificaciones?: CalificacionUncheckedUpdateManyWithoutClienteNestedInput
     pagos?: PagoUncheckedUpdateManyWithoutClienteNestedInput
+    suscripcionesPush?: SuscripcionPushUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type TrabajadorUpsertWithoutSolicitudesInput = {
@@ -27634,6 +29256,7 @@ export namespace Prisma {
     solicitudes?: SolicitudCreateNestedManyWithoutClienteInput
     calificaciones?: CalificacionCreateNestedManyWithoutClienteInput
     pagos?: PagoCreateNestedManyWithoutClienteInput
+    suscripcionesPush?: SuscripcionPushCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutDireccionesInput = {
@@ -27648,6 +29271,7 @@ export namespace Prisma {
     solicitudes?: SolicitudUncheckedCreateNestedManyWithoutClienteInput
     calificaciones?: CalificacionUncheckedCreateNestedManyWithoutClienteInput
     pagos?: PagoUncheckedCreateNestedManyWithoutClienteInput
+    suscripcionesPush?: SuscripcionPushUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutDireccionesInput = {
@@ -27722,6 +29346,7 @@ export namespace Prisma {
     solicitudes?: SolicitudUpdateManyWithoutClienteNestedInput
     calificaciones?: CalificacionUpdateManyWithoutClienteNestedInput
     pagos?: PagoUpdateManyWithoutClienteNestedInput
+    suscripcionesPush?: SuscripcionPushUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutDireccionesInput = {
@@ -27736,6 +29361,7 @@ export namespace Prisma {
     solicitudes?: SolicitudUncheckedUpdateManyWithoutClienteNestedInput
     calificaciones?: CalificacionUncheckedUpdateManyWithoutClienteNestedInput
     pagos?: PagoUncheckedUpdateManyWithoutClienteNestedInput
+    suscripcionesPush?: SuscripcionPushUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type SolicitudUpsertWithWhereUniqueWithoutDireccionInput = {
@@ -27805,6 +29431,7 @@ export namespace Prisma {
     direcciones?: DireccionCreateNestedManyWithoutUsuarioInput
     solicitudes?: SolicitudCreateNestedManyWithoutClienteInput
     pagos?: PagoCreateNestedManyWithoutClienteInput
+    suscripcionesPush?: SuscripcionPushCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutCalificacionesInput = {
@@ -27819,6 +29446,7 @@ export namespace Prisma {
     direcciones?: DireccionUncheckedCreateNestedManyWithoutUsuarioInput
     solicitudes?: SolicitudUncheckedCreateNestedManyWithoutClienteInput
     pagos?: PagoUncheckedCreateNestedManyWithoutClienteInput
+    suscripcionesPush?: SuscripcionPushUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutCalificacionesInput = {
@@ -27942,6 +29570,7 @@ export namespace Prisma {
     direcciones?: DireccionUpdateManyWithoutUsuarioNestedInput
     solicitudes?: SolicitudUpdateManyWithoutClienteNestedInput
     pagos?: PagoUpdateManyWithoutClienteNestedInput
+    suscripcionesPush?: SuscripcionPushUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutCalificacionesInput = {
@@ -27956,6 +29585,7 @@ export namespace Prisma {
     direcciones?: DireccionUncheckedUpdateManyWithoutUsuarioNestedInput
     solicitudes?: SolicitudUncheckedUpdateManyWithoutClienteNestedInput
     pagos?: PagoUncheckedUpdateManyWithoutClienteNestedInput
+    suscripcionesPush?: SuscripcionPushUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type TrabajadorUpsertWithoutCalificacionesInput = {
@@ -28251,6 +29881,7 @@ export namespace Prisma {
     direcciones?: DireccionCreateNestedManyWithoutUsuarioInput
     solicitudes?: SolicitudCreateNestedManyWithoutClienteInput
     calificaciones?: CalificacionCreateNestedManyWithoutClienteInput
+    suscripcionesPush?: SuscripcionPushCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutPagosInput = {
@@ -28265,6 +29896,7 @@ export namespace Prisma {
     direcciones?: DireccionUncheckedCreateNestedManyWithoutUsuarioInput
     solicitudes?: SolicitudUncheckedCreateNestedManyWithoutClienteInput
     calificaciones?: CalificacionUncheckedCreateNestedManyWithoutClienteInput
+    suscripcionesPush?: SuscripcionPushUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutPagosInput = {
@@ -28406,6 +30038,7 @@ export namespace Prisma {
     direcciones?: DireccionUpdateManyWithoutUsuarioNestedInput
     solicitudes?: SolicitudUpdateManyWithoutClienteNestedInput
     calificaciones?: CalificacionUpdateManyWithoutClienteNestedInput
+    suscripcionesPush?: SuscripcionPushUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutPagosInput = {
@@ -28420,6 +30053,7 @@ export namespace Prisma {
     direcciones?: DireccionUncheckedUpdateManyWithoutUsuarioNestedInput
     solicitudes?: SolicitudUncheckedUpdateManyWithoutClienteNestedInput
     calificaciones?: CalificacionUncheckedUpdateManyWithoutClienteNestedInput
+    suscripcionesPush?: SuscripcionPushUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type TrabajadorUpsertWithoutPagosInput = {
@@ -28558,6 +30192,80 @@ export namespace Prisma {
     fechaPago?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type UsuarioCreateWithoutSuscripcionesPushInput = {
+    nombre: string
+    correo: string
+    telefono?: string | null
+    contrasenaHash: string
+    fotoPerfil?: string | null
+    fechaRegistro?: Date | string
+    activo?: boolean
+    direcciones?: DireccionCreateNestedManyWithoutUsuarioInput
+    solicitudes?: SolicitudCreateNestedManyWithoutClienteInput
+    calificaciones?: CalificacionCreateNestedManyWithoutClienteInput
+    pagos?: PagoCreateNestedManyWithoutClienteInput
+  }
+
+  export type UsuarioUncheckedCreateWithoutSuscripcionesPushInput = {
+    id?: number
+    nombre: string
+    correo: string
+    telefono?: string | null
+    contrasenaHash: string
+    fotoPerfil?: string | null
+    fechaRegistro?: Date | string
+    activo?: boolean
+    direcciones?: DireccionUncheckedCreateNestedManyWithoutUsuarioInput
+    solicitudes?: SolicitudUncheckedCreateNestedManyWithoutClienteInput
+    calificaciones?: CalificacionUncheckedCreateNestedManyWithoutClienteInput
+    pagos?: PagoUncheckedCreateNestedManyWithoutClienteInput
+  }
+
+  export type UsuarioCreateOrConnectWithoutSuscripcionesPushInput = {
+    where: UsuarioWhereUniqueInput
+    create: XOR<UsuarioCreateWithoutSuscripcionesPushInput, UsuarioUncheckedCreateWithoutSuscripcionesPushInput>
+  }
+
+  export type UsuarioUpsertWithoutSuscripcionesPushInput = {
+    update: XOR<UsuarioUpdateWithoutSuscripcionesPushInput, UsuarioUncheckedUpdateWithoutSuscripcionesPushInput>
+    create: XOR<UsuarioCreateWithoutSuscripcionesPushInput, UsuarioUncheckedCreateWithoutSuscripcionesPushInput>
+    where?: UsuarioWhereInput
+  }
+
+  export type UsuarioUpdateToOneWithWhereWithoutSuscripcionesPushInput = {
+    where?: UsuarioWhereInput
+    data: XOR<UsuarioUpdateWithoutSuscripcionesPushInput, UsuarioUncheckedUpdateWithoutSuscripcionesPushInput>
+  }
+
+  export type UsuarioUpdateWithoutSuscripcionesPushInput = {
+    nombre?: StringFieldUpdateOperationsInput | string
+    correo?: StringFieldUpdateOperationsInput | string
+    telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    contrasenaHash?: StringFieldUpdateOperationsInput | string
+    fotoPerfil?: NullableStringFieldUpdateOperationsInput | string | null
+    fechaRegistro?: DateTimeFieldUpdateOperationsInput | Date | string
+    activo?: BoolFieldUpdateOperationsInput | boolean
+    direcciones?: DireccionUpdateManyWithoutUsuarioNestedInput
+    solicitudes?: SolicitudUpdateManyWithoutClienteNestedInput
+    calificaciones?: CalificacionUpdateManyWithoutClienteNestedInput
+    pagos?: PagoUpdateManyWithoutClienteNestedInput
+  }
+
+  export type UsuarioUncheckedUpdateWithoutSuscripcionesPushInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    nombre?: StringFieldUpdateOperationsInput | string
+    correo?: StringFieldUpdateOperationsInput | string
+    telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    contrasenaHash?: StringFieldUpdateOperationsInput | string
+    fotoPerfil?: NullableStringFieldUpdateOperationsInput | string | null
+    fechaRegistro?: DateTimeFieldUpdateOperationsInput | Date | string
+    activo?: BoolFieldUpdateOperationsInput | boolean
+    direcciones?: DireccionUncheckedUpdateManyWithoutUsuarioNestedInput
+    solicitudes?: SolicitudUncheckedUpdateManyWithoutClienteNestedInput
+    calificaciones?: CalificacionUncheckedUpdateManyWithoutClienteNestedInput
+    pagos?: PagoUncheckedUpdateManyWithoutClienteNestedInput
+  }
+
   export type DireccionCreateManyUsuarioInput = {
     id?: number
     alias?: string | null
@@ -28600,6 +30308,14 @@ export namespace Prisma {
     metodoPago: $Enums.MetodoPago
     estado?: $Enums.EstadoPago
     fechaPago?: Date | string
+  }
+
+  export type SuscripcionPushCreateManyUsuarioInput = {
+    id?: bigint | number
+    endpoint: string
+    p256dh: string
+    auth: string
+    fechaCreacion?: Date | string
   }
 
   export type DireccionUpdateWithoutUsuarioInput = {
@@ -28740,6 +30456,30 @@ export namespace Prisma {
     metodoPago?: EnumMetodoPagoFieldUpdateOperationsInput | $Enums.MetodoPago
     estado?: EnumEstadoPagoFieldUpdateOperationsInput | $Enums.EstadoPago
     fechaPago?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SuscripcionPushUpdateWithoutUsuarioInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    endpoint?: StringFieldUpdateOperationsInput | string
+    p256dh?: StringFieldUpdateOperationsInput | string
+    auth?: StringFieldUpdateOperationsInput | string
+    fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SuscripcionPushUncheckedUpdateWithoutUsuarioInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    endpoint?: StringFieldUpdateOperationsInput | string
+    p256dh?: StringFieldUpdateOperationsInput | string
+    auth?: StringFieldUpdateOperationsInput | string
+    fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SuscripcionPushUncheckedUpdateManyWithoutUsuarioInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    endpoint?: StringFieldUpdateOperationsInput | string
+    p256dh?: StringFieldUpdateOperationsInput | string
+    auth?: StringFieldUpdateOperationsInput | string
+    fechaCreacion?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TrabajadorEspecialidadCreateManyTrabajadorInput = {

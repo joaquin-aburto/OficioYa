@@ -6,6 +6,11 @@ import { useRouter } from 'next/navigation'
 import './dashboard.css'
 import { subirFotosProblema, validarFoto, MAX_FOTOS } from '../../lib/fotoProblema'
 
+import { usePush } from '../../lib/usePush'
+
+
+
+
 /* ------------------------------------------------------------------ */
 /* Tipos                                                               */
 /* ------------------------------------------------------------------ */
@@ -344,6 +349,9 @@ export default function ClienteDashboardPage() {
     return () => clearTimeout(t)
   }, [toast])
 
+
+  // dentro de ClienteDashboardPage, después de los useState:
+const push = usePush(usuarioId)
   /* --- acciones contra la API --- */
   async function ejecutar(body: Record<string, unknown>, exito: string): Promise<boolean> {
     if (!usuarioId) return false
@@ -835,47 +843,73 @@ export default function ClienteDashboardPage() {
             </section>
           </div>
 
+
+
+
+
           {/* ----------------------------- Columna lateral ----------------------------- */}
           <aside className="col-side">
-            <section id="notificaciones" className="block block-side" aria-labelledby="t-not">
-              <div className="block-head"><h2 id="t-not">Avisos</h2></div>
-              {data.notificaciones.length === 0 ? (
-                <p className="vacio">Sin avisos por ahora.</p>
-              ) : (
-                <ul className="not-list">
-                  {data.notificaciones.map((n) => (
-                    <li key={n.id} className={n.leido ? '' : 'nueva'}>
-                      <p>{n.mensaje}</p>
-                      <span className="muted small">{hace(n.fechaCreacion)}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
+  <section id="notificaciones" className="block block-side" aria-labelledby="t-not">
+    <div className="block-head"><h2 id="t-not">Avisos</h2></div>
 
-            <section id="direcciones" className="block block-side" aria-labelledby="t-dir">
-              <div className="block-head"><h2 id="t-dir">Mis direcciones</h2></div>
-              {data.direcciones.length === 0 ? (
-                <p className="vacio">Agrega una dirección al crear tu primera solicitud.</p>
-              ) : (
-                <ul className="dir-list">
-                  {data.direcciones.map((d) => (
-                    <li key={d.id}>
-                      <Icon name="pin" size={16} />
-                      <div>
-                        <strong>{d.alias || 'Dirección'}</strong>
-                        <p className="muted small">
-                          {d.calle}
-                          {d.colonia ? `, ${d.colonia}` : ''}
-                          {d.ciudad ? `, ${d.ciudad}` : ''}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          </aside>
+    {push.soportado && !push.activo && push.permiso !== 'denied' && (
+      <div className="push-banner">
+        <p>Recibe avisos al instante, incluso con la página cerrada.</p>
+        <button
+          className="btn btn-primary btn-sm"
+          onClick={async () => {
+            const ok = await push.activar()
+            setToast(ok ? 'Notificaciones activadas.' : 'No se pudo activar.')
+          }}
+        >
+          Activar notificaciones
+        </button>
+      </div>
+    )}
+    {push.permiso === 'denied' && (
+      <p className="muted small">Bloqueaste las notificaciones. Actívalas desde la configuración del navegador.</p>
+    )}
+    {push.activo && (
+      <button className="link-danger" onClick={push.desactivar}>Desactivar notificaciones</button>
+    )}
+
+    {data.notificaciones.length === 0 ? (
+      <p className="vacio">Sin avisos por ahora.</p>
+    ) : (
+      <ul className="not-list">
+        {data.notificaciones.map((n) => (
+          <li key={n.id} className={n.leido ? '' : 'nueva'}>
+            <p>{n.mensaje}</p>
+            <span className="muted small">{hace(n.fechaCreacion)}</span>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+
+  <section id="direcciones" className="block block-side" aria-labelledby="t-dir">
+    <div className="block-head"><h2 id="t-dir">Mis direcciones</h2></div>
+    {data.direcciones.length === 0 ? (
+      <p className="vacio">Agrega una dirección al crear tu primera solicitud.</p>
+    ) : (
+      <ul className="dir-list">
+        {data.direcciones.map((d) => (
+          <li key={d.id}>
+            <Icon name="pin" size={16} />
+            <div>
+              <strong>{d.alias || 'Dirección'}</strong>
+              <p className="muted small">
+                {d.calle}
+                {d.colonia ? `, ${d.colonia}` : ''}
+                {d.ciudad ? `, ${d.ciudad}` : ''}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+</aside>
         </div>
       </div>
 

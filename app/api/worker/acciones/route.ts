@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from '../../../lib/prisma'
+import { enviarPush } from '../../../lib/enviarPush'
 
 // POST /api/trabajador/acciones
 // Body: { trabajadorId, accion, ...datos }
@@ -37,6 +38,19 @@ export async function POST(req: Request) {
 
         const yaCotizo = await prisma.cotizacion.findFirst({ where: { solicitudId, trabajadorId } })
         if (yaCotizo) return fail('Ya enviaste una cotización para esta solicitud.', 409)
+
+          const solicitud = await prisma.solicitud.findUnique({
+            where: { id: solicitudId },
+            select: { clienteId: true },
+          })
+
+          if (solicitud) {
+            await enviarPush(solicitud.clienteId, {
+              title: 'Nueva cotización',
+              body: 'Un profesional te envió una cotización',
+              url: '/cliente/dashboard#cotizaciones',
+            })
+          }
 
         await prisma.$transaction([
           prisma.cotizacion.create({

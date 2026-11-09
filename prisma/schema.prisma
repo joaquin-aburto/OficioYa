@@ -88,6 +88,7 @@ model Usuario {
   pagos          Pago[]         @relation("PagoCliente")
 
   @@map("usuarios")
+  suscripcionesPush SuscripcionPush[]
 }
 
 
@@ -333,4 +334,18 @@ model Notificacion {
   fechaCreacion    DateTime         @default(now())
 
   @@map("notificaciones")
+}
+
+model SuscripcionPush {
+  id            BigInt   @id @default(autoincrement())
+  usuarioId     Int      @map("usuario_id")
+  endpoint      String   @unique
+  p256dh        String
+  auth          String
+  fechaCreacion DateTime @default(now()) @map("fecha_creacion") @db.Timestamptz
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@map("suscripcion_push")
 }

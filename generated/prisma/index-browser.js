@@ -269,6 +269,15 @@ exports.Prisma.NotificacionScalarFieldEnum = {
   fechaCreacion: 'fechaCreacion'
 };
 
+exports.Prisma.SuscripcionPushScalarFieldEnum = {
+  id: 'id',
+  usuarioId: 'usuarioId',
+  endpoint: 'endpoint',
+  p256dh: 'p256dh',
+  auth: 'auth',
+  fechaCreacion: 'fechaCreacion'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -355,7 +364,8 @@ exports.Prisma.ModelName = {
   FotoTrabajo: 'FotoTrabajo',
   Pago: 'Pago',
   Comision: 'Comision',
-  Notificacion: 'Notificacion'
+  Notificacion: 'Notificacion',
+  SuscripcionPush: 'SuscripcionPush'
 };
 
 /**

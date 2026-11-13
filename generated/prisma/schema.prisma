@@ -222,15 +222,16 @@ model Disponibilidad {
 }
 
 model Direccion {
-  id          Int      @id @default(autoincrement())
-  usuarioId   Int
-  alias       String?
-  calle       String
-  colonia     String?
-  ciudad      String?
-  referencias String?
-  latitud     Decimal? @db.Decimal(9, 6)
-  longitud    Decimal? @db.Decimal(9, 6)
+  id           Int      @id @default(autoincrement())
+  usuarioId    Int
+  alias        String?
+  calle        String
+  colonia      String?
+  ciudad       String?
+  codigoPostal String?
+  referencias  String?
+  latitud      Decimal? @db.Decimal(9, 6)
+  longitud     Decimal? @db.Decimal(9, 6)
 
   usuario     Usuario     @relation(fields: [usuarioId], references: [id])
   solicitudes Solicitud[]

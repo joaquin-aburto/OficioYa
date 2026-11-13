@@ -226,6 +226,8 @@ export default function AdminDashboardPage() {
     }
   }
 
+
+  
   function cerrarSesion() {
     localStorage.removeItem(STORAGE_KEY)
     router.push('/auth/login')

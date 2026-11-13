@@ -244,6 +244,7 @@ model Direccion {
   calle       String
   colonia     String?
   ciudad      String?
+  codigoPostal String?
   referencias String?
   latitud     Decimal? @db.Decimal(9, 6)
   longitud    Decimal? @db.Decimal(9, 6)

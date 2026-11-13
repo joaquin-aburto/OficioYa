@@ -224,6 +224,8 @@ export async function POST(req: Request) {
           mensaje: `El cliente pagará con ${String(metodoPago).toLowerCase()} la solicitud #${solicitudId}. Confirma cuando lo recibas.`,
         }
 
+        
+
         if (sol.pago) {
           if (sol.pago.estado !== 'Pendiente') return fail('Este pago ya fue confirmado.', 409)
           await prisma.$transaction([
@@ -251,7 +253,42 @@ export async function POST(req: Request) {
         }
         return NextResponse.json({ ok: true })
       }
+      case 'agregarDireccion': {
+  const calle = String(body.calle ?? '').trim()
+  if (!calle) return NextResponse.json({ error: 'Falta la calle.' }, { status: 400 })
 
+  await prisma.direccion.create({
+    data: {
+      usuarioId,
+      alias: String(body.alias ?? '').trim() || null,
+      calle,
+      colonia: String(body.colonia ?? '').trim() || null,
+      ciudad: String(body.ciudad ?? '').trim() || null,
+    },
+  })
+  return NextResponse.json({ ok: true })
+}
+
+case 'eliminarNotificacion': {
+  const r = await prisma.notificacion.deleteMany({
+    where: {
+      id: Number(body.notificacionId),
+      destinatarioTipo: 'Usuario',
+      destinatarioId: usuarioId,
+    },
+  })
+  if (r.count === 0) {
+    return NextResponse.json({ error: 'No se encontró el aviso.' }, { status: 404 })
+  }
+  return NextResponse.json({ ok: true })
+}
+
+case 'eliminarTodasNotificaciones': {
+  await prisma.notificacion.deleteMany({
+    where: { destinatarioTipo: 'Usuario', destinatarioId: usuarioId },
+  })
+  return NextResponse.json({ ok: true })
+}
       default:
         return fail('Acción no reconocida.')
     }

@@ -13448,6 +13448,7 @@ export namespace Prisma {
     calle: string | null
     colonia: string | null
     ciudad: string | null
+    codigoPostal: string | null
     referencias: string | null
     latitud: Decimal | null
     longitud: Decimal | null
@@ -13460,6 +13461,7 @@ export namespace Prisma {
     calle: string | null
     colonia: string | null
     ciudad: string | null
+    codigoPostal: string | null
     referencias: string | null
     latitud: Decimal | null
     longitud: Decimal | null
@@ -13472,6 +13474,7 @@ export namespace Prisma {
     calle: number
     colonia: number
     ciudad: number
+    codigoPostal: number
     referencias: number
     latitud: number
     longitud: number
@@ -13500,6 +13503,7 @@ export namespace Prisma {
     calle?: true
     colonia?: true
     ciudad?: true
+    codigoPostal?: true
     referencias?: true
     latitud?: true
     longitud?: true
@@ -13512,6 +13516,7 @@ export namespace Prisma {
     calle?: true
     colonia?: true
     ciudad?: true
+    codigoPostal?: true
     referencias?: true
     latitud?: true
     longitud?: true
@@ -13524,6 +13529,7 @@ export namespace Prisma {
     calle?: true
     colonia?: true
     ciudad?: true
+    codigoPostal?: true
     referencias?: true
     latitud?: true
     longitud?: true
@@ -13623,6 +13629,7 @@ export namespace Prisma {
     calle: string
     colonia: string | null
     ciudad: string | null
+    codigoPostal: string | null
     referencias: string | null
     latitud: Decimal | null
     longitud: Decimal | null
@@ -13654,6 +13661,7 @@ export namespace Prisma {
     calle?: boolean
     colonia?: boolean
     ciudad?: boolean
+    codigoPostal?: boolean
     referencias?: boolean
     latitud?: boolean
     longitud?: boolean
@@ -13669,6 +13677,7 @@ export namespace Prisma {
     calle?: boolean
     colonia?: boolean
     ciudad?: boolean
+    codigoPostal?: boolean
     referencias?: boolean
     latitud?: boolean
     longitud?: boolean
@@ -13682,6 +13691,7 @@ export namespace Prisma {
     calle?: boolean
     colonia?: boolean
     ciudad?: boolean
+    codigoPostal?: boolean
     referencias?: boolean
     latitud?: boolean
     longitud?: boolean
@@ -13695,12 +13705,13 @@ export namespace Prisma {
     calle?: boolean
     colonia?: boolean
     ciudad?: boolean
+    codigoPostal?: boolean
     referencias?: boolean
     latitud?: boolean
     longitud?: boolean
   }
 
-  export type DireccionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "usuarioId" | "alias" | "calle" | "colonia" | "ciudad" | "referencias" | "latitud" | "longitud", ExtArgs["result"]["direccion"]>
+  export type DireccionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "usuarioId" | "alias" | "calle" | "colonia" | "ciudad" | "codigoPostal" | "referencias" | "latitud" | "longitud", ExtArgs["result"]["direccion"]>
   export type DireccionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     solicitudes?: boolean | Direccion$solicitudesArgs<ExtArgs>
@@ -13726,6 +13737,7 @@ export namespace Prisma {
       calle: string
       colonia: string | null
       ciudad: string | null
+      codigoPostal: string | null
       referencias: string | null
       latitud: Prisma.Decimal | null
       longitud: Prisma.Decimal | null
@@ -14160,6 +14172,7 @@ export namespace Prisma {
     readonly calle: FieldRef<"Direccion", 'String'>
     readonly colonia: FieldRef<"Direccion", 'String'>
     readonly ciudad: FieldRef<"Direccion", 'String'>
+    readonly codigoPostal: FieldRef<"Direccion", 'String'>
     readonly referencias: FieldRef<"Direccion", 'String'>
     readonly latitud: FieldRef<"Direccion", 'Decimal'>
     readonly longitud: FieldRef<"Direccion", 'Decimal'>
@@ -21521,6 +21534,7 @@ export namespace Prisma {
     calle: 'calle',
     colonia: 'colonia',
     ciudad: 'ciudad',
+    codigoPostal: 'codigoPostal',
     referencias: 'referencias',
     latitud: 'latitud',
     longitud: 'longitud'
@@ -22520,6 +22534,7 @@ export namespace Prisma {
     calle?: StringFilter<"Direccion"> | string
     colonia?: StringNullableFilter<"Direccion"> | string | null
     ciudad?: StringNullableFilter<"Direccion"> | string | null
+    codigoPostal?: StringNullableFilter<"Direccion"> | string | null
     referencias?: StringNullableFilter<"Direccion"> | string | null
     latitud?: DecimalNullableFilter<"Direccion"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableFilter<"Direccion"> | Decimal | DecimalJsLike | number | string | null
@@ -22534,6 +22549,7 @@ export namespace Prisma {
     calle?: SortOrder
     colonia?: SortOrderInput | SortOrder
     ciudad?: SortOrderInput | SortOrder
+    codigoPostal?: SortOrderInput | SortOrder
     referencias?: SortOrderInput | SortOrder
     latitud?: SortOrderInput | SortOrder
     longitud?: SortOrderInput | SortOrder
@@ -22551,6 +22567,7 @@ export namespace Prisma {
     calle?: StringFilter<"Direccion"> | string
     colonia?: StringNullableFilter<"Direccion"> | string | null
     ciudad?: StringNullableFilter<"Direccion"> | string | null
+    codigoPostal?: StringNullableFilter<"Direccion"> | string | null
     referencias?: StringNullableFilter<"Direccion"> | string | null
     latitud?: DecimalNullableFilter<"Direccion"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableFilter<"Direccion"> | Decimal | DecimalJsLike | number | string | null
@@ -22565,6 +22582,7 @@ export namespace Prisma {
     calle?: SortOrder
     colonia?: SortOrderInput | SortOrder
     ciudad?: SortOrderInput | SortOrder
+    codigoPostal?: SortOrderInput | SortOrder
     referencias?: SortOrderInput | SortOrder
     latitud?: SortOrderInput | SortOrder
     longitud?: SortOrderInput | SortOrder
@@ -22585,6 +22603,7 @@ export namespace Prisma {
     calle?: StringWithAggregatesFilter<"Direccion"> | string
     colonia?: StringNullableWithAggregatesFilter<"Direccion"> | string | null
     ciudad?: StringNullableWithAggregatesFilter<"Direccion"> | string | null
+    codigoPostal?: StringNullableWithAggregatesFilter<"Direccion"> | string | null
     referencias?: StringNullableWithAggregatesFilter<"Direccion"> | string | null
     latitud?: DecimalNullableWithAggregatesFilter<"Direccion"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableWithAggregatesFilter<"Direccion"> | Decimal | DecimalJsLike | number | string | null
@@ -23669,6 +23688,7 @@ export namespace Prisma {
     calle: string
     colonia?: string | null
     ciudad?: string | null
+    codigoPostal?: string | null
     referencias?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
@@ -23683,6 +23703,7 @@ export namespace Prisma {
     calle: string
     colonia?: string | null
     ciudad?: string | null
+    codigoPostal?: string | null
     referencias?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
@@ -23694,6 +23715,7 @@ export namespace Prisma {
     calle?: StringFieldUpdateOperationsInput | string
     colonia?: NullableStringFieldUpdateOperationsInput | string | null
     ciudad?: NullableStringFieldUpdateOperationsInput | string | null
+    codigoPostal?: NullableStringFieldUpdateOperationsInput | string | null
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -23708,6 +23730,7 @@ export namespace Prisma {
     calle?: StringFieldUpdateOperationsInput | string
     colonia?: NullableStringFieldUpdateOperationsInput | string | null
     ciudad?: NullableStringFieldUpdateOperationsInput | string | null
+    codigoPostal?: NullableStringFieldUpdateOperationsInput | string | null
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -23721,6 +23744,7 @@ export namespace Prisma {
     calle: string
     colonia?: string | null
     ciudad?: string | null
+    codigoPostal?: string | null
     referencias?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
@@ -23731,6 +23755,7 @@ export namespace Prisma {
     calle?: StringFieldUpdateOperationsInput | string
     colonia?: NullableStringFieldUpdateOperationsInput | string | null
     ciudad?: NullableStringFieldUpdateOperationsInput | string | null
+    codigoPostal?: NullableStringFieldUpdateOperationsInput | string | null
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -23743,6 +23768,7 @@ export namespace Prisma {
     calle?: StringFieldUpdateOperationsInput | string
     colonia?: NullableStringFieldUpdateOperationsInput | string | null
     ciudad?: NullableStringFieldUpdateOperationsInput | string | null
+    codigoPostal?: NullableStringFieldUpdateOperationsInput | string | null
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -24957,6 +24983,7 @@ export namespace Prisma {
     calle?: SortOrder
     colonia?: SortOrder
     ciudad?: SortOrder
+    codigoPostal?: SortOrder
     referencias?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
@@ -24976,6 +25003,7 @@ export namespace Prisma {
     calle?: SortOrder
     colonia?: SortOrder
     ciudad?: SortOrder
+    codigoPostal?: SortOrder
     referencias?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
@@ -24988,6 +25016,7 @@ export namespace Prisma {
     calle?: SortOrder
     colonia?: SortOrder
     ciudad?: SortOrder
+    codigoPostal?: SortOrder
     referencias?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
@@ -27161,6 +27190,7 @@ export namespace Prisma {
     calle: string
     colonia?: string | null
     ciudad?: string | null
+    codigoPostal?: string | null
     referencias?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
@@ -27173,6 +27203,7 @@ export namespace Prisma {
     calle: string
     colonia?: string | null
     ciudad?: string | null
+    codigoPostal?: string | null
     referencias?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
@@ -27344,6 +27375,7 @@ export namespace Prisma {
     calle?: StringFilter<"Direccion"> | string
     colonia?: StringNullableFilter<"Direccion"> | string | null
     ciudad?: StringNullableFilter<"Direccion"> | string | null
+    codigoPostal?: StringNullableFilter<"Direccion"> | string | null
     referencias?: StringNullableFilter<"Direccion"> | string | null
     latitud?: DecimalNullableFilter<"Direccion"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableFilter<"Direccion"> | Decimal | DecimalJsLike | number | string | null
@@ -28562,6 +28594,7 @@ export namespace Prisma {
     calle: string
     colonia?: string | null
     ciudad?: string | null
+    codigoPostal?: string | null
     referencias?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
@@ -28575,6 +28608,7 @@ export namespace Prisma {
     calle: string
     colonia?: string | null
     ciudad?: string | null
+    codigoPostal?: string | null
     referencias?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
@@ -28817,6 +28851,7 @@ export namespace Prisma {
     calle?: StringFieldUpdateOperationsInput | string
     colonia?: NullableStringFieldUpdateOperationsInput | string | null
     ciudad?: NullableStringFieldUpdateOperationsInput | string | null
+    codigoPostal?: NullableStringFieldUpdateOperationsInput | string | null
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -28830,6 +28865,7 @@ export namespace Prisma {
     calle?: StringFieldUpdateOperationsInput | string
     colonia?: NullableStringFieldUpdateOperationsInput | string | null
     ciudad?: NullableStringFieldUpdateOperationsInput | string | null
+    codigoPostal?: NullableStringFieldUpdateOperationsInput | string | null
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -30272,6 +30308,7 @@ export namespace Prisma {
     calle: string
     colonia?: string | null
     ciudad?: string | null
+    codigoPostal?: string | null
     referencias?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
@@ -30323,6 +30360,7 @@ export namespace Prisma {
     calle?: StringFieldUpdateOperationsInput | string
     colonia?: NullableStringFieldUpdateOperationsInput | string | null
     ciudad?: NullableStringFieldUpdateOperationsInput | string | null
+    codigoPostal?: NullableStringFieldUpdateOperationsInput | string | null
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -30335,6 +30373,7 @@ export namespace Prisma {
     calle?: StringFieldUpdateOperationsInput | string
     colonia?: NullableStringFieldUpdateOperationsInput | string | null
     ciudad?: NullableStringFieldUpdateOperationsInput | string | null
+    codigoPostal?: NullableStringFieldUpdateOperationsInput | string | null
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -30347,6 +30386,7 @@ export namespace Prisma {
     calle?: StringFieldUpdateOperationsInput | string
     colonia?: NullableStringFieldUpdateOperationsInput | string | null
     ciudad?: NullableStringFieldUpdateOperationsInput | string | null
+    codigoPostal?: NullableStringFieldUpdateOperationsInput | string | null
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null

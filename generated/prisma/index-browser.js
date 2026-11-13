@@ -216,6 +216,7 @@ exports.Prisma.DireccionScalarFieldEnum = {
   calle: 'calle',
   colonia: 'colonia',
   ciudad: 'ciudad',
+  codigoPostal: 'codigoPostal',
   referencias: 'referencias',
   latitud: 'latitud',
   longitud: 'longitud'

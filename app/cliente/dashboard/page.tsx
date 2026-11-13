@@ -136,6 +136,7 @@ const PALABRAS_CLAVE: [string, string[]][] = [
 
 const quitarAcentos = (t: string) => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 
+
 function adivinarEspecialidad(texto: string, lista: Especialidad[]): number | null {
   const t = quitarAcentos(texto)
   for (const [clave, palabras] of PALABRAS_CLAVE) {
@@ -275,7 +276,7 @@ export default function ClienteDashboardPage() {
   const [calificando, setCalificando] = useState<Solicitud | null>(null)
   const [toast, setToast] = useState('')
   const [ocupado, setOcupado] = useState(false)
-
+  const [agregandoDir, setAgregandoDir] = useState(false)
   /* --- sesión mínima (localStorage). Reemplázala por cookie/sesión real --- */
   useEffect(() => {
     try {
@@ -377,7 +378,17 @@ const push = usePush(usuarioId)
       setOcupado(false)
     }
   }
+function eliminarNotificacion(id: number) {
+  // Se quita al instante de la pantalla; luego se confirma con el servidor
+  setData((d) => (d ? { ...d, notificaciones: d.notificaciones.filter((n) => n.id !== id) } : d))
+  ejecutar({ accion: 'eliminarNotificacion', notificacionId: id }, 'Aviso eliminado.')
+}
 
+function eliminarTodas() {
+  if (!confirm('¿Eliminar todos tus avisos?')) return
+  setData((d) => (d ? { ...d, notificaciones: [] } : d))
+  ejecutar({ accion: 'eliminarTodasNotificaciones' }, 'Avisos eliminados.')
+}
   function cerrarSesion() {
     localStorage.removeItem(STORAGE_KEY)
     router.push('/auth/login')
@@ -522,7 +533,7 @@ const push = usePush(usuarioId)
                 className="oficio"
                 onClick={() => abrirNuevaSolicitud({ especialidadId: e.id })}
               >
-                <span className="oficio-emoji" aria-hidden="true">{emojiDe(e.nombre, e.icono)}</span>
+                
                 {e.nombre}
               </button>
             ))}
@@ -711,7 +722,7 @@ const push = usePush(usuarioId)
                     return (
                       <li key={s.id} className="sol">
                         <div className="sol-top">
-                          <span className="sol-emoji" aria-hidden="true">{emojiDe(s.especialidad.nombre, s.especialidad.icono)}</span>
+                        
                           <div className="sol-title">
                             <h3>{s.especialidad.nombre}</h3>
                             <p className="muted small">
@@ -874,25 +885,47 @@ const push = usePush(usuarioId)
     )}
 
     {data.notificaciones.length === 0 ? (
-      <p className="vacio">Sin avisos por ahora.</p>
-    ) : (
-      <ul className="not-list">
-        {data.notificaciones.map((n) => (
-          <li key={n.id} className={n.leido ? '' : 'nueva'}>
+  <p className="vacio">Sin avisos por ahora.</p>
+) : (
+  <>
+    <button className="link-danger" onClick={eliminarTodas} disabled={ocupado}>
+      Eliminar todos
+    </button>
+    <ul className="not-list">
+      {data.notificaciones.map((n) => (
+        <li key={n.id} className={n.leido ? '' : 'nueva'}>
+          <div className="not-body">
             <p>{n.mensaje}</p>
             <span className="muted small">{hace(n.fechaCreacion)}</span>
-          </li>
-        ))}
-      </ul>
-    )}
+          </div>
+          <button
+            type="button"
+            className="icon-btn not-del"
+            onClick={() => eliminarNotificacion(n.id)}
+            aria-label="Eliminar aviso"
+            title="Eliminar"
+          >
+            <Icon name="close" size={14} />
+          </button>
+        </li>
+      ))}
+    </ul>
+  </>
+)}
   </section>
 
-  <section id="direcciones" className="block block-side" aria-labelledby="t-dir">
-    <div className="block-head"><h2 id="t-dir">Mis direcciones</h2></div>
-    {data.direcciones.length === 0 ? (
-      <p className="vacio">Agrega una dirección al crear tu primera solicitud.</p>
-    ) : (
-      <ul className="dir-list">
+
+<section id="direcciones" className="block block-side" aria-labelledby="t-dir">
+  <div className="block-head">
+    <h2 id="t-dir">Mis direcciones</h2>
+    <button type="button" className="btn btn-ghost btn-sm" onClick={() => setAgregandoDir(true)}>
+      <Icon name="plus" size={14} /> Agregar
+    </button>
+  </div>
+  {data.direcciones.length === 0 ? (
+    <p className="vacio">Aún no tienes direcciones guardadas.</p>
+  ) : (
+     <ul className="dir-list">
         {data.direcciones.map((d) => (
           <li key={d.id}>
             <Icon name="pin" size={16} />
@@ -907,8 +940,10 @@ const push = usePush(usuarioId)
           </li>
         ))}
       </ul>
-    )}
-  </section>
+  )}
+</section>
+
+
 </aside>
         </div>
       </div>
@@ -950,6 +985,17 @@ const push = usePush(usuarioId)
         />
       )}
 
+      {agregandoDir && (
+  <DireccionModal
+    ocupado={ocupado}
+    onClose={() => setAgregandoDir(false)}
+    onSubmit={async (dir) => {
+      const ok = await ejecutar({ accion: 'agregarDireccion', ...dir }, 'Dirección guardada.')
+      if (ok) setAgregandoDir(false)
+    }}
+  />
+)}
+
       {toast && (
         <div className="toast" role="status">
           {toast}
@@ -962,6 +1008,8 @@ const push = usePush(usuarioId)
 /* ------------------------------------------------------------------ */
 /* Modal: nueva solicitud (con fotos del problema)                     */
 /* ------------------------------------------------------------------ */
+
+
 
 function NuevaSolicitudModal({
   borrador,
@@ -1079,7 +1127,7 @@ function NuevaSolicitudModal({
                 className={especialidadId === e.id ? 'on' : ''}
                 onClick={() => setEspecialidadId(e.id)}
               >
-                {emojiDe(e.nombre, e.icono)} {e.nombre}
+               {e.nombre}
               </button>
             ))}
           </div>
@@ -1247,6 +1295,83 @@ function CalificarModal({
           <button type="button" className="btn btn-ghost" onClick={onClose}>Ahora no</button>
           <button type="submit" className="btn btn-primary" disabled={!puntos || ocupado}>
             {ocupado ? 'Enviando…' : 'Enviar calificación'}
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+function DireccionModal({
+  ocupado,
+  onClose,
+  onSubmit,
+}: {
+  ocupado: boolean
+  onClose: () => void
+  onSubmit: (dir: { alias: string; calle: string; colonia: string; ciudad: string }) => void
+}) {
+  const [alias, setAlias] = useState('')
+  const [calle, setCalle] = useState('')
+  const [colonia, setColonia] = useState('')
+  const [ciudad, setCiudad] = useState('')
+  const [aviso, setAviso] = useState('')
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  return (
+    <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <form
+        className="modal modal-sm"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="d-title"
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (!calle.trim()) return setAviso('Escribe la calle y número.')
+          setAviso('')
+          onSubmit({
+            alias: alias.trim() || 'Otra dirección',
+            calle: calle.trim(),
+            colonia: colonia.trim(),
+            ciudad: ciudad.trim(),
+          })
+        }}
+      >
+        <div className="modal-head">
+          <h2 id="d-title">Nueva dirección</h2>
+          <button type="button" className="icon-btn" onClick={onClose} aria-label="Cerrar">
+            <Icon name="close" />
+          </button>
+        </div>
+
+        <div className="field">
+          <label htmlFor="d-alias">Nombre (ej. Casa, Oficina, Casa de mamá)</label>
+          <input id="d-alias" value={alias} onChange={(e) => setAlias(e.target.value)} />
+        </div>
+        <div className="field">
+          <label htmlFor="d-calle">Calle y número</label>
+          <input id="d-calle" value={calle} onChange={(e) => setCalle(e.target.value)} />
+        </div>
+        <div className="field">
+          <label htmlFor="d-col">Colonia</label>
+          <input id="d-col" value={colonia} onChange={(e) => setColonia(e.target.value)} />
+        </div>
+        <div className="field">
+          <label htmlFor="d-ciudad">Ciudad</label>
+          <input id="d-ciudad" value={ciudad} onChange={(e) => setCiudad(e.target.value)} />
+        </div>
+
+        {aviso && <p className="form-aviso" role="alert">{aviso}</p>}
+
+        <div className="modal-actions">
+          <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary" disabled={ocupado}>
+            {ocupado ? 'Guardando…' : 'Guardar dirección'}
           </button>
         </div>
       </form>

@@ -79,6 +79,12 @@
   font-size: 13px;
 }
 
+
+.dir-list li { align-items: flex-start; }
+.dir-body { flex: 1; min-width: 0; }
+
+.not-del { flex-shrink: 0; opacity: 0.5; padding: 4px; }
+.not-del:hover { opacity: 1; }
 /* ------------------------------------------------------------------
    Barra lateral
 ------------------------------------------------------------------- */

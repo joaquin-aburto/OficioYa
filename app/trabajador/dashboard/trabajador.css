@@ -3,6 +3,11 @@
    ../../cliente/dashboard/dashboard.css */
 
 /* Aviso de perfil en revisión */
+
+:where(.dash) :is(button, input, select, textarea) {
+  font: inherit;
+  color: inherit;
+}
 .dash .banner {
   display: flex;
   align-items: flex-start;

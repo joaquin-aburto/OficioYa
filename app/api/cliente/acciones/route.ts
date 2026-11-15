@@ -289,6 +289,27 @@ case 'eliminarTodasNotificaciones': {
   })
   return NextResponse.json({ ok: true })
 }
+
+case 'eliminarDireccion': {
+  const id = Number(body.direccionId)
+
+  const dir = await prisma.direccion.findFirst({
+    where: { id, usuarioId },
+    select: { id: true, _count: { select: { solicitudes: true } } },
+  })
+  if (!dir) {
+    return NextResponse.json({ error: 'No se encontró la dirección.' }, { status: 404 })
+  }
+  if (dir._count.solicitudes > 0) {
+    return NextResponse.json(
+      { error: 'Esta dirección está ligada a solicitudes y no se puede eliminar.' },
+      { status: 409 }
+    )
+  }
+
+  await prisma.direccion.delete({ where: { id: dir.id } })
+  return NextResponse.json({ ok: true })
+}
       default:
         return fail('Acción no reconocida.')
     }

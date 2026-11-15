@@ -24,6 +24,7 @@ type Direccion = {
   calle: string
   colonia: string | null
   ciudad: string | null
+  codigoPostal: string | null
 }
 type TrabajadorMini = {
   id: number
@@ -389,6 +390,12 @@ function eliminarTodas() {
   setData((d) => (d ? { ...d, notificaciones: [] } : d))
   ejecutar({ accion: 'eliminarTodasNotificaciones' }, 'Avisos eliminados.')
 }
+function eliminarDireccion(id: number) {
+  if (!confirm('¿Eliminar esta dirección?')) return
+  ejecutar({ accion: 'eliminarDireccion', direccionId: id }, 'Dirección eliminada.')
+}
+
+
   function cerrarSesion() {
     localStorage.removeItem(STORAGE_KEY)
     router.push('/auth/login')
@@ -928,16 +935,27 @@ function eliminarTodas() {
      <ul className="dir-list">
         {data.direcciones.map((d) => (
           <li key={d.id}>
-            <Icon name="pin" size={16} />
-            <div>
-              <strong>{d.alias || 'Dirección'}</strong>
-              <p className="muted small">
-                {d.calle}
-                {d.colonia ? `, ${d.colonia}` : ''}
-                {d.ciudad ? `, ${d.ciudad}` : ''}
-              </p>
-            </div>
-          </li>
+          <Icon name="pin" size={16} />
+          <div className="dir-body">
+            <strong>{d.alias || 'Dirección'}</strong>
+            <p className="muted small">
+              {d.calle}
+              {d.colonia ? `, ${d.colonia}` : ''}
+              {d.ciudad ? `, ${d.ciudad}` : ''}
+              {d.codigoPostal ? `, C.P. ${d.codigoPostal}` : ''}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="icon-btn not-del"
+            onClick={() => eliminarDireccion(d.id)}
+            disabled={ocupado}
+            aria-label={`Eliminar dirección ${d.alias || ''}`}
+            title="Eliminar"
+          >
+            <Icon name="close" size={14} />
+          </button>
+</li>
         ))}
       </ul>
   )}
@@ -1035,6 +1053,7 @@ function NuevaSolicitudModal({
   const [colonia, setColonia] = useState('')
   const [ciudad, setCiudad] = useState('')
   const [aviso, setAviso] = useState('')
+  const [cp, setCp] = useState('')
 
   // Fotos del problema (opcional, hasta MAX_FOTOS)
   const [fotos, setFotos] = useState<File[]>([])
@@ -1208,6 +1227,7 @@ function NuevaSolicitudModal({
             <input aria-label="Calle y número" placeholder="Calle y número" value={calle} onChange={(e) => setCalle(e.target.value)} />
             <input aria-label="Colonia" placeholder="Colonia" value={colonia} onChange={(e) => setColonia(e.target.value)} />
             <input aria-label="Ciudad" placeholder="Ciudad" value={ciudad} onChange={(e) => setCiudad(e.target.value)} />
+            <input aria-label="Código postal" placeholder="Código postal" value={cp} onChange={(e) => setCp(e.target.value)} />
           </div>
         )}
 
@@ -1302,6 +1322,7 @@ function CalificarModal({
   )
 }
 
+
 function DireccionModal({
   ocupado,
   onClose,
@@ -1309,13 +1330,14 @@ function DireccionModal({
 }: {
   ocupado: boolean
   onClose: () => void
-  onSubmit: (dir: { alias: string; calle: string; colonia: string; ciudad: string }) => void
+ onSubmit: (dir: { alias: string; calle: string; colonia: string; ciudad: string; codigoPostal: string }) => void
 }) {
   const [alias, setAlias] = useState('')
   const [calle, setCalle] = useState('')
   const [colonia, setColonia] = useState('')
   const [ciudad, setCiudad] = useState('')
   const [aviso, setAviso] = useState('')
+  const [cp, setCp] = useState('') 
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
@@ -1330,17 +1352,19 @@ function DireccionModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="d-title"
-        onSubmit={(e) => {
-          e.preventDefault()
-          if (!calle.trim()) return setAviso('Escribe la calle y número.')
-          setAviso('')
-          onSubmit({
-            alias: alias.trim() || 'Otra dirección',
-            calle: calle.trim(),
-            colonia: colonia.trim(),
-            ciudad: ciudad.trim(),
-          })
-        }}
+       onSubmit={(e) => {
+        e.preventDefault()
+        if (!calle.trim()) return setAviso('Escribe la calle y número.')
+        if (cp.length !== 5) return setAviso('El código postal debe tener 5 dígitos.')
+        setAviso('')
+        onSubmit({
+          alias: alias.trim() || 'Otra dirección',
+          calle: calle.trim(),
+          colonia: colonia.trim(),
+          ciudad: ciudad.trim(),
+          codigoPostal: cp,
+        })
+      }}
       >
         <div className="modal-head">
           <h2 id="d-title">Nueva dirección</h2>
@@ -1364,6 +1388,20 @@ function DireccionModal({
         <div className="field">
           <label htmlFor="d-ciudad">Ciudad</label>
           <input id="d-ciudad" value={ciudad} onChange={(e) => setCiudad(e.target.value)} />
+        </div>
+
+
+
+        <div className="field">
+          <label htmlFor="d-cp">Código postal</label>
+          <input
+            id="d-cp"
+            inputMode="numeric"
+            maxLength={5}
+            placeholder="45400"
+            value={cp}
+            onChange={(e) => setCp(e.target.value.replace(/\D/g, ''))}
+          />
         </div>
 
         {aviso && <p className="form-aviso" role="alert">{aviso}</p>}

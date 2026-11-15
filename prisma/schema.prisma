@@ -248,6 +248,7 @@ model Direccion {
   referencias String?
   latitud     Decimal? @db.Decimal(9, 6)
   longitud    Decimal? @db.Decimal(9, 6)
+  activa Boolean @default(true)
 
   usuario     Usuario     @relation(fields: [usuarioId], references: [id])
   solicitudes Solicitud[]

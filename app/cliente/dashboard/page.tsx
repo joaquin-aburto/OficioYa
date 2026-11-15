@@ -294,6 +294,25 @@ export default function ClienteDashboardPage() {
   const [tarjeta, setTarjeta] = useState<TarjetaGuardada | null>(null)
 const [agregandoTarjeta, setAgregandoTarjeta] = useState<Solicitud | null>(null)
 const [seleccion, setSeleccion] = useState<Record<number, Metodo>>({})
+
+const [omitidas, setOmitidas] = useState<number[]>([])
+
+useEffect(() => {
+  if (!usuarioId) return
+  try {
+    const raw = localStorage.getItem(`oficioya_omitidas_${usuarioId}`)
+    setOmitidas(raw ? JSON.parse(raw) : [])
+  } catch {}
+}, [usuarioId])
+
+function omitirCalificacion(id: number) {
+  setOmitidas((prev) => {
+    const nuevo = [...prev, id]
+    try { localStorage.setItem(`oficioya_omitidas_${usuarioId}`, JSON.stringify(nuevo)) } catch {}
+    return nuevo
+  })
+  setCalificando(null)
+}
   /* --- sesión mínima (localStorage). Reemplázala por cookie/sesión real --- */
   useEffect(() => {
     try {
@@ -764,11 +783,14 @@ function eliminarDireccion(id: number) {
                 <ul className="cal-list">
                   {porCalificar.map((s) => (
                     <li key={s.id}>
-                      <span>
-                        <strong>{s.especialidad.nombre}</strong> con {s.trabajadorAsignado?.nombre ?? 'tu profesional'}
-                      </span>
-                      <button className="btn btn-accent" onClick={() => setCalificando(s)}>Calificar servicio</button>
-                    </li>
+  <span>
+    <strong>{s.especialidad.nombre}</strong> con {s.trabajadorAsignado?.nombre ?? 'tu profesional'}
+  </span>
+  <div style={{ display: 'flex', gap: 8 }}>
+    <button className="btn btn-ghost btn-sm" onClick={() => omitirCalificacion(s.id)}>Omitir</button>
+    <button className="btn btn-accent" onClick={() => setCalificando(s)}>Calificar servicio</button>
+  </div>
+</li>
                   ))}
                 </ul>
               </section>
@@ -1067,20 +1089,21 @@ function eliminarDireccion(id: number) {
         />
       )}
 
-      {calificando && (
-        <CalificarModal
-          solicitud={calificando}
-          ocupado={ocupado}
-          onClose={() => setCalificando(null)}
-          onSubmit={async (puntuacion, comentario) => {
-            const ok = await ejecutar(
-              { accion: 'calificar', solicitudId: calificando.id, puntuacion, comentario },
-              'Gracias por tu calificación.'
-            )
-            if (ok) setCalificando(null)
-          }}
-        />
-      )}
+     {calificando && (
+      <CalificarModal
+        solicitud={calificando}
+        ocupado={ocupado}
+        onClose={() => setCalificando(null)}
+        onOmitir={() => omitirCalificacion(calificando.id)}
+        onSubmit={async (puntuacion, comentario) => {
+          const ok = await ejecutar(
+            { accion: 'calificar', solicitudId: calificando.id, puntuacion, comentario },
+            'Gracias por tu calificación.'
+          )
+          if (ok) setCalificando(null)
+        }}
+      />
+    )}
 
       {agregandoDir && (
   <DireccionModal
@@ -1093,7 +1116,7 @@ function eliminarDireccion(id: number) {
   />
 )}
 
-{agregandoTarjeta && (
+{/* {agregandoTarjeta && (
   <TarjetaModal
     ocupado={ocupado}
     onClose={() => setAgregandoTarjeta(null)}
@@ -1107,7 +1130,7 @@ function eliminarDireccion(id: number) {
       if (ok) setAgregandoTarjeta(null)
     }}
   />
-)}
+)} */}
 
       {toast && (
         <div className="toast" role="status">
@@ -1259,34 +1282,52 @@ function NuevaSolicitudModal({
         </div>
 
         {/* Fotos del problema */}
-        <div className="field">
-          <label htmlFor="m-fotos">Fotos del problema (opcional, hasta {MAX_FOTOS})</label>
-          <div className="foto-grid">
-            {fotoPreviews.map((url, i) => (
-              <div key={url} className="foto-thumb">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={url} alt={`Foto ${i + 1} del problema`} />
-                <button type="button" className="foto-quitar" onClick={() => quitarFoto(i)} aria-label="Quitar foto">
-                  <Icon name="close" size={14} />
-                </button>
-              </div>
-            ))}
-            {fotos.length < MAX_FOTOS && (
-              <label htmlFor="m-fotos" className="foto-agregar">
-                <Icon name="plus" size={20} />
-                <span>Agregar</span>
-              </label>
-            )}
-          </div>
-          <input
-            id="m-fotos"
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            multiple
-            onChange={agregarFotos}
-            className="avatar-upload-input"
-          />
-        </div>
+<div className="field">
+  <label htmlFor="m-fotos">Fotos del problema (opcional, hasta {MAX_FOTOS})</label>
+
+  <div className="foto-grid">
+    {fotoPreviews.map((url, i) => (
+      <div key={url} className="foto-thumb">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={url} alt={`Foto ${i + 1} del problema`} />
+        <button type="button" className="foto-quitar" onClick={() => quitarFoto(i)} aria-label="Quitar foto">
+          <Icon name="close" size={14} />
+        </button>
+      </div>
+    ))}
+
+    {fotos.length < MAX_FOTOS && (
+      <label htmlFor="m-fotos" className="foto-agregar">
+        <Icon name="plus" size={20} />
+        <span>Galería</span>
+      </label>
+    )}
+
+    {fotos.length < MAX_FOTOS && (
+      <label htmlFor="m-camara" className="foto-agregar">
+        <span style={{ fontSize: 20 }}>📷</span>
+        <span>Cámara</span>
+      </label>
+    )}
+  </div> {/* ← este es el cierre de foto-grid que faltaba */}
+
+  <input
+    id="m-fotos"
+    type="file"
+    accept="image/*"
+    multiple
+    onChange={agregarFotos}
+    className="avatar-upload-input"
+  />
+  <input
+    id="m-camara"
+    type="file"
+    accept="image/*"
+    capture="environment"
+    onChange={agregarFotos}
+    className="avatar-upload-input"
+  />
+</div>
 
         <fieldset className="field">
           <legend>¿Qué tan pronto lo necesitas?</legend>
@@ -1344,14 +1385,16 @@ function NuevaSolicitudModal({
 /* ------------------------------------------------------------------ */
 
 function CalificarModal({
-  solicitud,
+   solicitud,
   ocupado,
   onClose,
+  onOmitir,        // ← agregar aquí
   onSubmit,
 }: {
   solicitud: Solicitud
   ocupado: boolean
   onClose: () => void
+  onOmitir: () => void   // ← y aquí en el tipo
   onSubmit: (puntuacion: number, comentario: string) => void
 }) {
   const [puntos, setPuntos] = useState(0)

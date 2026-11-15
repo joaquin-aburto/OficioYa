@@ -219,7 +219,8 @@ exports.Prisma.DireccionScalarFieldEnum = {
   codigoPostal: 'codigoPostal',
   referencias: 'referencias',
   latitud: 'latitud',
-  longitud: 'longitud'
+  longitud: 'longitud',
+  activa: 'activa'
 };
 
 exports.Prisma.CalificacionScalarFieldEnum = {

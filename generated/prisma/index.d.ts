@@ -13452,6 +13452,7 @@ export namespace Prisma {
     referencias: string | null
     latitud: Decimal | null
     longitud: Decimal | null
+    activa: boolean | null
   }
 
   export type DireccionMaxAggregateOutputType = {
@@ -13465,6 +13466,7 @@ export namespace Prisma {
     referencias: string | null
     latitud: Decimal | null
     longitud: Decimal | null
+    activa: boolean | null
   }
 
   export type DireccionCountAggregateOutputType = {
@@ -13478,6 +13480,7 @@ export namespace Prisma {
     referencias: number
     latitud: number
     longitud: number
+    activa: number
     _all: number
   }
 
@@ -13507,6 +13510,7 @@ export namespace Prisma {
     referencias?: true
     latitud?: true
     longitud?: true
+    activa?: true
   }
 
   export type DireccionMaxAggregateInputType = {
@@ -13520,6 +13524,7 @@ export namespace Prisma {
     referencias?: true
     latitud?: true
     longitud?: true
+    activa?: true
   }
 
   export type DireccionCountAggregateInputType = {
@@ -13533,6 +13538,7 @@ export namespace Prisma {
     referencias?: true
     latitud?: true
     longitud?: true
+    activa?: true
     _all?: true
   }
 
@@ -13633,6 +13639,7 @@ export namespace Prisma {
     referencias: string | null
     latitud: Decimal | null
     longitud: Decimal | null
+    activa: boolean
     _count: DireccionCountAggregateOutputType | null
     _avg: DireccionAvgAggregateOutputType | null
     _sum: DireccionSumAggregateOutputType | null
@@ -13665,6 +13672,7 @@ export namespace Prisma {
     referencias?: boolean
     latitud?: boolean
     longitud?: boolean
+    activa?: boolean
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     solicitudes?: boolean | Direccion$solicitudesArgs<ExtArgs>
     _count?: boolean | DireccionCountOutputTypeDefaultArgs<ExtArgs>
@@ -13681,6 +13689,7 @@ export namespace Prisma {
     referencias?: boolean
     latitud?: boolean
     longitud?: boolean
+    activa?: boolean
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["direccion"]>
 
@@ -13695,6 +13704,7 @@ export namespace Prisma {
     referencias?: boolean
     latitud?: boolean
     longitud?: boolean
+    activa?: boolean
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["direccion"]>
 
@@ -13709,9 +13719,10 @@ export namespace Prisma {
     referencias?: boolean
     latitud?: boolean
     longitud?: boolean
+    activa?: boolean
   }
 
-  export type DireccionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "usuarioId" | "alias" | "calle" | "colonia" | "ciudad" | "codigoPostal" | "referencias" | "latitud" | "longitud", ExtArgs["result"]["direccion"]>
+  export type DireccionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "usuarioId" | "alias" | "calle" | "colonia" | "ciudad" | "codigoPostal" | "referencias" | "latitud" | "longitud" | "activa", ExtArgs["result"]["direccion"]>
   export type DireccionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     solicitudes?: boolean | Direccion$solicitudesArgs<ExtArgs>
@@ -13741,6 +13752,7 @@ export namespace Prisma {
       referencias: string | null
       latitud: Prisma.Decimal | null
       longitud: Prisma.Decimal | null
+      activa: boolean
     }, ExtArgs["result"]["direccion"]>
     composites: {}
   }
@@ -14176,6 +14188,7 @@ export namespace Prisma {
     readonly referencias: FieldRef<"Direccion", 'String'>
     readonly latitud: FieldRef<"Direccion", 'Decimal'>
     readonly longitud: FieldRef<"Direccion", 'Decimal'>
+    readonly activa: FieldRef<"Direccion", 'Boolean'>
   }
     
 
@@ -21537,7 +21550,8 @@ export namespace Prisma {
     codigoPostal: 'codigoPostal',
     referencias: 'referencias',
     latitud: 'latitud',
-    longitud: 'longitud'
+    longitud: 'longitud',
+    activa: 'activa'
   };
 
   export type DireccionScalarFieldEnum = (typeof DireccionScalarFieldEnum)[keyof typeof DireccionScalarFieldEnum]
@@ -22538,6 +22552,7 @@ export namespace Prisma {
     referencias?: StringNullableFilter<"Direccion"> | string | null
     latitud?: DecimalNullableFilter<"Direccion"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableFilter<"Direccion"> | Decimal | DecimalJsLike | number | string | null
+    activa?: BoolFilter<"Direccion"> | boolean
     usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
     solicitudes?: SolicitudListRelationFilter
   }
@@ -22553,6 +22568,7 @@ export namespace Prisma {
     referencias?: SortOrderInput | SortOrder
     latitud?: SortOrderInput | SortOrder
     longitud?: SortOrderInput | SortOrder
+    activa?: SortOrder
     usuario?: UsuarioOrderByWithRelationInput
     solicitudes?: SolicitudOrderByRelationAggregateInput
   }
@@ -22571,6 +22587,7 @@ export namespace Prisma {
     referencias?: StringNullableFilter<"Direccion"> | string | null
     latitud?: DecimalNullableFilter<"Direccion"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableFilter<"Direccion"> | Decimal | DecimalJsLike | number | string | null
+    activa?: BoolFilter<"Direccion"> | boolean
     usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
     solicitudes?: SolicitudListRelationFilter
   }, "id">
@@ -22586,6 +22603,7 @@ export namespace Prisma {
     referencias?: SortOrderInput | SortOrder
     latitud?: SortOrderInput | SortOrder
     longitud?: SortOrderInput | SortOrder
+    activa?: SortOrder
     _count?: DireccionCountOrderByAggregateInput
     _avg?: DireccionAvgOrderByAggregateInput
     _max?: DireccionMaxOrderByAggregateInput
@@ -22607,6 +22625,7 @@ export namespace Prisma {
     referencias?: StringNullableWithAggregatesFilter<"Direccion"> | string | null
     latitud?: DecimalNullableWithAggregatesFilter<"Direccion"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableWithAggregatesFilter<"Direccion"> | Decimal | DecimalJsLike | number | string | null
+    activa?: BoolWithAggregatesFilter<"Direccion"> | boolean
   }
 
   export type CalificacionWhereInput = {
@@ -23692,6 +23711,7 @@ export namespace Prisma {
     referencias?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    activa?: boolean
     usuario: UsuarioCreateNestedOneWithoutDireccionesInput
     solicitudes?: SolicitudCreateNestedManyWithoutDireccionInput
   }
@@ -23707,6 +23727,7 @@ export namespace Prisma {
     referencias?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    activa?: boolean
     solicitudes?: SolicitudUncheckedCreateNestedManyWithoutDireccionInput
   }
 
@@ -23719,6 +23740,7 @@ export namespace Prisma {
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    activa?: BoolFieldUpdateOperationsInput | boolean
     usuario?: UsuarioUpdateOneRequiredWithoutDireccionesNestedInput
     solicitudes?: SolicitudUpdateManyWithoutDireccionNestedInput
   }
@@ -23734,6 +23756,7 @@ export namespace Prisma {
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    activa?: BoolFieldUpdateOperationsInput | boolean
     solicitudes?: SolicitudUncheckedUpdateManyWithoutDireccionNestedInput
   }
 
@@ -23748,6 +23771,7 @@ export namespace Prisma {
     referencias?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    activa?: boolean
   }
 
   export type DireccionUpdateManyMutationInput = {
@@ -23759,6 +23783,7 @@ export namespace Prisma {
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    activa?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type DireccionUncheckedUpdateManyInput = {
@@ -23772,6 +23797,7 @@ export namespace Prisma {
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    activa?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type CalificacionCreateInput = {
@@ -24987,6 +25013,7 @@ export namespace Prisma {
     referencias?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
+    activa?: SortOrder
   }
 
   export type DireccionAvgOrderByAggregateInput = {
@@ -25007,6 +25034,7 @@ export namespace Prisma {
     referencias?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
+    activa?: SortOrder
   }
 
   export type DireccionMinOrderByAggregateInput = {
@@ -25020,6 +25048,7 @@ export namespace Prisma {
     referencias?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
+    activa?: SortOrder
   }
 
   export type DireccionSumOrderByAggregateInput = {
@@ -27194,6 +27223,7 @@ export namespace Prisma {
     referencias?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    activa?: boolean
     solicitudes?: SolicitudCreateNestedManyWithoutDireccionInput
   }
 
@@ -27207,6 +27237,7 @@ export namespace Prisma {
     referencias?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    activa?: boolean
     solicitudes?: SolicitudUncheckedCreateNestedManyWithoutDireccionInput
   }
 
@@ -27379,6 +27410,7 @@ export namespace Prisma {
     referencias?: StringNullableFilter<"Direccion"> | string | null
     latitud?: DecimalNullableFilter<"Direccion"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableFilter<"Direccion"> | Decimal | DecimalJsLike | number | string | null
+    activa?: BoolFilter<"Direccion"> | boolean
   }
 
   export type SolicitudUpsertWithWhereUniqueWithoutClienteInput = {
@@ -28598,6 +28630,7 @@ export namespace Prisma {
     referencias?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    activa?: boolean
     usuario: UsuarioCreateNestedOneWithoutDireccionesInput
   }
 
@@ -28612,6 +28645,7 @@ export namespace Prisma {
     referencias?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    activa?: boolean
   }
 
   export type DireccionCreateOrConnectWithoutSolicitudesInput = {
@@ -28855,6 +28889,7 @@ export namespace Prisma {
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    activa?: BoolFieldUpdateOperationsInput | boolean
     usuario?: UsuarioUpdateOneRequiredWithoutDireccionesNestedInput
   }
 
@@ -28869,6 +28904,7 @@ export namespace Prisma {
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    activa?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type EspecialidadUpsertWithoutSolicitudesInput = {
@@ -30312,6 +30348,7 @@ export namespace Prisma {
     referencias?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    activa?: boolean
   }
 
   export type SolicitudCreateManyClienteInput = {
@@ -30364,6 +30401,7 @@ export namespace Prisma {
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    activa?: BoolFieldUpdateOperationsInput | boolean
     solicitudes?: SolicitudUpdateManyWithoutDireccionNestedInput
   }
 
@@ -30377,6 +30415,7 @@ export namespace Prisma {
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    activa?: BoolFieldUpdateOperationsInput | boolean
     solicitudes?: SolicitudUncheckedUpdateManyWithoutDireccionNestedInput
   }
 
@@ -30390,6 +30429,7 @@ export namespace Prisma {
     referencias?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    activa?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type SolicitudUpdateWithoutClienteInput = {

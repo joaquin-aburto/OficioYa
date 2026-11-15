@@ -39,10 +39,11 @@ export async function GET(req: Request) {
             pago: { select: { id: true, estado: true, metodoPago: true } },
           },
         }),
-        prisma.direccion.findMany({
-          where: { usuarioId },
-          select: { id: true, alias: true, calle: true, colonia: true, ciudad: true },
-        }),
+       prisma.direccion.findMany({
+  where: { usuarioId, activa: true },
+  orderBy: { id: 'asc' },
+  select: { id: true, alias: true, calle: true, colonia: true, ciudad: true, codigoPostal: true },
+}),
         prisma.especialidad.findMany({
           orderBy: { nombre: 'asc' },
           select: { id: true, nombre: true, descripcion: true, icono: true },
@@ -71,6 +72,8 @@ export async function GET(req: Request) {
     // Promedio de calificaciones de todos los trabajadores que aparecen en pantalla
     const idsTrabajadores = new Set<number>(candidatos.map((t) => t.id))
     solicitudes.forEach((s) => s.cotizaciones.forEach((c) => idsTrabajadores.add(c.trabajadorId)))
+
+    
 
     const promedios = await prisma.calificacion.groupBy({
       by: ['trabajadorId'],

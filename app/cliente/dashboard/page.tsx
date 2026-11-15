@@ -483,10 +483,10 @@ function eliminarDireccion(id: number) {
       ),
     [activas]
   )
-  const porCalificar = useMemo(
-    () => solicitudes.filter((s) => s.estado === 'Terminada' && !s.yaCalificada),
-    [solicitudes]
-  )
+ const porCalificar = useMemo(
+  () => solicitudes.filter((s) => s.estado === 'Terminada' && !s.yaCalificada && !omitidas.includes(s.id)),
+  [solicitudes, omitidas]
+)
   // Trabajos terminados que aún no se pagan (sin método elegido, o con pago pendiente de confirmar)
   const porPagar = useMemo(
     () =>
@@ -787,7 +787,9 @@ function eliminarDireccion(id: number) {
     <strong>{s.especialidad.nombre}</strong> con {s.trabajadorAsignado?.nombre ?? 'tu profesional'}
   </span>
   <div style={{ display: 'flex', gap: 8 }}>
-    <button className="btn btn-ghost btn-sm" onClick={() => omitirCalificacion(s.id)}>Omitir</button>
+    <button type="button" className="btn btn-ghost" onClick={() => omitirCalificacion(s.id)}>
+  No calificar
+</button>
     <button className="btn btn-accent" onClick={() => setCalificando(s)}>Calificar servicio</button>
   </div>
 </li>
@@ -1106,31 +1108,29 @@ function eliminarDireccion(id: number) {
     )}
 
       {agregandoDir && (
-  <DireccionModal
-    ocupado={ocupado}
-    onClose={() => setAgregandoDir(false)}
-    onSubmit={async (dir) => {
-      const ok = await ejecutar({ accion: 'agregarDireccion', ...dir }, 'Dirección guardada.')
-      if (ok) setAgregandoDir(false)
-    }}
-  />
-)}
+        <DireccionModal
+          ocupado={ocupado}
+          onClose={() => setAgregandoDir(false)}
+          onSubmit={async (dir) => {
+            const ok = await ejecutar({ accion: 'agregarDireccion', ...dir }, 'Dirección guardada.')
+            if (ok) setAgregandoDir(false)
+          }}
+        />
+      )}
 
-{/* {agregandoTarjeta && (
-  <TarjetaModal
-    ocupado={ocupado}
-    onClose={() => setAgregandoTarjeta(null)}
-    onSubmit={async (t) => {
-      try { localStorage.setItem(`oficioya_tarjeta_${usuarioId}`, JSON.stringify(t)) } catch {}
-      setTarjeta(t)
-      const ok = await ejecutar(
-        { accion: 'elegirMetodoPago', solicitudId: agregandoTarjeta.id, metodoPago: 'Tarjeta' },
-        `Tarjeta ${t.marca} •••• ${t.ultimos4} agregada.`
-      )
-      if (ok) setAgregandoTarjeta(null)
-    }}
-  />
-)} */}
+      {agregandoTarjeta && (
+        <TarjetaModal
+          ocupado={ocupado}
+          onClose={() => setAgregandoTarjeta(null)}
+          onSubmit={(t) => {
+            try { localStorage.setItem(`oficioya_tarjeta_${usuarioId}`, JSON.stringify(t)) } catch {}
+            setTarjeta(t)
+            setSeleccion((p) => ({ ...p, [agregandoTarjeta.id]: 'Tarjeta' }))
+            setToast(`Tarjeta ${t.marca} •••• ${t.ultimos4} agregada. Ahora pulsa Pagar.`)
+            setAgregandoTarjeta(null)
+          }}
+        />
+      )}
 
       {toast && (
         <div className="toast" role="status">
@@ -1385,16 +1385,16 @@ function NuevaSolicitudModal({
 /* ------------------------------------------------------------------ */
 
 function CalificarModal({
-   solicitud,
+  solicitud,
   ocupado,
   onClose,
-  onOmitir,        // ← agregar aquí
+  onOmitir,
   onSubmit,
 }: {
   solicitud: Solicitud
   ocupado: boolean
   onClose: () => void
-  onOmitir: () => void   // ← y aquí en el tipo
+  onOmitir: () => void
   onSubmit: (puntuacion: number, comentario: string) => void
 }) {
   const [puntos, setPuntos] = useState(0)

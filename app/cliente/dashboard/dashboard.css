@@ -85,6 +85,28 @@
 
 .not-del { flex-shrink: 0; opacity: 0.5; padding: 4px; }
 .not-del:hover { opacity: 1; }
+
+.chips .paypal-btn,
+.paypal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 16px;
+  background: #ffc439;
+  border: 1px solid #ffc439;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  transition: filter 0.15s;
+}
+.chips .paypal-btn:hover { filter: brightness(0.95); background: #ffc439; }
+.chips .paypal-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.chips .paypal-btn .pp-pay { color: #003087; }
+.chips .paypal-btn .pp-pal { color: #009cde; }
 /* ------------------------------------------------------------------
    Barra lateral
 ------------------------------------------------------------------- */

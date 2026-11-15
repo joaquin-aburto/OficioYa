@@ -43,8 +43,11 @@ type Cotizacion = {
   fechaEnvio: string
   trabajador: TrabajadorMini
 }
-type Metodo = 'Tarjeta' | 'Efectivo' | 'Transferencia'
+type Metodo = 'Tarjeta' | 'Efectivo' | 'PayPal' | 'Transferencia' 
 type PagoMini = { id: number; estado: 'Pendiente' | 'Completado' | 'Fallido'; metodoPago: Metodo }
+type TarjetaGuardada = { marca: string; ultimos4: string; titular: string; vence: string }
+
+
 
 type Solicitud = {
   id: number
@@ -94,8 +97,9 @@ type DashboardData = {
 
 // Debe coincidir con lo que guardes en el login (ver instrucciones)
 const STORAGE_KEY = 'oficioya_usuario'
+const METODOS: Metodo[] = ['Efectivo', 'PayPal', 'Tarjeta']
 
-const METODOS: Metodo[] = ['Efectivo', 'Transferencia', 'Tarjeta']
+
 const PASOS = ['Pendiente', 'Cotizada', 'Aceptada', 'EnCurso', 'Terminada', 'Calificada']
 const ACTIVAS = ['Pendiente', 'Cotizada', 'Aceptada', 'EnCurso']
 const ETIQUETA_ESTADO: Record<string, string> = {
@@ -147,6 +151,13 @@ function adivinarEspecialidad(texto: string, lista: Especialidad[]): number | nu
     }
   }
   return null
+}
+
+function marcaTarjeta(num: string) {
+  if (num.startsWith('4')) return 'Visa'
+  if (/^(5[1-5]|2[2-7])/.test(num)) return 'Mastercard'
+  if (/^3[47]/.test(num)) return 'Amex'
+  return 'Tarjeta'
 }
 
 function emojiDe(nombre: string, icono?: string | null) {
@@ -278,6 +289,11 @@ export default function ClienteDashboardPage() {
   const [toast, setToast] = useState('')
   const [ocupado, setOcupado] = useState(false)
   const [agregandoDir, setAgregandoDir] = useState(false)
+  
+
+  const [tarjeta, setTarjeta] = useState<TarjetaGuardada | null>(null)
+const [agregandoTarjeta, setAgregandoTarjeta] = useState<Solicitud | null>(null)
+const [seleccion, setSeleccion] = useState<Record<number, Metodo>>({})
   /* --- sesión mínima (localStorage). Reemplázala por cookie/sesión real --- */
   useEffect(() => {
     try {
@@ -379,6 +395,42 @@ const push = usePush(usuarioId)
       setOcupado(false)
     }
   }
+
+function pagar(s: Solicitud, m: Metodo) {
+  const nombre = s.trabajadorAsignado?.nombre ?? 'tu profesional'
+
+  if (m === 'PayPal') {
+    window.open('https://www.paypal.com/signin', '_blank', 'noopener,noreferrer')
+    ejecutar(
+      { accion: 'elegirMetodoPago', solicitudId: s.id, metodoPago: 'PayPal' },
+      `Te llevamos a PayPal. ${nombre} confirmará cuando reciba el pago.`
+    )
+    return
+  }
+
+  if (m === 'Efectivo') {
+    ejecutar(
+      { accion: 'elegirMetodoPago', solicitudId: s.id, metodoPago: 'Efectivo' },
+      `Listo. Le avisamos a ${nombre} que pagarás en efectivo.`
+    )
+    return
+  }
+
+  // Tarjeta: solo se selecciona; el pago se envía con el botón "Pagar"
+  if (!tarjeta) {
+    setAgregandoTarjeta(s)
+    return
+  }
+  setSeleccion((p) => ({ ...p, [s.id]: 'Tarjeta' }))
+}
+
+function pagarConTarjeta(s: Solicitud) {
+  const nombre = s.trabajadorAsignado?.nombre ?? 'tu profesional'
+  ejecutar(
+    { accion: 'elegirMetodoPago', solicitudId: s.id, metodoPago: 'Tarjeta' },
+    `Pago enviado. ${nombre} confirmará cuando lo reciba.`
+  )
+}
 function eliminarNotificacion(id: number) {
   // Se quita al instante de la pantalla; luego se confirma con el servidor
   setData((d) => (d ? { ...d, notificaciones: d.notificaciones.filter((n) => n.id !== id) } : d))
@@ -653,24 +705,51 @@ function eliminarDireccion(id: number) {
                               : 'El trabajo ya terminó. ¿Cómo le vas a pagar?'}
                           </span>
                         </span>
-                        <div className="chips" role="group" aria-label="Forma de pago">
-                          {METODOS.map((m) => (
-                            <button
-                              key={m}
-                              type="button"
-                              className={s.pago?.metodoPago === m ? 'on' : ''}
-                              disabled={ocupado}
-                              onClick={() =>
-                                ejecutar(
-                                  { accion: 'elegirMetodoPago', solicitudId: s.id, metodoPago: m },
-                                  `Listo. Le avisamos a ${nombre} que pagarás con ${m.toLowerCase()}.`
-                                )
-                              }
-                            >
-                              {m}
+                       <div className="chips" role="group" aria-label="Forma de pago">
+                        <button
+                          type="button"
+                          className={(seleccion[s.id] ?? s.pago?.metodoPago) === 'Efectivo' ? 'on' : ''}
+                          disabled={ocupado}
+                          onClick={() => pagar(s, 'Efectivo')}
+                        >
+                          💵 Efectivo
+                        </button>
+                        <button
+                          type="button"
+                          className={(seleccion[s.id] ?? s.pago?.metodoPago) === 'Tarjeta' ? 'on' : ''}
+                          disabled={ocupado}
+                          onClick={() => pagar(s, 'Tarjeta')}
+                        >
+                          💳 Tarjeta
+                        </button>
+                        {/* Botón de PayPal */}
+                      <button type="button" className="paypal-btn" disabled={ocupado} onClick={() => pagar(s, 'PayPal')}>
+                        <span className="pp-pay">Pay</span><span className="pp-pal">Pal</span>
+                      </button>
+
+                      </div>
+
+                      
+                      {/* Tarjeta elegida: botón Pagar */}
+                      {seleccion[s.id] === 'Tarjeta' && tarjeta && s.pago?.metodoPago !== 'Tarjeta' && (
+                        <div className="tarjeta-pagar">
+                          <p className="muted small">
+                            {tarjeta.marca} •••• {tarjeta.ultimos4} ·{' '}
+                            <button type="button" className="link-danger" onClick={() => setAgregandoTarjeta(s)}>
+                              Cambiar tarjeta
                             </button>
-                          ))}
+                          </p>
+                          <button
+                            type="button"
+                            className="btn btn-primary btn-block"
+                            disabled={ocupado}
+                            onClick={() => pagarConTarjeta(s)}
+                          >
+                            {ocupado ? 'Enviando…' : `Pagar ${total ? dinero(total) : ''}`}
+                          </button>
                         </div>
+                      )}
+                      
                       </li>
                     )
                   })}
@@ -1010,6 +1089,22 @@ function eliminarDireccion(id: number) {
     onSubmit={async (dir) => {
       const ok = await ejecutar({ accion: 'agregarDireccion', ...dir }, 'Dirección guardada.')
       if (ok) setAgregandoDir(false)
+    }}
+  />
+)}
+
+{agregandoTarjeta && (
+  <TarjetaModal
+    ocupado={ocupado}
+    onClose={() => setAgregandoTarjeta(null)}
+    onSubmit={async (t) => {
+      try { localStorage.setItem(`oficioya_tarjeta_${usuarioId}`, JSON.stringify(t)) } catch {}
+      setTarjeta(t)
+      const ok = await ejecutar(
+        { accion: 'elegirMetodoPago', solicitudId: agregandoTarjeta.id, metodoPago: 'Tarjeta' },
+        `Tarjeta ${t.marca} •••• ${t.ultimos4} agregada.`
+      )
+      if (ok) setAgregandoTarjeta(null)
     }}
   />
 )}
@@ -1410,6 +1505,104 @@ function DireccionModal({
           <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
           <button type="submit" className="btn btn-primary" disabled={ocupado}>
             {ocupado ? 'Guardando…' : 'Guardar dirección'}
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+function TarjetaModal({
+  ocupado,
+  onClose,
+  onSubmit,
+}: {
+  ocupado: boolean
+  onClose: () => void
+  onSubmit: (t: TarjetaGuardada) => void
+}) {
+  const [numero, setNumero] = useState('')
+  const [titular, setTitular] = useState('')
+  const [vence, setVence] = useState('')
+  const [cvv, setCvv] = useState('')
+  const [aviso, setAviso] = useState('')
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  const limpio = numero.replace(/\s/g, '')
+
+  function enviar(e: FormEvent) {
+    e.preventDefault()
+    if (limpio.length < 13 || limpio.length > 19) return setAviso('Revisa el número de tarjeta.')
+    if (!titular.trim()) return setAviso('Escribe el nombre que aparece en la tarjeta.')
+    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(vence)) return setAviso('La fecha debe ser MM/AA.')
+    if (cvv.length < 3) return setAviso('Revisa el código de seguridad.')
+    setAviso('')
+    // Solo se conservan marca y últimos 4 dígitos. Número completo y CVV se descartan.
+    onSubmit({ marca: marcaTarjeta(limpio), ultimos4: limpio.slice(-4), titular: titular.trim(), vence })
+  }
+
+  return (
+    <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <form className="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="t-title" onSubmit={enviar}>
+        <div className="modal-head">
+          <h2 id="t-title">Agregar tarjeta</h2>
+          <button type="button" className="icon-btn" onClick={onClose} aria-label="Cerrar">
+            <Icon name="close" />
+          </button>
+        </div>
+
+        <div className="field">
+          <label htmlFor="t-num">Número de tarjeta</label>
+          <input
+            id="t-num"
+            inputMode="numeric"
+            autoComplete="cc-number"
+            placeholder="4242 4242 4242 4242"
+            value={numero}
+            onChange={(e) =>
+              setNumero(e.target.value.replace(/\D/g, '').slice(0, 19).replace(/(.{4})/g, '$1 ').trim())
+            }
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="t-tit">Nombre del titular</label>
+          <input id="t-tit" autoComplete="cc-name" value={titular} onChange={(e) => setTitular(e.target.value)} />
+        </div>
+        <div className="field field-grid">
+          <input
+            aria-label="Vencimiento"
+            placeholder="MM/AA"
+            inputMode="numeric"
+            autoComplete="cc-exp"
+            maxLength={5}
+            value={vence}
+            onChange={(e) => {
+              const d = e.target.value.replace(/\D/g, '').slice(0, 4)
+              setVence(d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d)
+            }}
+          />
+          <input
+            aria-label="Código de seguridad"
+            placeholder="CVV"
+            inputMode="numeric"
+            autoComplete="cc-csc"
+            maxLength={4}
+            value={cvv}
+            onChange={(e) => setCvv(e.target.value.replace(/\D/g, ''))}
+          />
+        </div>
+
+        {aviso && <p className="form-aviso" role="alert">{aviso}</p>}
+
+        <div className="modal-actions">
+          <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary" disabled={ocupado}>
+            {ocupado ? 'Guardando…' : 'Guardar tarjeta'}
           </button>
         </div>
       </form>

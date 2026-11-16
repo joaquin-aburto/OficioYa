@@ -290,6 +290,9 @@ export default function TrabajadorDashboardPage() {
   const [horario, setHorario] = useState<Horario>(() => horarioDesde([]))
   const [horarioSucio, setHorarioSucio] = useState(false)
 
+  // Solicitudes que el trabajador decidió ignorar (se guardan en este navegador)
+  const [ignoradas, setIgnoradas] = useState<number[]>([])
+
   /* --- sesión mínima (localStorage). Reemplázala por cookie/sesión real --- */
   useEffect(() => {
     try {
@@ -304,6 +307,29 @@ export default function TrabajadorDashboardPage() {
       router.replace('/auth/login')
     }
   }, [router])
+
+  /* --- solicitudes ignoradas --- */
+  useEffect(() => {
+    if (!trabajadorId) return
+    try {
+      const raw = localStorage.getItem(`oficioya_ignoradas_${trabajadorId}`)
+      setIgnoradas(raw ? JSON.parse(raw) : [])
+    } catch {}
+  }, [trabajadorId])
+
+  function ignorarSolicitud(id: number) {
+    setIgnoradas((prev) => {
+      const nuevo = [...prev, id]
+      try { localStorage.setItem(`oficioya_ignoradas_${trabajadorId}`, JSON.stringify(nuevo)) } catch {}
+      return nuevo
+    })
+    setToast('Solicitud ignorada.')
+  }
+
+  function restaurarIgnoradas() {
+    setIgnoradas([])
+    try { localStorage.removeItem(`oficioya_ignoradas_${trabajadorId}`) } catch {}
+  }
 
   const ultimaFirma = useRef('')
   const notifVistas = useRef<Set<number> | null>(null)
@@ -401,6 +427,18 @@ export default function TrabajadorDashboardPage() {
     router.push('/auth/login')
   }
 
+  function eliminarNotificacion(id: number) {
+    // Se quita al instante de la pantalla; luego se confirma con el servidor
+    setData((d) => (d ? { ...d, notificaciones: d.notificaciones.filter((n) => n.id !== id) } : d))
+    ejecutar({ accion: 'eliminarNotificacion', notificacionId: id }, 'Aviso eliminado.')
+  }
+
+  function eliminarTodas() {
+    if (!confirm('¿Eliminar todos tus avisos?')) return
+    setData((d) => (d ? { ...d, notificaciones: [] } : d))
+    ejecutar({ accion: 'eliminarTodasNotificaciones' }, 'Avisos eliminados.')
+  }
+
   function cambiarDia(dia: Dia, cambios: Partial<Horario[Dia]>) {
     setHorario((h) => ({ ...h, [dia]: { ...h[dia], ...cambios } }))
     setHorarioSucio(true)
@@ -416,7 +454,12 @@ export default function TrabajadorDashboardPage() {
   }
 
   /* --- datos derivados --- */
-  const leads = data?.leads ?? []
+  const leads = useMemo(
+    () => (data?.leads ?? []).filter((l) => !ignoradas.includes(l.id)),
+    [data, ignoradas]
+  )
+  const totalIgnoradas = (data?.leads ?? []).filter((l) => ignoradas.includes(l.id)).length
+
   const urgentes = useMemo(() => leads.filter((l) => l.urgencia === 'Urgente'), [leads])
   const leadsVisibles = filtroLeads === 'urgentes' ? urgentes : leads
   const cotizacionesEnEspera = (data?.cotizaciones ?? []).filter((c) => c.estado === 'Enviada').length
@@ -525,7 +568,7 @@ export default function TrabajadorDashboardPage() {
               <div className="oficios-mini" aria-label="Tus oficios">
                 {data.especialidades.map((e) => (
                   <span key={e.id} className="oficio-tag">
-                    {emojiDe(e.nombre, e.icono)} {e.nombre}
+                    {emojiDe(e.nombre)} {e.nombre}
                   </span>
                 ))}
               </div>
@@ -581,6 +624,12 @@ export default function TrabajadorDashboardPage() {
                 </div>
               </div>
 
+              {totalIgnoradas > 0 && (
+                <button type="button" className="link-danger" onClick={restaurarIgnoradas}>
+                  Mostrar {totalIgnoradas} {totalIgnoradas === 1 ? 'solicitud ignorada' : 'solicitudes ignoradas'} de nuevo
+                </button>
+              )}
+
               {leadsVisibles.length === 0 ? (
                 <p className="vacio">
                   {data.especialidades.length === 0
@@ -592,7 +641,6 @@ export default function TrabajadorDashboardPage() {
                   {leadsVisibles.map((l) => (
                     <li key={l.id} className={`lead ${l.urgencia === 'Urgente' ? 'lead-urgente' : ''}`}>
                       <div className="lead-top">
-                        <span className="sol-emoji" aria-hidden="true">{emojiDe(l.especialidad.nombre, l.especialidad.icono)}</span>
                         <div className="sol-title">
                           <h3>{l.especialidad.nombre}</h3>
                           <p className="muted small">
@@ -615,9 +663,20 @@ export default function TrabajadorDashboardPage() {
                           : `${l.totalCotizaciones} ${l.totalCotizaciones === 1 ? 'cotización' : 'cotizaciones'} enviadas`}
                       </p>
 
-                      <button className="btn btn-primary btn-block" onClick={() => setCotizando(l)}>
-                        Enviar cotización
-                      </button>
+                      <div className="cot-actions">
+                        <button className="btn btn-primary" onClick={() => setCotizando(l)}>
+                          Enviar cotización
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-ghost"
+                          onClick={() => {
+                            if (confirm('¿Ignorar esta solicitud? Ya no aparecerá en tu lista.')) ignorarSolicitud(l.id)
+                          }}
+                        >
+                          Ignorar
+                        </button>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -639,7 +698,7 @@ export default function TrabajadorDashboardPage() {
                     return (
                       <li key={t.id} className="sol">
                         <div className="sol-top">
-                          <span className="sol-emoji" aria-hidden="true">{emojiDe(t.especialidad.nombre, t.especialidad.icono)}</span>
+
                           <div className="sol-title">
                             <h3>{t.especialidad.nombre}</h3>
                             <p className="muted small">
@@ -935,14 +994,30 @@ export default function TrabajadorDashboardPage() {
               {data.notificaciones.length === 0 ? (
                 <p className="vacio">Sin avisos por ahora.</p>
               ) : (
-                <ul className="not-list">
-                  {data.notificaciones.map((n) => (
-                    <li key={n.id} className={n.leido ? '' : 'nueva'}>
-                      <p>{n.mensaje}</p>
-                      <span className="muted small">{hace(n.fechaCreacion)}</span>
-                    </li>
-                  ))}
-                </ul>
+                <>
+                  <button className="link-danger" onClick={eliminarTodas} disabled={ocupado}>
+                    Eliminar todos
+                  </button>
+                  <ul className="not-list">
+                    {data.notificaciones.map((n) => (
+                      <li key={n.id} className={n.leido ? '' : 'nueva'}>
+                        <div className="not-body">
+                          <p>{n.mensaje}</p>
+                          <span className="muted small">{hace(n.fechaCreacion)}</span>
+                        </div>
+                        <button
+                          type="button"
+                          className="icon-btn not-del"
+                          onClick={() => eliminarNotificacion(n.id)}
+                          aria-label="Eliminar aviso"
+                          title="Eliminar"
+                        >
+                          <Icon name="close" size={14} />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </>
               )}
             </section>
           </aside>

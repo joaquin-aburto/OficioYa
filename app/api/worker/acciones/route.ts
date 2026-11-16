@@ -197,6 +197,25 @@ export async function POST(req: Request) {
         await prisma.servicio.update({ where: { id: servicio.id }, data: { activo: !servicio.activo } })
         return NextResponse.json({ ok: true })
       }
+      
+      case 'eliminarNotificacion': {
+        const r = await prisma.notificacion.deleteMany({
+          where: {
+            id: Number(body.notificacionId),
+            destinatarioTipo: 'Trabajador',
+            destinatarioId: trabajadorId,
+          },
+        })
+        if (r.count === 0) return NextResponse.json({ error: 'Aviso no encontrado.' }, { status: 404 })
+        return NextResponse.json({ ok: true })
+      }
+
+      case 'eliminarTodasNotificaciones': {
+        await prisma.notificacion.deleteMany({
+          where: { destinatarioTipo: 'Trabajador', destinatarioId: trabajadorId },
+        })
+        return NextResponse.json({ ok: true })
+      }
 
       default:
         return fail('Acción no reconocida.')

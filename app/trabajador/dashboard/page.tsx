@@ -161,6 +161,19 @@ function saludo() {
   return 'Buenas noches'
 }
 
+// getDay(): 0 = domingo ... 6 = sábado
+const DIA_POR_NUMERO: Dia[] = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado']
+
+// fechaDeseada es una fecha sin hora ("2026-11-20..."). Se toma solo AAAA-MM-DD y se arma como
+// fecha local; con new Date(iso) en México (UTC-6) el día se recorrería uno hacia atrás.
+function fechaLocal(iso: string) {
+  const [y, m, d] = iso.slice(0, 10).split('-').map(Number)
+  return new Date(y, m - 1, d)
+}
+const diaDeFecha = (iso: string): Dia => DIA_POR_NUMERO[fechaLocal(iso).getDay()]
+const diaCorto = (iso: string) =>
+  fechaLocal(iso).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })
+
 const ESTADO_TRABAJO: Record<string, string> = {
   Aceptada: 'Por iniciar',
   EnCurso: 'En curso',
@@ -454,11 +467,26 @@ export default function TrabajadorDashboardPage() {
   }
 
   /* --- datos derivados --- */
-  const leads = useMemo(
-    () => (data?.leads ?? []).filter((l) => !ignoradas.includes(l.id)),
-    [data, ignoradas]
+  // Días que el trabajador tiene guardados como disponibles (el horario ya guardado, no el borrador)
+  const diasQueTrabaja = useMemo(
+    () => new Set((data?.disponibilidad ?? []).map((b) => b.diaSemana)),
+    [data]
   )
-  const totalIgnoradas = (data?.leads ?? []).filter((l) => ignoradas.includes(l.id)).length
+
+  // Una solicitud se oculta si pide una fecha en un día que no trabaja.
+  // Sin horario guardado, o sin fecha deseada, siempre se muestra.
+  const trabajaEseDia = useCallback(
+    (l: Lead) =>
+      diasQueTrabaja.size === 0 || !l.fechaDeseada || diasQueTrabaja.has(diaDeFecha(l.fechaDeseada)),
+    [diasQueTrabaja]
+  )
+
+  const leads = useMemo(
+    () => (data?.leads ?? []).filter((l) => !ignoradas.includes(l.id) && trabajaEseDia(l)),
+    [data, ignoradas, trabajaEseDia]
+  )
+  const totalIgnoradas = (data?.leads ?? []).filter((l) => ignoradas.includes(l.id) && trabajaEseDia(l)).length
+  const totalFueraDeHorario = (data?.leads ?? []).filter((l) => !ignoradas.includes(l.id) && !trabajaEseDia(l)).length
 
   const urgentes = useMemo(() => leads.filter((l) => l.urgencia === 'Urgente'), [leads])
   const leadsVisibles = filtroLeads === 'urgentes' ? urgentes : leads
@@ -624,6 +652,16 @@ export default function TrabajadorDashboardPage() {
                 </div>
               </div>
 
+              {totalFueraDeHorario > 0 && (
+                <p className="muted small">
+                  {totalFueraDeHorario}{' '}
+                  {totalFueraDeHorario === 1
+                    ? 'solicitud oculta porque pide un día en que no trabajas.'
+                    : 'solicitudes ocultas porque piden un día en que no trabajas.'}{' '}
+                  <a href="#agenda">Cambiar mi horario</a>
+                </p>
+              )}
+
               {totalIgnoradas > 0 && (
                 <button type="button" className="link-danger" onClick={restaurarIgnoradas}>
                   Mostrar {totalIgnoradas} {totalIgnoradas === 1 ? 'solicitud ignorada' : 'solicitudes ignoradas'} de nuevo
@@ -645,7 +683,7 @@ export default function TrabajadorDashboardPage() {
                           <h3>{l.especialidad.nombre}</h3>
                           <p className="muted small">
                             {l.clienteNombre} · {hace(l.fechaCreacion)}
-                            {l.fechaDeseada ? ` · lo quiere para el ${fechaCorta(l.fechaDeseada)}` : ''}
+                            {l.fechaDeseada ? ` · lo quiere para el ${diaCorto(l.fechaDeseada)}` : ''}
                           </p>
                         </div>
                         {l.urgencia === 'Urgente' && <span className="tag tag-urgente">Urgente</span>}
@@ -703,7 +741,7 @@ export default function TrabajadorDashboardPage() {
                             <h3>{t.especialidad.nombre}</h3>
                             <p className="muted small">
                               #{t.id} · {t.cliente.nombre}
-                              {t.fechaDeseada ? ` · para el ${fechaCorta(t.fechaDeseada)}` : ''}
+                              {t.fechaDeseada ? ` · para el ${diaCorto(t.fechaDeseada)}` : ''}
                             </p>
                           </div>
                           {t.urgencia === 'Urgente' && <span className="tag tag-urgente">Urgente</span>}

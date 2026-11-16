@@ -8,9 +8,6 @@ import { subirFotosProblema, validarFoto, MAX_FOTOS } from '../../lib/fotoProble
 
 import { usePush } from '../../lib/usePush'
 
-
-
-
 /* ------------------------------------------------------------------ */
 /* Tipos                                                               */
 /* ------------------------------------------------------------------ */
@@ -43,11 +40,9 @@ type Cotizacion = {
   fechaEnvio: string
   trabajador: TrabajadorMini
 }
-type Metodo = 'Tarjeta' | 'Efectivo' | 'PayPal' | 'Transferencia' 
+type Metodo = 'Tarjeta' | 'Efectivo' | 'PayPal' | 'Transferencia'
 type PagoMini = { id: number; estado: 'Pendiente' | 'Completado' | 'Fallido'; metodoPago: Metodo }
 type TarjetaGuardada = { marca: string; ultimos4: string; titular: string; vence: string }
-
-
 
 type Solicitud = {
   id: number
@@ -97,11 +92,11 @@ type DashboardData = {
 
 // Debe coincidir con lo que guardes en el login (ver instrucciones)
 const STORAGE_KEY = 'oficioya_usuario'
-const METODOS: Metodo[] = ['Efectivo', 'PayPal', 'Tarjeta']
-
 
 const PASOS = ['Pendiente', 'Cotizada', 'Aceptada', 'EnCurso', 'Terminada', 'Calificada']
 const ACTIVAS = ['Pendiente', 'Cotizada', 'Aceptada', 'EnCurso']
+// Estados en los que el cliente todavía puede cambiar el problema
+const EDITABLES = ['Pendiente', 'Cotizada']
 const ETIQUETA_ESTADO: Record<string, string> = {
   Pendiente: 'Esperando cotizaciones',
   Cotizada: 'Ya hay cotizaciones',
@@ -141,7 +136,6 @@ const PALABRAS_CLAVE: [string, string[]][] = [
 
 const quitarAcentos = (t: string) => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 
-
 function adivinarEspecialidad(texto: string, lista: Especialidad[]): number | null {
   const t = quitarAcentos(texto)
   for (const [clave, palabras] of PALABRAS_CLAVE) {
@@ -172,6 +166,13 @@ const dinero = (n: number) =>
 const fechaCorta = (iso: string) =>
   new Date(iso).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })
 
+// fechaDeseada es una fecha sin hora ("2026-11-20..."). Se toma solo AAAA-MM-DD y se arma como
+// fecha local; con new Date(iso) en México (UTC-6) el día se recorrería uno hacia atrás.
+const diaCorto = (iso: string) => {
+  const [y, m, d] = iso.slice(0, 10).split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })
+}
+
 function hace(iso: string) {
   const min = Math.round((Date.now() - new Date(iso).getTime()) / 60000)
   if (min < 1) return 'ahora'
@@ -187,6 +188,20 @@ function saludo() {
   if (h < 12) return 'Buenos días'
   if (h < 19) return 'Buenas tardes'
   return 'Buenas noches'
+}
+
+/* --- fechas para solicitudes urgentes (siempre en hora local, no UTC) --- */
+const DIAS_MAX_URGENTE = 5
+
+const aISO = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
+const hoyISO = () => aISO(new Date())
+
+const sumarDiasISO = (n: number) => {
+  const d = new Date()
+  d.setDate(d.getDate() + n)
+  return aISO(d)
 }
 
 /* ------------------------------------------------------------------ */
@@ -285,34 +300,35 @@ export default function ClienteDashboardPage() {
   const [filtroEsp, setFiltroEsp] = useState<number | null>(null)
   const [problema, setProblema] = useState('')
   const [borrador, setBorrador] = useState<BorradorSolicitud | null>(null)
+  const [editando, setEditando] = useState<Solicitud | null>(null)
   const [calificando, setCalificando] = useState<Solicitud | null>(null)
   const [toast, setToast] = useState('')
   const [ocupado, setOcupado] = useState(false)
   const [agregandoDir, setAgregandoDir] = useState(false)
-  
 
   const [tarjeta, setTarjeta] = useState<TarjetaGuardada | null>(null)
-const [agregandoTarjeta, setAgregandoTarjeta] = useState<Solicitud | null>(null)
-const [seleccion, setSeleccion] = useState<Record<number, Metodo>>({})
+  const [agregandoTarjeta, setAgregandoTarjeta] = useState<Solicitud | null>(null)
+  const [seleccion, setSeleccion] = useState<Record<number, Metodo>>({})
 
-const [omitidas, setOmitidas] = useState<number[]>([])
+  const [omitidas, setOmitidas] = useState<number[]>([])
 
-useEffect(() => {
-  if (!usuarioId) return
-  try {
-    const raw = localStorage.getItem(`oficioya_omitidas_${usuarioId}`)
-    setOmitidas(raw ? JSON.parse(raw) : [])
-  } catch {}
-}, [usuarioId])
+  useEffect(() => {
+    if (!usuarioId) return
+    try {
+      const raw = localStorage.getItem(`oficioya_omitidas_${usuarioId}`)
+      setOmitidas(raw ? JSON.parse(raw) : [])
+    } catch {}
+  }, [usuarioId])
 
-function omitirCalificacion(id: number) {
-  setOmitidas((prev) => {
-    const nuevo = [...prev, id]
-    try { localStorage.setItem(`oficioya_omitidas_${usuarioId}`, JSON.stringify(nuevo)) } catch {}
-    return nuevo
-  })
-  setCalificando(null)
-}
+  function omitirCalificacion(id: number) {
+    setOmitidas((prev) => {
+      const nuevo = [...prev, id]
+      try { localStorage.setItem(`oficioya_omitidas_${usuarioId}`, JSON.stringify(nuevo)) } catch {}
+      return nuevo
+    })
+    setCalificando(null)
+  }
+
   /* --- sesión mínima (localStorage). Reemplázala por cookie/sesión real --- */
   useEffect(() => {
     try {
@@ -386,9 +402,8 @@ function omitirCalificacion(id: number) {
     return () => clearTimeout(t)
   }, [toast])
 
+  const push = usePush(usuarioId)
 
-  // dentro de ClienteDashboardPage, después de los useState:
-const push = usePush(usuarioId)
   /* --- acciones contra la API --- */
   async function ejecutar(body: Record<string, unknown>, exito: string): Promise<boolean> {
     if (!usuarioId) return false
@@ -415,57 +430,58 @@ const push = usePush(usuarioId)
     }
   }
 
-function pagar(s: Solicitud, m: Metodo) {
-  const nombre = s.trabajadorAsignado?.nombre ?? 'tu profesional'
+  function pagar(s: Solicitud, m: Metodo) {
+    const nombre = s.trabajadorAsignado?.nombre ?? 'tu profesional'
 
-  if (m === 'PayPal') {
-    window.open('https://www.paypal.com/signin', '_blank', 'noopener,noreferrer')
+    if (m === 'PayPal') {
+      window.open('https://www.paypal.com/signin', '_blank', 'noopener,noreferrer')
+      ejecutar(
+        { accion: 'elegirMetodoPago', solicitudId: s.id, metodoPago: 'PayPal' },
+        `Te llevamos a PayPal. ${nombre} confirmará cuando reciba el pago.`
+      )
+      return
+    }
+
+    if (m === 'Efectivo') {
+      ejecutar(
+        { accion: 'elegirMetodoPago', solicitudId: s.id, metodoPago: 'Efectivo' },
+        `Listo. Le avisamos a ${nombre} que pagarás en efectivo.`
+      )
+      return
+    }
+
+    // Tarjeta: solo se selecciona; el pago se envía con el botón "Pagar"
+    if (!tarjeta) {
+      setAgregandoTarjeta(s)
+      return
+    }
+    setSeleccion((p) => ({ ...p, [s.id]: 'Tarjeta' }))
+  }
+
+  function pagarConTarjeta(s: Solicitud) {
+    const nombre = s.trabajadorAsignado?.nombre ?? 'tu profesional'
     ejecutar(
-      { accion: 'elegirMetodoPago', solicitudId: s.id, metodoPago: 'PayPal' },
-      `Te llevamos a PayPal. ${nombre} confirmará cuando reciba el pago.`
+      { accion: 'elegirMetodoPago', solicitudId: s.id, metodoPago: 'Tarjeta' },
+      `Pago enviado. ${nombre} confirmará cuando lo reciba.`
     )
-    return
   }
 
-  if (m === 'Efectivo') {
-    ejecutar(
-      { accion: 'elegirMetodoPago', solicitudId: s.id, metodoPago: 'Efectivo' },
-      `Listo. Le avisamos a ${nombre} que pagarás en efectivo.`
-    )
-    return
+  function eliminarNotificacion(id: number) {
+    // Se quita al instante de la pantalla; luego se confirma con el servidor
+    setData((d) => (d ? { ...d, notificaciones: d.notificaciones.filter((n) => n.id !== id) } : d))
+    ejecutar({ accion: 'eliminarNotificacion', notificacionId: id }, 'Aviso eliminado.')
   }
 
-  // Tarjeta: solo se selecciona; el pago se envía con el botón "Pagar"
-  if (!tarjeta) {
-    setAgregandoTarjeta(s)
-    return
+  function eliminarTodas() {
+    if (!confirm('¿Eliminar todos tus avisos?')) return
+    setData((d) => (d ? { ...d, notificaciones: [] } : d))
+    ejecutar({ accion: 'eliminarTodasNotificaciones' }, 'Avisos eliminados.')
   }
-  setSeleccion((p) => ({ ...p, [s.id]: 'Tarjeta' }))
-}
 
-function pagarConTarjeta(s: Solicitud) {
-  const nombre = s.trabajadorAsignado?.nombre ?? 'tu profesional'
-  ejecutar(
-    { accion: 'elegirMetodoPago', solicitudId: s.id, metodoPago: 'Tarjeta' },
-    `Pago enviado. ${nombre} confirmará cuando lo reciba.`
-  )
-}
-function eliminarNotificacion(id: number) {
-  // Se quita al instante de la pantalla; luego se confirma con el servidor
-  setData((d) => (d ? { ...d, notificaciones: d.notificaciones.filter((n) => n.id !== id) } : d))
-  ejecutar({ accion: 'eliminarNotificacion', notificacionId: id }, 'Aviso eliminado.')
-}
-
-function eliminarTodas() {
-  if (!confirm('¿Eliminar todos tus avisos?')) return
-  setData((d) => (d ? { ...d, notificaciones: [] } : d))
-  ejecutar({ accion: 'eliminarTodasNotificaciones' }, 'Avisos eliminados.')
-}
-function eliminarDireccion(id: number) {
-  if (!confirm('¿Eliminar esta dirección?')) return
-  ejecutar({ accion: 'eliminarDireccion', direccionId: id }, 'Dirección eliminada.')
-}
-
+  function eliminarDireccion(id: number) {
+    if (!confirm('¿Eliminar esta dirección?')) return
+    ejecutar({ accion: 'eliminarDireccion', direccionId: id }, 'Dirección eliminada.')
+  }
 
   function cerrarSesion() {
     localStorage.removeItem(STORAGE_KEY)
@@ -483,10 +499,10 @@ function eliminarDireccion(id: number) {
       ),
     [activas]
   )
- const porCalificar = useMemo(
-  () => solicitudes.filter((s) => s.estado === 'Terminada' && !s.yaCalificada && !omitidas.includes(s.id)),
-  [solicitudes, omitidas]
-)
+  const porCalificar = useMemo(
+    () => solicitudes.filter((s) => s.estado === 'Terminada' && !s.yaCalificada && !omitidas.includes(s.id)),
+    [solicitudes, omitidas]
+  )
   // Trabajos terminados que aún no se pagan (sin método elegido, o con pago pendiente de confirmar)
   const porPagar = useMemo(
     () =>
@@ -611,7 +627,6 @@ function eliminarDireccion(id: number) {
                 className="oficio"
                 onClick={() => abrirNuevaSolicitud({ especialidadId: e.id })}
               >
-                
                 {e.nombre}
               </button>
             ))}
@@ -724,51 +739,48 @@ function eliminarDireccion(id: number) {
                               : 'El trabajo ya terminó. ¿Cómo le vas a pagar?'}
                           </span>
                         </span>
-                       <div className="chips" role="group" aria-label="Forma de pago">
-                        <button
-                          type="button"
-                          className={(seleccion[s.id] ?? s.pago?.metodoPago) === 'Efectivo' ? 'on' : ''}
-                          disabled={ocupado}
-                          onClick={() => pagar(s, 'Efectivo')}
-                        >
-                          💵 Efectivo
-                        </button>
-                        <button
-                          type="button"
-                          className={(seleccion[s.id] ?? s.pago?.metodoPago) === 'Tarjeta' ? 'on' : ''}
-                          disabled={ocupado}
-                          onClick={() => pagar(s, 'Tarjeta')}
-                        >
-                          💳 Tarjeta
-                        </button>
-                        {/* Botón de PayPal */}
-                      <button type="button" className="paypal-btn" disabled={ocupado} onClick={() => pagar(s, 'PayPal')}>
-                        <span className="pp-pay">Pay</span><span className="pp-pal">Pal</span>
-                      </button>
-
-                      </div>
-
-                      
-                      {/* Tarjeta elegida: botón Pagar */}
-                      {seleccion[s.id] === 'Tarjeta' && tarjeta && s.pago?.metodoPago !== 'Tarjeta' && (
-                        <div className="tarjeta-pagar">
-                          <p className="muted small">
-                            {tarjeta.marca} •••• {tarjeta.ultimos4} ·{' '}
-                            <button type="button" className="link-danger" onClick={() => setAgregandoTarjeta(s)}>
-                              Cambiar tarjeta
-                            </button>
-                          </p>
+                        <div className="chips" role="group" aria-label="Forma de pago">
                           <button
                             type="button"
-                            className="btn btn-primary btn-block"
+                            className={(seleccion[s.id] ?? s.pago?.metodoPago) === 'Efectivo' ? 'on' : ''}
                             disabled={ocupado}
-                            onClick={() => pagarConTarjeta(s)}
+                            onClick={() => pagar(s, 'Efectivo')}
                           >
-                            {ocupado ? 'Enviando…' : `Pagar ${total ? dinero(total) : ''}`}
+                            💵 Efectivo
+                          </button>
+                          <button
+                            type="button"
+                            className={(seleccion[s.id] ?? s.pago?.metodoPago) === 'Tarjeta' ? 'on' : ''}
+                            disabled={ocupado}
+                            onClick={() => pagar(s, 'Tarjeta')}
+                          >
+                            💳 Tarjeta
+                          </button>
+                          {/* Botón de PayPal */}
+                          <button type="button" className="paypal-btn" disabled={ocupado} onClick={() => pagar(s, 'PayPal')}>
+                            <span className="pp-pay">Pay</span><span className="pp-pal">Pal</span>
                           </button>
                         </div>
-                      )}
-                      
+
+                        {/* Tarjeta elegida: botón Pagar */}
+                        {seleccion[s.id] === 'Tarjeta' && tarjeta && s.pago?.metodoPago !== 'Tarjeta' && (
+                          <div className="tarjeta-pagar">
+                            <p className="muted small">
+                              {tarjeta.marca} •••• {tarjeta.ultimos4} ·{' '}
+                              <button type="button" className="link-danger" onClick={() => setAgregandoTarjeta(s)}>
+                                Cambiar tarjeta
+                              </button>
+                            </p>
+                            <button
+                              type="button"
+                              className="btn btn-primary btn-block"
+                              disabled={ocupado}
+                              onClick={() => pagarConTarjeta(s)}
+                            >
+                              {ocupado ? 'Enviando…' : `Pagar ${total ? dinero(total) : ''}`}
+                            </button>
+                          </div>
+                        )}
                       </li>
                     )
                   })}
@@ -783,16 +795,16 @@ function eliminarDireccion(id: number) {
                 <ul className="cal-list">
                   {porCalificar.map((s) => (
                     <li key={s.id}>
-  <span>
-    <strong>{s.especialidad.nombre}</strong> con {s.trabajadorAsignado?.nombre ?? 'tu profesional'}
-  </span>
-  <div style={{ display: 'flex', gap: 8 }}>
-    <button type="button" className="btn btn-ghost" onClick={() => omitirCalificacion(s.id)}>
-  No calificar
-</button>
-    <button className="btn btn-accent" onClick={() => setCalificando(s)}>Calificar servicio</button>
-  </div>
-</li>
+                      <span>
+                        <strong>{s.especialidad.nombre}</strong> con {s.trabajadorAsignado?.nombre ?? 'tu profesional'}
+                      </span>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <button type="button" className="btn btn-ghost" onClick={() => omitirCalificacion(s.id)}>
+                          No calificar
+                        </button>
+                        <button className="btn btn-accent" onClick={() => setCalificando(s)}>Calificar servicio</button>
+                      </div>
+                    </li>
                   ))}
                 </ul>
               </section>
@@ -832,12 +844,11 @@ function eliminarDireccion(id: number) {
                     return (
                       <li key={s.id} className="sol">
                         <div className="sol-top">
-                        
                           <div className="sol-title">
                             <h3>{s.especialidad.nombre}</h3>
                             <p className="muted small">
                               #{s.id} · creada el {fechaCorta(s.fechaCreacion)}
-                              {s.fechaDeseada ? ` · para el ${fechaCorta(s.fechaDeseada)}` : ''}
+                              {s.fechaDeseada ? ` · para el ${diaCorto(s.fechaDeseada)}` : ''}
                             </p>
                           </div>
                           {s.urgencia === 'Urgente' && <span className="tag tag-urgente">Urgente</span>}
@@ -869,18 +880,28 @@ function eliminarDireccion(id: number) {
                           </div>
                         )}
 
-                        {['Pendiente', 'Cotizada'].includes(s.estado) && (
-                          <button
-                            className="link-danger"
-                            disabled={ocupado}
-                            onClick={() => {
-                              if (confirm('¿Cancelar esta solicitud? Las cotizaciones recibidas se descartarán.')) {
-                                ejecutar({ accion: 'cancelarSolicitud', solicitudId: s.id }, 'Solicitud cancelada.')
-                              }
-                            }}
-                          >
-                            Cancelar solicitud
-                          </button>
+                        {EDITABLES.includes(s.estado) && (
+                          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                            <button
+                              type="button"
+                              className="btn btn-ghost btn-sm"
+                              disabled={ocupado}
+                              onClick={() => setEditando(s)}
+                            >
+                              Editar problema
+                            </button>
+                            <button
+                              className="link-danger"
+                              disabled={ocupado}
+                              onClick={() => {
+                                if (confirm('¿Cancelar esta solicitud? Las cotizaciones recibidas se descartarán.')) {
+                                  ejecutar({ accion: 'cancelarSolicitud', solicitudId: s.id }, 'Solicitud cancelada.')
+                                }
+                              }}
+                            >
+                              Cancelar solicitud
+                            </button>
+                          </div>
                         )}
                         {s.estado === 'Aceptada' && (
                           <div className="confirmar-box estado-espera">
@@ -964,108 +985,101 @@ function eliminarDireccion(id: number) {
             </section>
           </div>
 
-
-
-
-
           {/* ----------------------------- Columna lateral ----------------------------- */}
           <aside className="col-side">
-  <section id="notificaciones" className="block block-side" aria-labelledby="t-not">
-    <div className="block-head"><h2 id="t-not">Avisos</h2></div>
+            <section id="notificaciones" className="block block-side" aria-labelledby="t-not">
+              <div className="block-head"><h2 id="t-not">Avisos</h2></div>
 
-    {push.soportado && !push.activo && push.permiso !== 'denied' && (
-      <div className="push-banner">
-        <p>Recibe avisos al instante, incluso con la página cerrada.</p>
-        <button
-          className="btn btn-primary btn-sm"
-          onClick={async () => {
-            const ok = await push.activar()
-            setToast(ok ? 'Notificaciones activadas.' : 'No se pudo activar.')
-          }}
-        >
-          Activar notificaciones
-        </button>
-      </div>
-    )}
-    {push.permiso === 'denied' && (
-      <p className="muted small">Bloqueaste las notificaciones. Actívalas desde la configuración del navegador.</p>
-    )}
-    {push.activo && (
-      <button className="link-danger" onClick={push.desactivar}>Desactivar notificaciones</button>
-    )}
+              {push.soportado && !push.activo && push.permiso !== 'denied' && (
+                <div className="push-banner">
+                  <p>Recibe avisos al instante, incluso con la página cerrada.</p>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={async () => {
+                      const ok = await push.activar()
+                      setToast(ok ? 'Notificaciones activadas.' : 'No se pudo activar.')
+                    }}
+                  >
+                    Activar notificaciones
+                  </button>
+                </div>
+              )}
+              {push.permiso === 'denied' && (
+                <p className="muted small">Bloqueaste las notificaciones. Actívalas desde la configuración del navegador.</p>
+              )}
+              {push.activo && (
+                <button className="link-danger" onClick={push.desactivar}>Desactivar notificaciones</button>
+              )}
 
-    {data.notificaciones.length === 0 ? (
-  <p className="vacio">Sin avisos por ahora.</p>
-) : (
-  <>
-    <button className="link-danger" onClick={eliminarTodas} disabled={ocupado}>
-      Eliminar todos
-    </button>
-    <ul className="not-list">
-      {data.notificaciones.map((n) => (
-        <li key={n.id} className={n.leido ? '' : 'nueva'}>
-          <div className="not-body">
-            <p>{n.mensaje}</p>
-            <span className="muted small">{hace(n.fechaCreacion)}</span>
-          </div>
-          <button
-            type="button"
-            className="icon-btn not-del"
-            onClick={() => eliminarNotificacion(n.id)}
-            aria-label="Eliminar aviso"
-            title="Eliminar"
-          >
-            <Icon name="close" size={14} />
-          </button>
-        </li>
-      ))}
-    </ul>
-  </>
-)}
-  </section>
+              {data.notificaciones.length === 0 ? (
+                <p className="vacio">Sin avisos por ahora.</p>
+              ) : (
+                <>
+                  <button className="link-danger" onClick={eliminarTodas} disabled={ocupado}>
+                    Eliminar todos
+                  </button>
+                  <ul className="not-list">
+                    {data.notificaciones.map((n) => (
+                      <li key={n.id} className={n.leido ? '' : 'nueva'}>
+                        <div className="not-body">
+                          <p>{n.mensaje}</p>
+                          <span className="muted small">{hace(n.fechaCreacion)}</span>
+                        </div>
+                        <button
+                          type="button"
+                          className="icon-btn not-del"
+                          onClick={() => eliminarNotificacion(n.id)}
+                          aria-label="Eliminar aviso"
+                          title="Eliminar"
+                        >
+                          <Icon name="close" size={14} />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </section>
 
-
-<section id="direcciones" className="block block-side" aria-labelledby="t-dir">
-  <div className="block-head">
-    <h2 id="t-dir">Mis direcciones</h2>
-    <button type="button" className="btn btn-ghost btn-sm" onClick={() => setAgregandoDir(true)}>
-      <Icon name="plus" size={14} /> Agregar
-    </button>
-  </div>
-  {data.direcciones.length === 0 ? (
-    <p className="vacio">Aún no tienes direcciones guardadas.</p>
-  ) : (
-     <ul className="dir-list">
-        {data.direcciones.map((d) => (
-          <li key={d.id}>
-          <Icon name="pin" size={16} />
-          <div className="dir-body">
-            <strong>{d.alias || 'Dirección'}</strong>
-            <p className="muted small">
-              {d.calle}
-              {d.colonia ? `, ${d.colonia}` : ''}
-              {d.ciudad ? `, ${d.ciudad}` : ''}
-              {d.codigoPostal ? `, C.P. ${d.codigoPostal}` : ''}
-            </p>
-          </div>
-          <button
-            type="button"
-            className="icon-btn not-del"
-            onClick={() => eliminarDireccion(d.id)}
-            disabled={ocupado}
-            aria-label={`Eliminar dirección ${d.alias || ''}`}
-            title="Eliminar"
-          >
-            <Icon name="close" size={14} />
-          </button>
-</li>
-        ))}
-      </ul>
-  )}
-</section>
-
-
-</aside>
+            <section id="direcciones" className="block block-side" aria-labelledby="t-dir">
+              <div className="block-head">
+                <h2 id="t-dir">Mis direcciones</h2>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setAgregandoDir(true)}>
+                  <Icon name="plus" size={14} /> Agregar
+                </button>
+              </div>
+              {data.direcciones.length === 0 ? (
+                <p className="vacio">Aún no tienes direcciones guardadas.</p>
+              ) : (
+                <ul className="dir-list">
+                  {data.direcciones.map((d) => (
+                    <li key={d.id}>
+                      <Icon name="pin" size={16} />
+                      <div className="dir-body">
+                        <strong>{d.alias || 'Dirección'}</strong>
+                        <p className="muted small">
+                          {d.calle}
+                          {d.colonia ? `, ${d.colonia}` : ''}
+                          {d.ciudad ? `, ${d.ciudad}` : ''}
+                          {d.codigoPostal ? `, C.P. ${d.codigoPostal}` : ''}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        className="icon-btn not-del"
+                        onClick={() => eliminarDireccion(d.id)}
+                        disabled={ocupado}
+                        aria-label={`Eliminar dirección ${d.alias || ''}`}
+                        title="Eliminar"
+                      >
+                        <Icon name="close" size={14} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </aside>
         </div>
       </div>
 
@@ -1091,21 +1105,36 @@ function eliminarDireccion(id: number) {
         />
       )}
 
-     {calificando && (
-      <CalificarModal
-        solicitud={calificando}
-        ocupado={ocupado}
-        onClose={() => setCalificando(null)}
-        onOmitir={() => omitirCalificacion(calificando.id)}
-        onSubmit={async (puntuacion, comentario) => {
-          const ok = await ejecutar(
-            { accion: 'calificar', solicitudId: calificando.id, puntuacion, comentario },
-            'Gracias por tu calificación.'
-          )
-          if (ok) setCalificando(null)
-        }}
-      />
-    )}
+      {editando && (
+        <EditarSolicitudModal
+          solicitud={editando}
+          ocupado={ocupado}
+          onClose={() => setEditando(null)}
+          onSubmit={async (payload) => {
+            const ok = await ejecutar(
+              { accion: 'editarSolicitud', solicitudId: editando.id, ...payload },
+              'Solicitud actualizada.'
+            )
+            if (ok) setEditando(null)
+          }}
+        />
+      )}
+
+      {calificando && (
+        <CalificarModal
+          solicitud={calificando}
+          ocupado={ocupado}
+          onClose={() => setCalificando(null)}
+          onOmitir={() => omitirCalificacion(calificando.id)}
+          onSubmit={async (puntuacion, comentario) => {
+            const ok = await ejecutar(
+              { accion: 'calificar', solicitudId: calificando.id, puntuacion, comentario },
+              'Gracias por tu calificación.'
+            )
+            if (ok) setCalificando(null)
+          }}
+        />
+      )}
 
       {agregandoDir && (
         <DireccionModal
@@ -1145,8 +1174,6 @@ function eliminarDireccion(id: number) {
 /* Modal: nueva solicitud (con fotos del problema)                     */
 /* ------------------------------------------------------------------ */
 
-
-
 function NuevaSolicitudModal({
   borrador,
   especialidades,
@@ -1165,7 +1192,8 @@ function NuevaSolicitudModal({
   const [especialidadId, setEspecialidadId] = useState<number | null>(borrador.especialidadId)
   const [descripcion, setDescripcion] = useState(borrador.descripcion)
   const [urgencia, setUrgencia] = useState<Urgencia>(borrador.urgencia)
-  const [fechaDeseada, setFechaDeseada] = useState('')
+  // Si se abre desde "Tengo una urgencia", la fecha arranca en hoy
+  const [fechaDeseada, setFechaDeseada] = useState(borrador.urgencia === 'Urgente' ? hoyISO() : '')
   const [direccionId, setDireccionId] = useState<string>(direcciones[0] ? String(direcciones[0].id) : 'nueva')
   const [calle, setCalle] = useState('')
   const [colonia, setColonia] = useState('')
@@ -1189,6 +1217,14 @@ function NuevaSolicitudModal({
     return () => fotoPreviews.forEach((url) => URL.revokeObjectURL(url))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  function elegirUrgencia(u: Urgencia) {
+    setUrgencia(u)
+    if (u === 'Urgente') {
+      // Pone hoy automáticamente si está vacía o fuera del rango de 5 días
+      setFechaDeseada((f) => (!f || f < hoyISO() || f > sumarDiasISO(DIAS_MAX_URGENTE) ? hoyISO() : f))
+    }
+  }
 
   function agregarFotos(event: ChangeEvent<HTMLInputElement>) {
     const nuevas = Array.from(event.target.files ?? [])
@@ -1216,6 +1252,9 @@ function NuevaSolicitudModal({
     if (!especialidadId) return setAviso('Elige qué tipo de profesional necesitas.')
     if (descripcion.trim().length < 10) return setAviso('Cuéntanos un poco más del problema (mínimo 10 caracteres).')
     if (direccionId === 'nueva' && !calle.trim()) return setAviso('Agrega la dirección donde se necesita el servicio.')
+    if (urgencia === 'Urgente' && fechaDeseada && fechaDeseada > sumarDiasISO(DIAS_MAX_URGENTE)) {
+      return setAviso(`Si es urgente, la fecha puede ser máximo ${DIAS_MAX_URGENTE} días a partir de hoy.`)
+    }
     setAviso('')
 
     // Primero se suben las fotos a Supabase; al backend solo van las URLs
@@ -1264,7 +1303,7 @@ function NuevaSolicitudModal({
                 className={especialidadId === e.id ? 'on' : ''}
                 onClick={() => setEspecialidadId(e.id)}
               >
-               {e.nombre}
+                {e.nombre}
               </button>
             ))}
           </div>
@@ -1282,68 +1321,79 @@ function NuevaSolicitudModal({
         </div>
 
         {/* Fotos del problema */}
-<div className="field">
-  <label htmlFor="m-fotos">Fotos del problema (opcional, hasta {MAX_FOTOS})</label>
+        <div className="field">
+          <label htmlFor="m-fotos">Fotos del problema (opcional, hasta {MAX_FOTOS})</label>
 
-  <div className="foto-grid">
-    {fotoPreviews.map((url, i) => (
-      <div key={url} className="foto-thumb">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={url} alt={`Foto ${i + 1} del problema`} />
-        <button type="button" className="foto-quitar" onClick={() => quitarFoto(i)} aria-label="Quitar foto">
-          <Icon name="close" size={14} />
-        </button>
-      </div>
-    ))}
+          <div className="foto-grid">
+            {fotoPreviews.map((url, i) => (
+              <div key={url} className="foto-thumb">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={url} alt={`Foto ${i + 1} del problema`} />
+                <button type="button" className="foto-quitar" onClick={() => quitarFoto(i)} aria-label="Quitar foto">
+                  <Icon name="close" size={14} />
+                </button>
+              </div>
+            ))}
 
-    {fotos.length < MAX_FOTOS && (
-      <label htmlFor="m-fotos" className="foto-agregar">
-        <Icon name="plus" size={20} />
-        <span>Galería</span>
-      </label>
-    )}
+            {fotos.length < MAX_FOTOS && (
+              <label htmlFor="m-fotos" className="foto-agregar">
+                <Icon name="plus" size={20} />
+                <span>Galería</span>
+              </label>
+            )}
 
-    {fotos.length < MAX_FOTOS && (
-      <label htmlFor="m-camara" className="foto-agregar">
-        <span style={{ fontSize: 20 }}>📷</span>
-        <span>Cámara</span>
-      </label>
-    )}
-  </div> {/* ← este es el cierre de foto-grid que faltaba */}
+            {fotos.length < MAX_FOTOS && (
+              <label htmlFor="m-camara" className="foto-agregar">
+                <span style={{ fontSize: 20 }}>📷</span>
+                <span>Cámara</span>
+              </label>
+            )}
+          </div>
 
-  <input
-    id="m-fotos"
-    type="file"
-    accept="image/*"
-    multiple
-    onChange={agregarFotos}
-    className="avatar-upload-input"
-  />
-  <input
-    id="m-camara"
-    type="file"
-    accept="image/*"
-    capture="environment"
-    onChange={agregarFotos}
-    className="avatar-upload-input"
-  />
-</div>
+          <input
+            id="m-fotos"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={agregarFotos}
+            className="avatar-upload-input"
+          />
+          <input
+            id="m-camara"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={agregarFotos}
+            className="avatar-upload-input"
+          />
+        </div>
 
         <fieldset className="field">
           <legend>¿Qué tan pronto lo necesitas?</legend>
           <div className="seg">
-            <button type="button" className={urgencia === 'Normal' ? 'on' : ''} onClick={() => setUrgencia('Normal')}>
+            <button type="button" className={urgencia === 'Normal' ? 'on' : ''} onClick={() => elegirUrgencia('Normal')}>
               Puedo esperar
             </button>
-            <button type="button" className={urgencia === 'Urgente' ? 'on on-urgente' : ''} onClick={() => setUrgencia('Urgente')}>
+            <button type="button" className={urgencia === 'Urgente' ? 'on on-urgente' : ''} onClick={() => elegirUrgencia('Urgente')}>
               Es urgente
             </button>
           </div>
         </fieldset>
 
         <div className="field">
-          <label htmlFor="m-fecha">Fecha que prefieres (opcional)</label>
-          <input id="m-fecha" type="date" value={fechaDeseada} min={new Date().toISOString().slice(0, 10)} onChange={(e) => setFechaDeseada(e.target.value)} />
+          <label htmlFor="m-fecha">
+            {urgencia === 'Urgente'
+              ? `Fecha (urgente: máximo ${DIAS_MAX_URGENTE} días desde hoy)`
+              : 'Fecha que prefieres (opcional)'}
+          </label>
+          <input
+            id="m-fecha"
+            type="date"
+            value={fechaDeseada}
+            min={hoyISO()}
+            max={urgencia === 'Urgente' ? sumarDiasISO(DIAS_MAX_URGENTE) : undefined}
+            onChange={(e) => setFechaDeseada(e.target.value)}
+          />
         </div>
 
         <div className="field">
@@ -1373,6 +1423,139 @@ function NuevaSolicitudModal({
           <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
           <button type="submit" className="btn btn-primary" disabled={ocupado || subiendoFotos}>
             {subiendoFotos ? 'Subiendo fotos…' : ocupado ? 'Enviando…' : 'Enviar solicitud'}
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Modal: editar el problema de una solicitud                          */
+/* ------------------------------------------------------------------ */
+
+function EditarSolicitudModal({
+  solicitud,
+  ocupado,
+  onClose,
+  onSubmit,
+}: {
+  solicitud: Solicitud
+  ocupado: boolean
+  onClose: () => void
+  onSubmit: (payload: { descripcion: string; urgencia: Urgencia; fechaDeseada: string | null }) => void
+}) {
+  const fechaOriginal = solicitud.fechaDeseada ? solicitud.fechaDeseada.slice(0, 10) : ''
+
+  const [descripcion, setDescripcion] = useState(solicitud.descripcion)
+  const [urgencia, setUrgencia] = useState<Urgencia>(solicitud.urgencia)
+  const [fechaDeseada, setFechaDeseada] = useState(fechaOriginal)
+  const [aviso, setAviso] = useState('')
+
+  const hayCotizaciones = solicitud.cotizaciones.some((c) => c.estado === 'Enviada')
+  const sinCambios =
+    descripcion.trim() === solicitud.descripcion.trim() &&
+    urgencia === solicitud.urgencia &&
+    fechaDeseada === fechaOriginal
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  function elegirUrgencia(u: Urgencia) {
+    setUrgencia(u)
+    if (u === 'Urgente') {
+      // Pone hoy automáticamente si está vacía o fuera del rango de 5 días
+      setFechaDeseada((f) => (!f || f < hoyISO() || f > sumarDiasISO(DIAS_MAX_URGENTE) ? hoyISO() : f))
+    }
+  }
+
+  function enviar(e: FormEvent) {
+    e.preventDefault()
+    if (descripcion.trim().length < 10) return setAviso('Cuéntanos un poco más del problema (mínimo 10 caracteres).')
+    if (fechaDeseada && fechaDeseada !== fechaOriginal && fechaDeseada < hoyISO()) {
+      return setAviso('La fecha no puede ser anterior a hoy.')
+    }
+    if (urgencia === 'Urgente' && fechaDeseada && fechaDeseada > sumarDiasISO(DIAS_MAX_URGENTE)) {
+      return setAviso(`Si es urgente, la fecha puede ser máximo ${DIAS_MAX_URGENTE} días a partir de hoy.`)
+    }
+    setAviso('')
+    onSubmit({ descripcion: descripcion.trim(), urgencia, fechaDeseada: fechaDeseada || null })
+  }
+
+  return (
+    <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <form
+        className="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="e-title"
+        onSubmit={enviar}
+        noValidate
+      >
+        <div className="modal-head">
+          <h2 id="e-title">Editar solicitud #{solicitud.id}</h2>
+          <button type="button" className="icon-btn" onClick={onClose} aria-label="Cerrar">
+            <Icon name="close" />
+          </button>
+        </div>
+
+        <p className="muted small">{solicitud.especialidad.nombre}</p>
+
+        {hayCotizaciones && (
+          <p className="muted small" role="note">
+            Ya recibiste cotizaciones con la descripción anterior. Si cambias mucho el problema, los profesionales
+            podrían querer ajustar su precio.
+          </p>
+        )}
+
+        <div className="field">
+          <label htmlFor="e-desc">Cuéntanos qué pasa</label>
+          <textarea
+            id="e-desc"
+            rows={5}
+            value={descripcion}
+            onChange={(e) => setDescripcion(e.target.value)}
+            placeholder="Desde cuándo pasa, dónde está el problema, si ya intentaste algo…"
+          />
+        </div>
+
+        <fieldset className="field">
+          <legend>¿Qué tan pronto lo necesitas?</legend>
+          <div className="seg">
+            <button type="button" className={urgencia === 'Normal' ? 'on' : ''} onClick={() => elegirUrgencia('Normal')}>
+              Puedo esperar
+            </button>
+            <button type="button" className={urgencia === 'Urgente' ? 'on on-urgente' : ''} onClick={() => elegirUrgencia('Urgente')}>
+              Es urgente
+            </button>
+          </div>
+        </fieldset>
+
+        <div className="field">
+          <label htmlFor="e-fecha">
+            {urgencia === 'Urgente'
+              ? `Fecha (urgente: máximo ${DIAS_MAX_URGENTE} días desde hoy)`
+              : 'Fecha que prefieres (opcional)'}
+          </label>
+          <input
+            id="e-fecha"
+            type="date"
+            value={fechaDeseada}
+            min={hoyISO()}
+            max={urgencia === 'Urgente' ? sumarDiasISO(DIAS_MAX_URGENTE) : undefined}
+            onChange={(e) => setFechaDeseada(e.target.value)}
+          />
+        </div>
+
+        {aviso && <p className="form-aviso" role="alert">{aviso}</p>}
+
+        <div className="modal-actions">
+          <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary" disabled={ocupado || sinCambios}>
+            {ocupado ? 'Guardando…' : 'Guardar cambios'}
           </button>
         </div>
       </form>
@@ -1460,7 +1643,6 @@ function CalificarModal({
   )
 }
 
-
 function DireccionModal({
   ocupado,
   onClose,
@@ -1468,14 +1650,14 @@ function DireccionModal({
 }: {
   ocupado: boolean
   onClose: () => void
- onSubmit: (dir: { alias: string; calle: string; colonia: string; ciudad: string; codigoPostal: string }) => void
+  onSubmit: (dir: { alias: string; calle: string; colonia: string; ciudad: string; codigoPostal: string }) => void
 }) {
   const [alias, setAlias] = useState('')
   const [calle, setCalle] = useState('')
   const [colonia, setColonia] = useState('')
   const [ciudad, setCiudad] = useState('')
   const [aviso, setAviso] = useState('')
-  const [cp, setCp] = useState('') 
+  const [cp, setCp] = useState('')
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
@@ -1490,19 +1672,19 @@ function DireccionModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="d-title"
-       onSubmit={(e) => {
-        e.preventDefault()
-        if (!calle.trim()) return setAviso('Escribe la calle y número.')
-        if (cp.length !== 5) return setAviso('El código postal debe tener 5 dígitos.')
-        setAviso('')
-        onSubmit({
-          alias: alias.trim() || 'Otra dirección',
-          calle: calle.trim(),
-          colonia: colonia.trim(),
-          ciudad: ciudad.trim(),
-          codigoPostal: cp,
-        })
-      }}
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (!calle.trim()) return setAviso('Escribe la calle y número.')
+          if (cp.length !== 5) return setAviso('El código postal debe tener 5 dígitos.')
+          setAviso('')
+          onSubmit({
+            alias: alias.trim() || 'Otra dirección',
+            calle: calle.trim(),
+            colonia: colonia.trim(),
+            ciudad: ciudad.trim(),
+            codigoPostal: cp,
+          })
+        }}
       >
         <div className="modal-head">
           <h2 id="d-title">Nueva dirección</h2>
@@ -1527,8 +1709,6 @@ function DireccionModal({
           <label htmlFor="d-ciudad">Ciudad</label>
           <input id="d-ciudad" value={ciudad} onChange={(e) => setCiudad(e.target.value)} />
         </div>
-
-
 
         <div className="field">
           <label htmlFor="d-cp">Código postal</label>

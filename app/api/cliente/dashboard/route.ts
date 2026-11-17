@@ -118,6 +118,7 @@ export async function GET(req: Request) {
       estado: s.estado,
       fechaCreacion: s.fechaCreacion,
       fechaDeseada: s.fechaDeseada,
+      fotos: s.fotos,
       especialidad: s.especialidad,
       direccion: s.direccion,
       trabajadorAsignado: s.trabajadorAsignado,

@@ -57,6 +57,7 @@ type Solicitud = {
   yaCalificada: boolean
   pago: PagoMini | null
   cotizaciones: Cotizacion[]
+  fotos?: string[]
 }
 type Profesional = {
   id: number
@@ -279,6 +280,55 @@ function ProgresoSolicitud({ estado }: { estado: string }) {
         <span key={p} className={i <= idx ? 'on' : ''} />
       ))}
     </div>
+  )
+}
+
+// Miniaturas de las fotos que subió el cliente; al tocar una se ve grande
+function FotosProblema({ fotos }: { fotos?: string[] }) {
+  const [abierta, setAbierta] = useState<number | null>(null)
+  const lista = fotos ?? []
+
+  useEffect(() => {
+    if (abierta === null) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setAbierta(null)
+      if (e.key === 'ArrowRight') setAbierta((i) => (i === null ? i : (i + 1) % lista.length))
+      if (e.key === 'ArrowLeft') setAbierta((i) => (i === null ? i : (i - 1 + lista.length) % lista.length))
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [abierta, lista.length])
+
+  if (lista.length === 0) return null
+
+  return (
+    <>
+      <div className="fotos-problema" aria-label={`Fotos del problema (${lista.length})`}>
+        {lista.map((url, i) => (
+          <button type="button" key={url} className="foto-mini" onClick={() => setAbierta(i)} aria-label={`Ver foto ${i + 1} de ${lista.length}`}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={url} alt="" loading="lazy" />
+          </button>
+        ))}
+      </div>
+
+      {abierta !== null && (
+        <div className="overlay visor" role="dialog" aria-modal="true" aria-label="Foto del problema" onMouseDown={(e) => e.target === e.currentTarget && setAbierta(null)}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="visor-img" src={lista[abierta]} alt={`Foto ${abierta + 1} de ${lista.length}`} />
+          <button type="button" className="visor-cerrar" onClick={() => setAbierta(null)} aria-label="Cerrar">
+            <Icon name="close" />
+          </button>
+          {lista.length > 1 && (
+            <>
+              <button type="button" className="visor-nav visor-prev" onClick={() => setAbierta((abierta - 1 + lista.length) % lista.length)} aria-label="Foto anterior">‹</button>
+              <button type="button" className="visor-nav visor-next" onClick={() => setAbierta((abierta + 1) % lista.length)} aria-label="Foto siguiente">›</button>
+              <span className="visor-cuenta">{abierta + 1} / {lista.length}</span>
+            </>
+          )}
+        </div>
+      )}
+    </>
   )
 }
 
@@ -855,6 +905,7 @@ export default function ClienteDashboardPage() {
                         </div>
 
                         <p className="sol-desc">{s.descripcion}</p>
+                        <FotosProblema fotos={s.fotos} />
 
                         <ProgresoSolicitud estado={s.estado} />
                         <p className="sol-estado">

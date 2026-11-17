@@ -281,6 +281,60 @@ function FotosProblema({ fotos }: { fotos?: string[] }) {
   )
 }
 
+// Lista que muestra `visibles` elementos a la vez; el resto se ve con su propio scroll.
+// Mide la altura real de los primeros elementos porque cada tarjeta puede medir distinto
+// (con fotos, con texto largo...), así siempre se ven justo 5 completos.
+function ListaScroll({
+  visibles = 5,
+  total,
+  etiqueta,
+  children,
+}: {
+  visibles?: number
+  total: number
+  etiqueta: string
+  children: ReactNode
+}) {
+  const ref = useRef<HTMLUListElement>(null)
+  const [alto, setAlto] = useState<number | null>(null)
+
+  useEffect(() => {
+    const ul = ref.current
+    if (!ul) return
+
+    const medir = () => {
+      const items = Array.from(ul.children) as HTMLElement[]
+      setAlto(items.length > visibles ? items[visibles].offsetTop - items[0].offsetTop : null)
+    }
+
+    medir()
+    // Vuelve a medir si cambia el ancho o si algún elemento crece (por ejemplo, al cargar una foto)
+    const ro = new ResizeObserver(medir)
+    ro.observe(ul)
+    Array.from(ul.children).forEach((el) => ro.observe(el))
+    return () => ro.disconnect()
+  }, [total, visibles])
+
+  return (
+    <>
+      <ul
+        ref={ref}
+        className="fila-list"
+        aria-label={etiqueta}
+        tabIndex={alto ? 0 : undefined}
+        style={alto ? { maxHeight: alto, overflowY: 'auto', overscrollBehavior: 'contain', paddingRight: 6 } : undefined}
+      >
+        {children}
+      </ul>
+      {total > visibles && (
+        <p className="muted small">
+          Se muestran {visibles} a la vez. Desliza para ver las {total} {etiqueta}.
+        </p>
+      )}
+    </>
+  )
+}
+
 /* ------------------------------------------------------------------ */
 /* Página                                                              */
 /* ------------------------------------------------------------------ */
@@ -831,13 +885,18 @@ export default function TrabajadorDashboardPage() {
 
             {/* Mis cotizaciones */}
             <section id="cotizaciones" className="block" aria-labelledby="t-cot">
-              <div className="block-head"><h2 id="t-cot">Mis cotizaciones</h2></div>
+              <div className="block-head">
+                <h2 id="t-cot">Mis cotizaciones</h2>
+                {data.cotizaciones.length > 0 && (
+                  <span className="muted small">{data.cotizaciones.length} en total</span>
+                )}
+              </div>
               {data.cotizaciones.length === 0 ? (
                 <p className="vacio">Todavía no has enviado cotizaciones. Empieza con una solicitud nueva.</p>
               ) : (
-                <ul className="fila-list">
+                <ListaScroll total={data.cotizaciones.length} etiqueta="cotizaciones">
                   {data.cotizaciones.map((c) => (
-                    <li key={c.id} className="fila">
+                    <li key={c.id} className="fila" style={{ flexShrink: 0 }}>
                       <div className="fila-main">
                         <strong>{c.solicitud.especialidad.nombre}</strong>
                         <span className="muted small">
@@ -854,7 +913,7 @@ export default function TrabajadorDashboardPage() {
                       </div>
                     </li>
                   ))}
-                </ul>
+                </ListaScroll>
               )}
             </section>
 

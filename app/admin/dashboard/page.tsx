@@ -38,6 +38,10 @@ type Verificado = {
   especialidades: Oficio[]
   calificacion: number | null
   totalResenas: number
+  // Opcionales: se muestran en la ventanita si /api/admin/dashboard los envía
+  telefono?: string | null
+  descripcion?: string | null
+  fechaRegistro?: string
 }
 type PagoFila = {
   id: number
@@ -161,7 +165,10 @@ export default function AdminDashboardPage() {
   const [toast, setToast] = useState('')
 
   const [rechazando, setRechazando] = useState<Pendiente | null>(null)
-  const [verTrabajador, setVerTrabajador] = useState<Pendiente | null>(null)
+  // Para "Ver documentos" basta con el id y el nombre (sirve para pendientes y verificados)
+  const [verTrabajador, setVerTrabajador] = useState<{ id: number; nombre: string } | null>(null)
+  // Perfil abierto de un trabajador verificado (se guarda solo el id para que siempre muestre datos al día)
+  const [verPerfilId, setVerPerfilId] = useState<number | null>(null)
   const [filtroVerificados, setFiltroVerificados] = useState('')
 
   /* --- sesión mínima (localStorage). Reemplázala por cookie/sesión real --- */
@@ -226,8 +233,6 @@ export default function AdminDashboardPage() {
     }
   }
 
-
-  
   function cerrarSesion() {
     localStorage.removeItem(STORAGE_KEY)
     router.push('/auth/login')
@@ -264,6 +269,7 @@ export default function AdminDashboardPage() {
   const { comisiones, totales, solicitudesPorEstado, pendientesVerificacion, pagosRecientes } = data
   const varMes = variacion(comisiones.esteMes, comisiones.mesPasado)
   const hoy = new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })
+  const perfil = data.trabajadoresVerificados.find((t) => t.id === verPerfilId) ?? null
 
   return (
     <div className="dash">
@@ -452,7 +458,7 @@ export default function AdminDashboardPage() {
                     Trabajadores verificados
                     <span className="count-chip">{data.trabajadoresVerificados.length}</span>
                   </h2>
-                  <p className="block-sub">Suspende o reactiva cuentas con el interruptor de estado.</p>
+                  <p className="block-sub">Toca un trabajador para ver su información. Suspende o reactiva cuentas con el interruptor de estado.</p>
                 </div>
                 <input
                   className="admin-search"
@@ -480,13 +486,36 @@ export default function AdminDashboardPage() {
                     <span role="columnheader">Estado</span>
                   </li>
                   {verificadosFiltrados.map((t) => (
-                    <li key={t.id} className={`admin-row ${t.activo ? '' : 'admin-row-off'}`} role="row">
+                    <li
+                      key={t.id}
+                      className={`admin-row ${t.activo ? '' : 'admin-row-off'}`}
+                      role="row"
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => setVerPerfilId(t.id)}
+                    >
                       <span className="admin-cell-who" role="cell">
-                        <Avatar nombre={t.nombre} foto={t.fotoPerfil} size={34} />
-                        <span>
-                          {t.nombre}
-                          <small className="admin-mail">{t.correo}</small>
-                        </span>
+                        <button
+                          type="button"
+                          title="Ver información del trabajador"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 10,
+                            background: 'none',
+                            border: 0,
+                            padding: 0,
+                            font: 'inherit',
+                            color: 'inherit',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <Avatar nombre={t.nombre} foto={t.fotoPerfil} size={34} />
+                          <span>
+                            {t.nombre}
+                            <small className="admin-mail">{t.correo}</small>
+                          </span>
+                        </button>
                       </span>
                       <span className="admin-cell" data-label="Oficios" role="cell">
                         {t.especialidades.map((e) => e.nombre).join(', ') || '—'}
@@ -503,12 +532,13 @@ export default function AdminDashboardPage() {
                           disabled={ocupado}
                           aria-pressed={t.activo}
                           title={t.activo ? 'Clic para suspender' : 'Clic para reactivar'}
-                          onClick={() =>
+                          onClick={(e) => {
+                            e.stopPropagation() // que no abra la ventanita del perfil
                             ejecutar(
                               { accion: 'alternarActivoTrabajador', trabajadorId: t.id },
                               t.activo ? `${t.nombre} fue suspendido.` : `${t.nombre} fue reactivado.`
                             )
-                          }
+                          }}
                         >
                           <span className="toggle-dot" aria-hidden="true" />
                           {t.activo ? 'Activo' : 'Suspendido'}
@@ -590,6 +620,22 @@ export default function AdminDashboardPage() {
         />
       )}
 
+      {perfil && (
+        <PerfilTrabajadorModal
+          trabajador={perfil}
+          ocupado={ocupado}
+          bloqueado={verTrabajador !== null}
+          onClose={() => setVerPerfilId(null)}
+          onDocumentos={() => setVerTrabajador({ id: perfil.id, nombre: perfil.nombre })}
+          onAlternar={() =>
+            ejecutar(
+              { accion: 'alternarActivoTrabajador', trabajadorId: perfil.id },
+              perfil.activo ? `${perfil.nombre} fue suspendido.` : `${perfil.nombre} fue reactivado.`
+            )
+          }
+        />
+      )}
+
       {verTrabajador && (
         <DocumentosModal
           trabajador={{ id: verTrabajador.id, nombre: verTrabajador.nombre }}
@@ -602,6 +648,122 @@ export default function AdminDashboardPage() {
           {toast}
         </div>
       )}
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Modal: información de un trabajador verificado                      */
+/* ------------------------------------------------------------------ */
+
+function PerfilTrabajadorModal({
+  trabajador: t,
+  ocupado,
+  bloqueado,
+  onClose,
+  onDocumentos,
+  onAlternar,
+}: {
+  trabajador: Verificado
+  ocupado: boolean
+  // true mientras está abierta otra ventana encima (documentos), para que Escape no cierre las dos
+  bloqueado: boolean
+  onClose: () => void
+  onDocumentos: () => void
+  onAlternar: () => void
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && !bloqueado && onClose()
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose, bloqueado])
+
+  const datos: { etiqueta: string; valor: ReactNode }[] = [
+    { etiqueta: 'Correo', valor: t.correo },
+    ...(t.telefono ? [{ etiqueta: 'Teléfono', valor: t.telefono }] : []),
+    {
+      etiqueta: 'Experiencia',
+      valor: t.anosExperiencia ? `${t.anosExperiencia} ${t.anosExperiencia === 1 ? 'año' : 'años'}` : 'Sin dato',
+    },
+    {
+      etiqueta: 'Trabajos terminados',
+      valor: `${t.trabajosCompletados} ${t.trabajosCompletados === 1 ? 'trabajo' : 'trabajos'}`,
+    },
+    { etiqueta: 'Calificación', valor: <Estrellas valor={t.calificacion} total={t.totalResenas} /> },
+    ...(t.fechaRegistro ? [{ etiqueta: 'Registro', valor: hace(t.fechaRegistro) }] : []),
+  ]
+
+  return (
+    <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && !bloqueado && onClose()}>
+      <div className="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="v-title">
+        <div className="modal-head">
+          <h2 id="v-title">Información del trabajador</h2>
+          <button type="button" className="icon-btn" onClick={onClose} aria-label="Cerrar">
+            <Icon name="close" />
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <Avatar nombre={t.nombre} foto={t.fotoPerfil} size={64} />
+          <div>
+            <p style={{ margin: 0, fontWeight: 700, fontSize: 18 }}>{t.nombre}</p>
+            <p className="verif" style={{ margin: '4px 0 6px' }}>
+              <Icon name="shield" size={14} /> Verificado
+            </p>
+            <span className={`tag ${t.activo ? 'tag-ok' : 'tag-urgente'}`}>{t.activo ? 'Activo' : 'Suspendido'}</span>
+          </div>
+        </div>
+
+        <div className="pend-tags" style={{ marginTop: 12 }}>
+          {t.especialidades.length === 0 ? (
+            <span className="chip-oficio chip-vacio">Sin oficios</span>
+          ) : (
+            t.especialidades.map((e) => (
+              <span key={e.id} className="chip-oficio">{e.nombre}</span>
+            ))
+          )}
+        </div>
+
+        <dl style={{ margin: '12px 0 0' }}>
+          {datos.map((d) => (
+            <div
+              key={d.etiqueta}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: 12,
+                padding: '9px 0',
+                borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+              }}
+            >
+              <dt className="muted small">{d.etiqueta}</dt>
+              <dd style={{ margin: 0, fontWeight: 600, textAlign: 'right', wordBreak: 'break-word' }}>{d.valor}</dd>
+            </div>
+          ))}
+        </dl>
+
+        {t.descripcion && <p className="pend-desc">{t.descripcion}</p>}
+
+        <div className="modal-actions" style={{ flexWrap: 'wrap' }}>
+          <button type="button" className="btn btn-ghost" onClick={onDocumentos}>
+            <Icon name="file" size={16} /> Ver documentos
+          </button>
+          {t.telefono && (
+            <a className="btn btn-ghost" href={`tel:${t.telefono}`}>
+              <Icon name="phone" size={16} /> Llamar
+            </a>
+          )}
+          <button
+            type="button"
+            className={t.activo ? 'btn btn-reject' : 'btn btn-primary'}
+            disabled={ocupado}
+            onClick={onAlternar}
+          >
+            {t.activo ? 'Suspender cuenta' : 'Reactivar cuenta'}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

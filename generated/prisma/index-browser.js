@@ -220,7 +220,8 @@ exports.Prisma.DireccionScalarFieldEnum = {
   referencias: 'referencias',
   latitud: 'latitud',
   longitud: 'longitud',
-  activa: 'activa'
+  activa: 'activa',
+  eliminada: 'eliminada'
 };
 
 exports.Prisma.CalificacionScalarFieldEnum = {

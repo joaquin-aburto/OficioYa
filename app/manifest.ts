@@ -1,19 +1,22 @@
-import type { MetadataRoute } from 'next'
+import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
+    id: '/',
     name: 'OficioYa',
     short_name: 'OficioYa',
-    description: 'Encuentra técnicos verificados cerca de ti.',
+    description: 'Encuentra y contrata trabajadores de oficio cerca de ti.',
     start_url: '/',
+    scope: '/',
     display: 'standalone',
-    background_color: '#F8FAF7',
-    theme_color: '#0F4C5C',
-    orientation: 'portrait-primary',
+    orientation: 'portrait',
+    background_color: '#ffffff',
+    theme_color: '#f97316',
     lang: 'es-MX',
     icons: [
-      { src: '/icon-light-32x32.png', sizes: '32x32', type: 'image/png' },
-      { src: '/apple-icon.png', sizes: '180x180', type: 'image/png', purpose: 'any' },
+      { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+      { src: '/icons/maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
     ],
-  }
+  };
 }
